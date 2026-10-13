@@ -1,15 +1,15 @@
-/* Layout Principal - Alto Fijo 100vh */
+/* Layout Principal - Alto Fijo 100vh exacto a admin-lista-jugadores y admin-editar-perfil */
 .cacc-layout {
   display: flex;
   height: 100vh;
   max-height: 100vh;
   width: 100%;
   background-color: #ECEFF1;
-  font-family: 'Segoe UI', system-ui, sans-serif;
+  font-family: 'Segoe UI', system-ui, -apple-system, BlinkMacSystemFont, Roboto, sans-serif;
   overflow: hidden;
 }
 
-/* Sidebar y Animación de Colapso */
+/* Sidebar y Animación de Colapso (280px Oficial) */
 .sidebar {
   width: 280px;
   min-width: 280px;
@@ -75,7 +75,7 @@
   font-size: 14px;
   font-weight: 500;
   cursor: pointer;
-  transition: background-color 0.2s;
+  transition: background-color 0.2s ease;
 }
 
   .nav-item:hover {
@@ -87,7 +87,7 @@
     font-weight: 600;
   }
 
-/* Sidebar Footer: Portales arriba de Cerrar Sesión */
+/* Sidebar Footer */
 .sidebar-footer {
   margin-top: auto;
   padding: 14px 14px 18px 14px;
@@ -169,7 +169,7 @@
   color: #1E293B;
   padding: 6px;
   border-radius: 6px;
-  transition: background-color 0.2s;
+  transition: background-color 0.2s ease;
 }
 
   .sidebar-toggle-btn:hover {
@@ -193,7 +193,7 @@
   user-select: none;
   padding: 6px 10px;
   border-radius: 8px;
-  transition: background-color 0.2s;
+  transition: background-color 0.2s ease;
 }
 
   .admin-profile:hover {
@@ -277,7 +277,7 @@
   align-items: center;
   gap: 10px;
   width: 100%;
-  transition: background-color 0.2s;
+  transition: background-color 0.2s ease;
 }
 
   .dropdown-item:hover {
@@ -300,20 +300,29 @@
     color: #B91C1C !important;
   }
 
-/* Área Central de Contenido */
+/* Área Central de Contenido con Scroll Controlado */
 .content-body {
-  padding: 16px 24px;
+  padding: 20px 30px;
   display: flex;
   flex-direction: column;
   flex: 1;
   min-height: 0;
-  overflow: hidden;
+  overflow-y: auto;
 }
+
+  .content-body::-webkit-scrollbar {
+    width: 6px;
+  }
+
+  .content-body::-webkit-scrollbar-thumb {
+    background: #CBD5E1;
+    border-radius: 4px;
+  }
 
 .load-state {
   text-align: center;
   padding: 40px;
-  font-size: 15px;
+  font-size: 14px;
   color: #475569;
 }
 
@@ -331,52 +340,38 @@
 .ficha-content-wrapper {
   display: flex;
   flex-direction: column;
-  flex: 1;
-  min-height: 0;
-  height: 100%;
-  gap: 12px;
+  gap: 16px;
+  width: 100%;
 }
 
 /* Grilla de 3 Columnas */
 .cards-grid-row {
   display: grid;
-  grid-template-columns: 1.05fr 1.35fr 1fr;
-  gap: 16px;
-  flex: 1;
-  min-height: 0;
-  overflow-y: auto;
-  padding-right: 4px;
+  grid-template-columns: 1fr 1fr 1.25fr;
+  gap: 20px;
+  align-items: start;
 }
-
-  .cards-grid-row::-webkit-scrollbar {
-    width: 6px;
-  }
-
-  .cards-grid-row::-webkit-scrollbar-thumb {
-    background: #CBD5E1;
-    border-radius: 4px;
-  }
 
 /* Tarjetas Principales */
 .card-box {
   background: #FFFFFF;
-  border-radius: 16px;
-  padding: 16px 18px;
+  border-radius: 14px;
+  padding: 20px;
+  border: 1px solid #E2E8F0;
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
   display: flex;
   flex-direction: column;
-  min-height: 0;
 }
 
 .photo-banner {
   display: flex;
   justify-content: center;
-  margin-bottom: 6px;
+  margin-bottom: 12px;
 }
 
 .avatar-banner-circle {
-  width: 52px;
-  height: 52px;
+  width: 64px;
+  height: 64px;
   border-radius: 50%;
   background: #D1FAE5;
   display: flex;
@@ -389,7 +384,7 @@
 }
 
 .player-name {
-  font-size: 15.5px;
+  font-size: 16px;
   font-weight: 800;
   color: #0F172A;
   margin: 0;
@@ -397,51 +392,94 @@
   letter-spacing: 0.3px;
 }
 
+.tags-header-row {
+  display: flex;
+  justify-content: center;
+  gap: 8px;
+  margin-top: 6px;
+}
+
 .player-pos-badge {
   display: inline-block;
   background: #E8F5E9;
   color: #007A3D;
-  font-size: 11.5px;
+  font-size: 11px;
   font-weight: 800;
-  padding: 2px 10px;
+  padding: 3px 10px;
   border-radius: 12px;
-  margin-top: 4px;
   text-transform: uppercase;
+  border: 1px solid #86EFAC;
+}
+
+.player-dni-badge {
+  display: inline-block;
+  background: #F1F5F9;
+  color: #475569;
+  font-size: 11px;
+  font-weight: 700;
+  padding: 3px 10px;
+  border-radius: 12px;
+  border: 1px solid #CBD5E1;
+}
+
+.category-pills-row {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 4px;
+  margin-top: 8px;
+}
+
+.category-pill {
+  display: inline-block;
+  background-color: #F8FAFC;
+  color: #007A3D;
+  padding: 2px 8px;
+  border-radius: 6px;
+  font-size: 11px;
+  font-weight: 700;
+  border: 1px solid #CBD5E1;
 }
 
 .card-divider {
   border: none;
   border-top: 1px solid #E2E8F0;
-  margin: 12px 0 8px 0;
+  margin: 16px 0 12px 0;
 }
 
 .section-subtitle {
   font-size: 12px;
   font-weight: 800;
-  color: #475569;
-  margin: 0 0 10px 0;
-  letter-spacing: 0.4px;
+  color: #64748B;
+  margin: 0 0 12px 0;
+  letter-spacing: 0.5px;
 }
 
 .card-title {
-  font-size: 14px;
+  font-size: 15px;
   font-weight: 800;
   color: #0F172A;
   margin: 0;
-  letter-spacing: 0.4px;
+  letter-spacing: 0.3px;
 }
 
 .card-header-row {
-  margin-bottom: 8px;
-  padding-bottom: 8px;
+  margin-bottom: 12px;
+  padding-bottom: 10px;
   border-bottom: 1px solid #E2E8F0;
+}
+
+.card-header-flex {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
 }
 
 /* Grilla Datos Personales */
 .personal-data-grid {
   display: grid;
   grid-template-columns: 1fr 1fr;
-  gap: 8px;
+  gap: 10px;
 }
 
 .data-item-card {
@@ -451,16 +489,7 @@
   background-color: #F8FAFC;
   border: 1px solid #E2E8F0;
   border-radius: 8px;
-  padding: 7px 10px;
-  transition: border-color 0.2s;
-}
-
-  .data-item-card:hover {
-    border-color: #CBD5E1;
-  }
-
-.tutor-card {
-  grid-column: span 1;
+  padding: 8px 12px;
 }
 
 .data-icon {
@@ -478,15 +507,14 @@
 }
 
 .data-label {
-  font-size: 10.5px;
+  font-size: 11px;
   font-weight: 700;
   color: #64748B;
   text-transform: uppercase;
-  letter-spacing: 0.2px;
 }
 
 .data-val {
-  font-size: 12.5px;
+  font-size: 13px;
   font-weight: 700;
   color: #1E293B;
   white-space: nowrap;
@@ -503,27 +531,132 @@
   display: flex;
   align-items: center;
   gap: 10px;
-  margin-top: 8px;
+  margin-top: 10px;
   padding: 8px 12px;
   background-color: #F8FAFC;
   border-radius: 8px;
   border: 1px solid #E2E8F0;
 }
 
-/* Tabla de Partidos Optimizada */
-.match-table-responsive {
-  flex: 1;
-  overflow-x: hidden;
-  overflow-y: auto;
+/* Bloque Tutor Unificado */
+.tutor-section-box {
+  margin-top: 4px;
+}
+
+.tutor-header-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 6px;
+}
+
+.badge-req {
+  font-size: 10px;
+  font-weight: 800;
+  color: #DC2626;
+  background-color: #FEE2E2;
+  border: 1px solid #FCA5A5;
+  padding: 2px 8px;
+  border-radius: 12px;
+  text-transform: uppercase;
+}
+
+.full-span {
+  grid-column: span 2;
+}
+
+.mb-0 {
+  margin-bottom: 0 !important;
+}
+
+/* Barra de Filtro de Partidos */
+.partidos-filter-toolbar {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background-color: #F8FAFC;
   border: 1px solid #E2E8F0;
   border-radius: 8px;
-  min-height: 0;
+  padding: 6px 10px;
+  margin-bottom: 12px;
+}
+
+.filter-label {
+  font-size: 12px;
+  font-weight: 700;
+  color: #475569;
+  white-space: nowrap;
+}
+
+.select-box {
+  position: relative;
+  display: flex;
+  align-items: center;
+  width: 100%;
+}
+
+.select-filtro-categoria select {
+  width: 100%;
+  height: 34px;
+  appearance: none;
+  padding: 0 32px 0 10px;
+  border: 1px solid #CBD5E1;
+  border-radius: 6px;
+  font-size: 12.5px;
+  color: #334155;
   background-color: #FFFFFF;
+  outline: none;
+  cursor: pointer;
+}
+
+.select-arrow {
+  position: absolute;
+  right: 10px;
+  pointer-events: none;
+  display: flex;
+  align-items: center;
+}
+
+/* Píldoras G / E / P */
+.stats-pills-row {
+  display: flex;
+  gap: 6px;
+}
+
+.badge-count {
+  display: inline-block;
+  padding: 2px 8px;
+  border-radius: 6px;
+  font-size: 11px;
+  font-weight: 800;
+  white-space: nowrap;
+}
+
+.badge-res-g {
+  background-color: #DCFCE7;
+  color: #15803D;
+}
+
+.badge-res-e {
+  background-color: #FEF3C7;
+  color: #B45309;
+}
+
+.badge-res-p {
+  background-color: #FEE2E2;
+  color: #B91C1C;
+}
+
+/* Tabla de Partidos */
+.match-table-responsive {
+  border: 1px solid #E2E8F0;
+  border-radius: 8px;
+  overflow-x: auto;
+  max-height: 240px;
 }
 
   .match-table-responsive::-webkit-scrollbar {
-    width: 4px;
-    height: 0px;
+    width: 6px;
   }
 
   .match-table-responsive::-webkit-scrollbar-thumb {
@@ -534,114 +667,83 @@
 .match-table {
   width: 100%;
   border-collapse: collapse;
-  font-size: 11.5px;
-  table-layout: fixed;
+  font-size: 12.5px;
 }
 
   .match-table th {
     background-color: #007A3D;
     color: #FFFFFF;
-    padding: 8px 6px;
+    padding: 8px 10px;
     font-weight: 700;
+    text-align: left;
+    font-size: 11.5px;
     position: sticky;
     top: 0;
     z-index: 1;
-    font-size: 10px;
-    letter-spacing: 0.3px;
-    white-space: nowrap;
   }
 
   .match-table td {
-    padding: 6px 6px;
+    padding: 8px 10px;
     border-bottom: 1px solid #F1F5F9;
     color: #334155;
     vertical-align: middle;
   }
 
-/* Proporciones calibradas para evitar cortes de texto */
-.th-fecha, .td-fecha {
-  width: 74px;
-  text-align: center;
-}
-
-.th-rival {
-  text-align: left;
-  padding-left: 8px;
-}
-
-.td-rival {
-  text-align: left;
-  padding-left: 8px;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  max-width: 0;
-}
-
-.th-condicion, .td-condicion {
-  width: 72px;
-  text-align: center;
-}
-
-.th-resultado, .td-resultado {
-  width: 78px;
-  text-align: center;
-}
-
-.th-minutos, .td-minutos {
-  width: 62px;
-  text-align: center;
-  font-weight: 700;
-}
-
-.badge-condicion {
-  padding: 2px 6px;
-  border-radius: 8px;
+.badge-division-mini {
+  background-color: #F1F5F9;
+  color: #007A3D;
   font-size: 10px;
-  font-weight: 600;
+  font-weight: 700;
+  padding: 2px 6px;
+  border-radius: 4px;
+  border: 1px solid #CBD5E1;
+}
+
+.badge-posicion {
   display: inline-block;
-}
-
-.badge-local {
-  background-color: #E8F5E9;
-  color: #1B5E20;
-}
-
-.badge-visitante {
-  background-color: #E2E8F0;
-  color: #475569;
+  background-color: #F8FAFC;
+  color: #334155;
+  padding: 2px 6px;
+  border-radius: 6px;
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  border: 1px solid #CBD5E1;
 }
 
 .badge-resultado {
-  padding: 2px 5px;
+  padding: 2px 6px;
   border-radius: 4px;
-  font-size: 10.5px;
-  font-weight: 700;
+  font-weight: 800;
+  font-size: 11px;
 }
 
 .res-g {
-  color: #007A3D;
-}
-
-.res-p {
-  color: #DC2626;
+  background-color: #DCFCE7;
+  color: #15803D;
 }
 
 .res-e {
-  color: #D97706;
+  background-color: #FEF3C7;
+  color: #B45309;
+}
+
+.res-p {
+  background-color: #FEE2E2;
+  color: #B91C1C;
 }
 
 .no-records {
   text-align: center;
   color: #94A3B8;
-  padding: 24px;
+  padding: 20px;
 }
 
 .total-minutos-footer {
   display: flex;
   justify-content: flex-end;
   gap: 8px;
-  padding: 8px 4px 4px 4px;
+  padding: 10px 4px 4px 4px;
   font-size: 12px;
   color: #0F172A;
 }
@@ -655,15 +757,31 @@
   color: #007A3D;
 }
 
-.match-action-box {
-  margin-top: 6px;
+.match-action-box,
+.medical-action-box {
+  margin-top: 12px;
 }
 
-.btn-full-history {
+.btn-card-action {
   width: 100%;
-  font-size: 12.5px;
-  padding: 7px 10px;
+  height: 38px;
+  background: #FFFFFF;
+  border: 1px solid #007A3D;
+  color: #007A3D;
+  padding: 0 14px;
+  border-radius: 8px;
+  font-weight: 700;
+  font-size: 13px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background-color 0.2s ease;
 }
+
+  .btn-card-action:hover {
+    background-color: #E6F4EA;
+  }
 
 /* Ficha Médica y Lesiones */
 .medical-section {
@@ -672,10 +790,10 @@
 }
 
 .medical-subtitle {
-  font-size: 11.5px;
+  font-size: 12px;
   font-weight: 700;
-  color: #475569;
-  margin-bottom: 4px;
+  color: #334155;
+  margin-bottom: 5px;
   text-transform: uppercase;
 }
 
@@ -683,11 +801,11 @@
   background-color: #F8FAFC;
   border: 1px solid #E2E8F0;
   border-radius: 8px;
-  padding: 8px 10px;
-  font-size: 12px;
+  padding: 10px 12px;
+  font-size: 13px;
   color: #334155;
-  line-height: 1.35;
-  min-height: 44px;
+  line-height: 1.4;
+  min-height: 48px;
 }
 
 .medical-empty {
@@ -698,20 +816,10 @@
 .lesiones-container {
   display: flex;
   flex-direction: column;
-  gap: 5px;
-  max-height: 115px;
+  gap: 6px;
+  max-height: 120px;
   overflow-y: auto;
-  padding-right: 2px;
 }
-
-  .lesiones-container::-webkit-scrollbar {
-    width: 4px;
-  }
-
-  .lesiones-container::-webkit-scrollbar-thumb {
-    background: #CBD5E1;
-    border-radius: 4px;
-  }
 
 .lesion-item-row {
   display: flex;
@@ -721,9 +829,9 @@
   border: 1px solid #E2E8F0;
   border-radius: 6px;
   padding: 6px 10px;
-  font-size: 12px;
+  font-size: 12.5px;
   color: #1E293B;
-  font-weight: 500;
+  font-weight: 600;
 }
 
 .lesion-dot {
@@ -734,36 +842,16 @@
   flex-shrink: 0;
 }
 
-.lesion-text {
-  flex: 1;
-  line-height: 1.3;
-}
-
-.medical-action-box {
-  margin-top: auto;
-  padding-top: 8px;
-  text-align: center;
-}
-
-.btn-ficha-completa {
-  width: 100%;
-  font-size: 12.5px;
-  padding: 7px 10px;
-}
-
 /* Footer de Acciones Inferior */
 .bottom-actions-row {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 10px 20px;
+  padding: 14px 20px;
   background-color: #FFFFFF;
-  border-radius: 12px;
+  border-radius: 14px;
+  border: 1px solid #E2E8F0;
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
-  margin-top: auto;
-  flex-shrink: 0;
-  width: 100%;
-  box-sizing: border-box;
 }
 
 .right-actions-group {
@@ -771,11 +859,11 @@
   gap: 12px;
 }
 
-.btn-action-outline {
+.btn-cancel {
   background: #FFFFFF;
-  border: 1.5px solid #007A3D;
-  color: #007A3D;
-  padding: 7px 18px;
+  border: 1.5px solid #CBD5E1;
+  color: #475569;
+  padding: 8px 18px;
   border-radius: 8px;
   font-size: 13px;
   font-weight: 700;
@@ -783,21 +871,21 @@
   transition: all 0.2s ease;
 }
 
-  .btn-action-outline:hover {
-    background-color: #007A3D;
-    color: #FFFFFF;
+  .btn-cancel:hover {
+    background-color: #F8FAFC;
+    border-color: #94A3B8;
   }
 
 .btn-solid-green {
   background-color: #007A3D;
   color: #FFFFFF;
   border: none;
-  padding: 7px 22px;
+  padding: 8px 22px;
   border-radius: 8px;
   font-size: 13px;
   font-weight: 700;
   cursor: pointer;
-  display: flex;
+  display: inline-flex;
   align-items: center;
   gap: 8px;
   transition: background-color 0.2s ease;
@@ -815,8 +903,8 @@
   position: fixed;
   top: 0;
   left: 0;
-  width: 100%;
-  height: 100%;
+  width: 100vw;
+  height: 100vh;
   background: rgba(15, 23, 42, 0.5);
   backdrop-filter: blur(2px);
   z-index: 1000;
@@ -836,7 +924,7 @@
 }
 
 .popup-card-large {
-  width: 720px;
+  width: 740px;
 }
 
 .popup-card-header {
@@ -881,35 +969,27 @@
 }
 
 .modal-table {
-  max-height: 300px;
-}
-
-.modal-lesiones {
-  max-height: 160px;
-  margin-top: 6px;
-}
-
-.popup-item strong {
-  font-size: 12.5px;
-  color: #0F172A;
-}
-
-.popup-item p {
-  margin: 3px 0 0 0;
-  color: #475569;
-  font-size: 12.5px;
-  line-height: 1.4;
+  max-height: 280px;
 }
 
 .popup-footer {
-  text-align: right;
-  padding-top: 6px;
+  display: flex;
+  justify-content: flex-end;
+  padding-top: 8px;
+  border-top: 1px solid #E2E8F0;
 }
 
 .mt-2 {
-  margin-top: 8px;
+  margin-top: 12px;
 }
 
 .ml-2 {
   margin-left: 8px;
+}
+
+/* Responsive Grid */
+@media (max-width: 1024px) {
+  .cards-grid-row {
+    grid-template-columns: 1fr;
+  }
 }

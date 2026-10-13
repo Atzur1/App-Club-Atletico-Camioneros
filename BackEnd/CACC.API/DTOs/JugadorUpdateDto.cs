@@ -1,5 +1,4 @@
-using System;
-using System.Collections.Generic;
+using System.Text.Json;
 using System.Text.Json.Serialization;
 
 namespace CACC.API.DTOs
@@ -15,20 +14,8 @@ namespace CACC.API.DTOs
         [JsonPropertyName("dni")]
         public string Dni { get; set; } = string.Empty;
 
-        [JsonPropertyName("genero")]
-        public string? Genero { get; set; }
-
         [JsonPropertyName("fechaNacimiento")]
         public DateTime? FechaDeNacimiento { get; set; }
-
-        [JsonPropertyName("domicilio")]
-        public string? Domicilio { get; set; }
-
-        [JsonPropertyName("idCategoria")]
-        public int IdCategoria { get; set; }
-
-        [JsonPropertyName("clubOrigen")]
-        public string? ClubOrigen { get; set; }
 
         [JsonPropertyName("posicion")]
         public string? Posicion { get; set; }
@@ -36,7 +23,9 @@ namespace CACC.API.DTOs
         [JsonPropertyName("peso")]
         public decimal? Peso { get; set; }
 
+        // Convertidor tolerante a comas, puntos y números directos
         [JsonPropertyName("altura")]
+        [JsonConverter(typeof(FlexibleDecimalConverter))]
         public decimal? Altura { get; set; }
 
         [JsonPropertyName("pieHabil")]
@@ -47,6 +36,38 @@ namespace CACC.API.DTOs
 
         [JsonPropertyName("partidos")]
         public List<PartidoUpdateDto> Partidos { get; set; } = new List<PartidoUpdateDto>();
+    }
+
+    public class FlexibleDecimalConverter : JsonConverter<decimal?>
+    {
+        public override decimal? Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
+        {
+            if (reader.TokenType == JsonTokenType.Null)
+                return null;
+
+            if (reader.TokenType == JsonTokenType.Number)
+                return reader.GetDecimal();
+
+            if (reader.TokenType == JsonTokenType.String)
+            {
+                var stringValue = reader.GetString()?.Trim().Replace(',', '.');
+                if (string.IsNullOrWhiteSpace(stringValue))
+                    return null;
+
+                if (decimal.TryParse(stringValue, System.Globalization.NumberStyles.Any, System.Globalization.CultureInfo.InvariantCulture, out var decimalVal))
+                    return decimalVal;
+            }
+
+            return null;
+        }
+
+        public override void Write(Utf8JsonWriter writer, decimal? value, JsonSerializerOptions options)
+        {
+            if (value.HasValue)
+                writer.WriteNumberValue(value.Value);
+            else
+                writer.WriteNullValue();
+        }
     }
 
     public class FichaMedicaUpdateDto

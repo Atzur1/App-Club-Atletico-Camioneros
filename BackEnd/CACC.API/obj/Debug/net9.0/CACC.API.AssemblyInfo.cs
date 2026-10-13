@@ -13,7 +13,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("CACC.API")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+c6aa1c471b8ba6a449f93897edadebc92fa9d961")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+93855b5a577839810faf6525a0c25cb9a6bd7d48")]
 [assembly: System.Reflection.AssemblyProductAttribute("CACC.API")]
 [assembly: System.Reflection.AssemblyTitleAttribute("CACC.API")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]

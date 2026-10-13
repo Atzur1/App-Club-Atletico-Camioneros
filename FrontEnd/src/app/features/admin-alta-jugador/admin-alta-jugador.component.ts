@@ -70,6 +70,8 @@ export class AdminAltaJugadorComponent implements OnInit {
   tutorEmail = '';
   tutorParentesco = 'Padre';
   tutorParentescoOtro = '';
+  buscandoTutor = false;
+  tutorEncontradoMensaje = '';
 
   edadCalculada: number | null = null;
   esMenorDeEdad = true;
@@ -186,32 +188,33 @@ export class AdminAltaJugadorComponent implements OnInit {
     this.tutorEmail = '';
     this.tutorParentesco = 'Padre';
     this.tutorParentescoOtro = '';
+    this.tutorEncontradoMensaje = '';
   }
 
+  // Búsqueda directa en el endpoint de tutores por DNI
   buscarTutor(): void {
     const dniLimpio = this.tutorDni.trim();
     if (!this.esMenorDeEdad || !dniLimpio) return;
 
-    this.http.get<any[]>('http://localhost:5191/api/jugadores').subscribe({
-      next: (data) => {
-        const jugadorConTutor = data.find(j => {
-          const t = j.tutor || j.Tutor;
-          return t && t.dni === dniLimpio;
-        });
+    this.buscandoTutor = true;
+    this.tutorEncontradoMensaje = '';
 
-        const tutor = jugadorConTutor?.tutor || jugadorConTutor?.Tutor;
-        if (tutor && tutor.nombre) {
-          this.tutorNombre = tutor.nombre || '';
-          this.tutorApellido = tutor.apellido || '';
-          this.tutorTelefono = tutor.telefono || '';
-          this.tutorEmail = tutor.email || '';
-          this.tutorParentesco = tutor.parentesco || 'Padre';
-        } else {
-          alert('No se encontró un tutor previo con ese DNI. Por favor complete los datos manualmente para registrarlo.');
+    this.http.get<any>(`http://localhost:5191/api/jugadores/tutores/${dniLimpio}`).subscribe({
+      next: (data) => {
+        this.buscandoTutor = false;
+        this.tutorNombre = data.nombre || '';
+        this.tutorApellido = data.apellido || '';
+        this.tutorTelefono = data.telefono || '';
+        this.tutorEmail = data.email || '';
+        if (data.parentesco) {
+          this.tutorParentesco = data.parentesco;
         }
+        this.tutorEncontradoMensaje = `Tutor existente encontrado: ${data.nombre} ${data.apellido}. Datos autocompletados.`;
       },
       error: () => {
-        alert('No se encontró un tutor previo con ese DNI. Por favor complete los datos manualmente para registrarlo.');
+        this.buscandoTutor = false;
+        this.tutorEncontradoMensaje = '';
+        alert('No se encontró ningún tutor previo con ese DNI. Por favor complete los datos manualmente para registrarlo.');
       }
     });
   }
