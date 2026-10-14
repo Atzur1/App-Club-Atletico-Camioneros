@@ -22,9 +22,9 @@ namespace CACC.DAO
 
             // Consultamos la vista de estado de deuda uniendo con personas por DNI
             var query = @"
-                SELECT v.PK_id_jugador, v.deuda_total, v.cantidad_cuotas_vencidas 
+                SELECT v.FK_id_jugador, v.deuda_total, v.cantidad_cuotas_vencidas
                 FROM VISTA_ESTADO_DEUDA v
-                INNER JOIN JUGADORES j ON v.PK_id_jugador = j.PK_id_jugador
+                INNER JOIN JUGADORES j ON v.FK_id_jugador = j.PK_id_jugador
                 INNER JOIN PERSONAS p ON j.FK_id_persona = p.PK_id_persona
                 WHERE p.dni = @Dni";
 
@@ -36,7 +36,7 @@ namespace CACC.DAO
             {
                 return new EstadoDeuda
                 {
-                    IdJugador = reader.GetInt32(reader.GetOrdinal("PK_id_jugador")),
+                    IdJugador = reader.GetInt32(reader.GetOrdinal("FK_id_jugador")),
                     DeudaTotal = reader.GetDecimal(reader.GetOrdinal("deuda_total")),
                     CantidadCuotasVencidas = reader.GetInt32(reader.GetOrdinal("cantidad_cuotas_vencidas"))
                 };
@@ -50,9 +50,9 @@ namespace CACC.DAO
             using var connection = new SqlConnection(_connectionString);
             await connection.OpenAsync();
 
-            // 1. Primero obtenemos el ID de la persona a partir del DNI
-            var queryPersona = "SELECT PK_id_persona FROM PERSONAS WHERE dni = @Dni";
-            int? idPersona = null;
+            // Resolve the player from the DNI; ASISTENCIAS is player/staff based in the current schema.
+            var queryPersona = "SELECT j.PK_id_jugador FROM JUGADORES j INNER JOIN PERSONAS p ON p.PK_id_persona=j.FK_id_persona WHERE p.dni=@Dni";
+            int? idJugador = null;
 
             using (var cmdPersona = new SqlCommand(queryPersona, connection))
             {
@@ -60,20 +60,20 @@ namespace CACC.DAO
                 var result = await cmdPersona.ExecuteScalarAsync();
                 if (result != null)
                 {
-                    idPersona = Convert.ToInt32(result);
+                    idJugador = Convert.ToInt32(result);
                 }
             }
 
-            if (idPersona == null) return false;
+            if (idJugador == null) return false;
 
             // 2. Registramos la asistencia
             var queryAsistencia = @"
-                INSERT INTO ASISTENCIAS (FK_id_persona, fecha_hora, estado_acceso, observaciones)
-                VALUES (@IdPersona, GETDATE(), @EstadoAcceso, @Observaciones)";
+                INSERT INTO ASISTENCIAS (FK_id_jugador, fecha_hora, estado_acceso, observaciones)
+                VALUES (@IdJugador, GETDATE(), @EstadoAcceso, @Observaciones)";
 
             using var cmdAsistencia = new SqlCommand(queryAsistencia, connection);
-            cmdAsistencia.Parameters.AddWithValue("@IdPersona", idPersona.Value);
-            cmdAsistencia.Parameters.AddWithValue("@EstadoAcceso", estadoAcceso);
+            cmdAsistencia.Parameters.AddWithValue("@IdJugador", idJugador.Value);
+            cmdAsistencia.Parameters.AddWithValue("@EstadoAcceso", estadoAcceso ? "PERMITIDO" : "DENEGADO");
             cmdAsistencia.Parameters.AddWithValue("@Observaciones", (object?)observaciones ?? DBNull.Value);
 
             int filasAfectadas = await cmdAsistencia.ExecuteNonQueryAsync();

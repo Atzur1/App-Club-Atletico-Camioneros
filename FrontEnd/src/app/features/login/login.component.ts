@@ -88,9 +88,8 @@ export class LoginComponent {
           return;
         }
 
-        // Fallback: Si no coincide ninguno, mandar a selección de portales por ser usuario autenticado
-        console.warn('Rol no contemplado, fallback a /seleccion-portales');
-        this.router.navigate(['/seleccion-portales']);
+        console.warn('Rol sin portal habilitado');
+        this.router.navigate(['/sin-autorizacion']);
       },
       error: (err) => {
         this.isLoading = false;

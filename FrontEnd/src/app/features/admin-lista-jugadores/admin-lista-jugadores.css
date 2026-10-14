@@ -616,19 +616,14 @@
   transition: all 0.2s ease;
 }
 
-.view-btn,
-.edit-btn {
-  color: #007A3D;
-}
-
 .view-btn:hover {
   background-color: #D1FAE5;
   border-color: #007A3D;
 }
 
 .edit-btn:hover {
-  background-color: #D1FAE5;
-  border-color: #007A3D;
+  background-color: #DBEAFE;
+  border-color: #2563EB;
 }
 
 .tutor-btn:hover {

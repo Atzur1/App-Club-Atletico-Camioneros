@@ -1,7 +1,10 @@
 import { Routes } from '@angular/router';
 import { LoginComponent } from './features/login/login.component';
+import { authGuard } from './core/guards/auth.guard';
+import { capabilityGuard } from './core/guards/capability.guard';
+import { Capability } from './core/auth/roles';
 
-export const routes: Routes = [
+const applicationRoutes: Routes = [
   // 1. Redirección inicial: Si entran a la raíz, los mandamos al login
   {
     path: '',
@@ -57,34 +60,10 @@ export const routes: Routes = [
         (m) => m.AdminListaJugadores
       )
   },
-  {
-    path: 'admin/jugador/:id',
-    loadComponent: () =>
-      import('./features/admin-ficha-jugador/admin-ficha-jugador').then(
-        (m) => m.AdminFichaJugador
-      )
-  },
-  {
-    path: 'admin/ficha-jugador/:id',
-    loadComponent: () =>
-      import('./features/admin-ficha-jugador/admin-ficha-jugador').then(
-        (m) => m.AdminFichaJugador
-      )
-  },
-  {
-    path: 'admin-ficha-jugador/:id',
-    loadComponent: () =>
-      import('./features/admin-ficha-jugador/admin-ficha-jugador').then(
-        (m) => m.AdminFichaJugador
-      )
-  },
-  {
-    path: 'admin-ficha-jugador',
-    loadComponent: () =>
-      import('./features/admin-ficha-jugador/admin-ficha-jugador').then(
-        (m) => m.AdminFichaJugador
-      )
-  },
+  { path: 'admin/jugador/:id', redirectTo: 'jugadores/:id' },
+  { path: 'admin/ficha-jugador/:id', redirectTo: 'jugadores/:id' },
+  { path: 'admin-ficha-jugador/:id', redirectTo: 'jugadores/:id' },
+  { path: 'admin-ficha-jugador', redirectTo: 'admin/lista-jugadores', pathMatch: 'full' },
   {
     path: 'admin/editar-perfil/:id',
     loadComponent: () =>
@@ -92,13 +71,7 @@ export const routes: Routes = [
         (m) => m.AdminEditarPerfil
       )
   },
-  {
-    path: 'admin/editar-perfil',
-    loadComponent: () =>
-      import('./features/admin-editar-perfil/admin-editar-perfil').then(
-        (m) => m.AdminEditarPerfil
-      )
-  },
+  { path: 'admin/editar-perfil', redirectTo: 'admin/lista-jugadores', pathMatch: 'full' },
   {
     path: 'admin-editar-perfil/:id',
     loadComponent: () =>
@@ -106,13 +79,7 @@ export const routes: Routes = [
         (m) => m.AdminEditarPerfil
       )
   },
-  {
-    path: 'admin-editar-perfil',
-    loadComponent: () =>
-      import('./features/admin-editar-perfil/admin-editar-perfil').then(
-        (m) => m.AdminEditarPerfil
-      )
-  },
+  { path: 'admin-editar-perfil', redirectTo: 'admin/lista-jugadores', pathMatch: 'full' },
   {
     path: 'admin-lista-jugadores',
     loadComponent: () =>
@@ -252,39 +219,12 @@ export const routes: Routes = [
   },
   {
     path: 'medico',
-    loadComponent: () =>
-      import('./features/medico-home/medico-home.component').then(
-        (m) => m.MedicoHomeComponent
-      )
+    loadComponent: () => import('./features/admin-home/admin-home.component').then(m => m.AdminHomeComponent)
   },
-  {
-    path: 'medico/ficha-jugador/:id',
-    loadComponent: () =>
-      import('./features/medico-ficha-jugador/medico-ficha-jugador.component').then(
-        (m) => m.MedicoFichaJugadorComponent
-      )
-  },
-  {
-    path: 'medico/ficha-jugador',
-    loadComponent: () =>
-      import('./features/medico-ficha-jugador/medico-ficha-jugador.component').then(
-        (m) => m.MedicoFichaJugadorComponent
-      )
-  },
-  {
-    path: 'medico-ficha-jugador/:id',
-    loadComponent: () =>
-      import('./features/medico-ficha-jugador/medico-ficha-jugador.component').then(
-        (m) => m.MedicoFichaJugadorComponent
-      )
-  },
-  {
-    path: 'medico-ficha-jugador',
-    loadComponent: () =>
-      import('./features/medico-ficha-jugador/medico-ficha-jugador.component').then(
-        (m) => m.MedicoFichaJugadorComponent
-      )
-  },
+  { path: 'medico/ficha-jugador/:id', redirectTo: 'jugadores/:id' },
+  { path: 'medico/ficha-jugador', redirectTo: 'medico/lista-jugadores', pathMatch: 'full' },
+  { path: 'medico-ficha-jugador/:id', redirectTo: 'jugadores/:id' },
+  { path: 'medico-ficha-jugador', redirectTo: 'medico/lista-jugadores', pathMatch: 'full' },
   {
     path: 'medico/editar-ficha/:id',
     loadComponent: () =>
@@ -301,93 +241,36 @@ export const routes: Routes = [
   },
   {
     path: 'medico/lista-jugadores',
-    loadComponent: () =>
-      import('./features/medico-lista-jugadores/medico-lista-jugadores.component').then(
-        (m) => m.MedicoListaJugadoresComponent
-      )
+    loadComponent: () => import('./features/admin-lista-jugadores/admin-lista-jugadores').then(m => m.AdminListaJugadores)
   },
-  {
-    path: 'medico-lista-jugadores',
-    loadComponent: () =>
-      import('./features/medico-lista-jugadores/medico-lista-jugadores.component').then(
-        (m) => m.MedicoListaJugadoresComponent
-      )
-  },
+  { path: 'medico-lista-jugadores', redirectTo: 'medico/lista-jugadores', pathMatch: 'full' },
   {
     path: 'medico/categorias',
-    loadComponent: () =>
-      import('./features/medico-seleccion-categorias/medico-seleccion-categorias.component').then(
-        (m) => m.MedicoSeleccionCategoriasComponent
-      )
+    loadComponent: () => import('./features/admin-lista-categoria/admin-lista-categoria').then(m => m.AdminListaCategoria)
   },
-  {
-    path: 'medico/categoria-jugadores',
-    loadComponent: () =>
-      import('./features/medico-categoria-jugadores/medico-categoria-jugadores.component').then(
-        (m) => m.MedicoCategoriaJugadoresComponent
-      )
-  },
+  { path: 'medico/categoria-jugadores', redirectTo: 'medico/categorias', pathMatch: 'full' },
   {
     path: 'dt',
-    loadComponent: () =>
-      import('./features/dt-home/dt-home.component').then(
-        (m) => m.DtHomeComponent
-      )
+    loadComponent: () => import('./features/admin-home/admin-home.component').then(m => m.AdminHomeComponent)
   },
   {
     path: 'profesor',
     redirectTo: 'dt',
     pathMatch: 'full'
   },
-  {
-    path: 'dt/jugador/:id',
-    loadComponent: () =>
-      import('./features/dt-ficha-jugador/dt-ficha-jugador.component').then(
-        (m) => m.DtFichaJugadorComponent
-      )
-  },
-  {
-    path: 'dt-ficha-jugador',
-    loadComponent: () =>
-      import('./features/dt-ficha-jugador/dt-ficha-jugador.component').then(
-        (m) => m.DtFichaJugadorComponent
-      )
-  },
+  { path: 'dt/jugador/:id', redirectTo: 'jugadores/:id' },
+  { path: 'dt-ficha-jugador', redirectTo: 'dt-categoria-jugadores', pathMatch: 'full' },
   {
     path: 'dt/categorias',
-    loadComponent: () =>
-      import('./features/dt-categoria/dt-categoria.component').then(
-        (m) => m.DtCategoriaComponent
-      )
+    loadComponent: () => import('./features/admin-lista-categoria/admin-lista-categoria').then(m => m.AdminListaCategoria)
   },
-  {
-    path: 'dt/categoria',
-    loadComponent: () =>
-      import('./features/dt-categoria/dt-categoria.component').then(
-        (m) => m.DtCategoriaComponent
-      )
-  },
-  {
-    path: 'dt-categoria',
-    loadComponent: () =>
-      import('./features/dt-categoria/dt-categoria.component').then(
-        (m) => m.DtCategoriaComponent
-      )
-  },
+  { path: 'dt/categoria', redirectTo: 'dt/categorias', pathMatch: 'full' },
+  { path: 'dt-categoria', redirectTo: 'dt/categorias', pathMatch: 'full' },
   {
     path: 'dt-categoria-jugadores',
-    loadComponent: () =>
-      import('./features/dt-categoria-jugadores/dt-categoria-jugadores').then(
-        (m) => m.DtCategoriaJugadoresComponent
-      )
+    loadComponent: () => import('./features/admin-lista-jugadores/admin-lista-jugadores').then(m => m.AdminListaJugadores)
   },
-  {
-    path: 'dt/categoria-jugadores',
-    loadComponent: () =>
-      import('./features/dt-categoria-jugadores/dt-categoria-jugadores').then(
-        (m) => m.DtCategoriaJugadoresComponent
-      )
-  },
+  { path: 'dt/categoria-jugadores', redirectTo: 'dt-categoria-jugadores', pathMatch: 'full' },
   {
     path: 'dt-editar-historial',
     loadComponent: () =>
@@ -404,25 +287,13 @@ export const routes: Routes = [
   },
   {
     path: 'coordinador',
-    loadComponent: () =>
-      import('./features/dashboard-coordinador/dashboard-coordinador').then(
-        (m) => m.DashboardCoordinador
-      )
+    loadComponent: () => import('./features/admin-home/admin-home.component').then(m => m.AdminHomeComponent)
   },
   {
     path: 'coordinador-seleccion-categorias',
-    loadComponent: () =>
-      import('./features/coordinador-seleccion-categorias/coordinador-seleccion-categorias').then(
-        (m) => m.CoordinadorSeleccionCategorias
-      )
+    loadComponent: () => import('./features/admin-lista-categoria/admin-lista-categoria').then(m => m.AdminListaCategoria)
   },
-  {
-    path: 'coordinador/visualizar-plantel',
-    loadComponent: () =>
-      import('./features/coordinador-visualizar-plantel/coordinador-visualizar-plantel').then(
-        (m) => m.CoordinadorVisualizarPlantel
-      )
-  },
+  { path: 'coordinador/visualizar-plantel', redirectTo: 'coordinador-seleccion-categorias', pathMatch: 'full' },
   {
     path: 'coordinador/visualizar-staff',
     loadComponent: () =>
@@ -430,13 +301,7 @@ export const routes: Routes = [
         (m) => m.CoordinadorVisualizarStaff
       )
   },
-  {
-    path: 'coordinador/visualizar-perfil',
-    loadComponent: () =>
-      import('./features/coordinador-visualizar-perfil/coordinador-visualizar-perfil').then(
-        (m) => m.CoordinadorVisualizarPerfil
-      )
-  },
+  { path: 'coordinador/visualizar-perfil/:id', redirectTo: 'jugadores/:id' },
   {
     path: 'coordinador/visualizar-perfil-staff',
     loadComponent: () =>
@@ -460,9 +325,52 @@ export const routes: Routes = [
   },
   {
     path: 'coordinador-lista-jugadores',
-    loadComponent: () =>
-      import('./features/coordinador-lista-jugadores/coordinador-lista-jugadores').then(
-        (m) => m.CoordinadorListaJugadores
-      )
+    loadComponent: () => import('./features/admin-lista-jugadores/admin-lista-jugadores').then(m => m.AdminListaJugadores)
+  },
+  {
+    path: 'semaforo-qr',
+    loadComponent: () => import('./features/qr-scanner/qr-scanner.component').then(m => m.QrScannerComponent)
+  }
+];
+
+function capabilitiesFor(path: string): Capability[] {
+  if (path.startsWith('medico/editar-ficha') || path.startsWith('medico-editar-ficha')) return ['medical:write'];
+  if (path.startsWith('coordinador/editar-') || path.startsWith('dt/editar-') || path.startsWith('dt-editar-')) return ['admin'];
+  if (path === 'seleccion-portales' || path.startsWith('admin')) return ['admin'];
+  if (path.startsWith('medico')) return ['players:read:all'];
+  if (path.startsWith('dt') || path === 'profesor') return ['players:read:assigned'];
+  if (path.startsWith('coordinador')) return ['players:read:all'];
+  if (path.startsWith('semaforo-qr')) return ['attendance:scan'];
+  return [];
+}
+
+const protectedRoutes = applicationRoutes.map(route => {
+  // Angular resolves redirects before guards. Adding canActivate to a
+  // redirect makes the complete router configuration invalid (NG04014).
+  if (route.path === '' || route.path === 'login' || route.redirectTo) return route;
+  return {
+    ...route,
+    canActivate: [authGuard, capabilityGuard],
+    data: { ...(route.data ?? {}), capabilities: capabilitiesFor(route.path ?? '') }
+  };
+});
+
+export const routes: Routes = [
+  {
+    path: 'jugadores/:id',
+    loadComponent: () => import('./features/jugador-perfil/jugador-perfil.component').then(m => m.JugadorPerfilComponent),
+    canActivate: [authGuard, capabilityGuard],
+    data: { capabilities: ['players:read:all', 'players:read:assigned', 'medical:read'] satisfies Capability[] }
+  },
+  ...protectedRoutes,
+  {
+    path: 'sin-autorizacion',
+    loadComponent: () => import('./features/status-page/status-page.component').then(m => m.StatusPageComponent),
+    data: { title: 'Acceso no autorizado', message: 'Tu rol no tiene permiso para acceder a esta pantalla.' }
+  },
+  {
+    path: '**',
+    loadComponent: () => import('./features/status-page/status-page.component').then(m => m.StatusPageComponent),
+    data: { title: 'Página no encontrada', message: 'La dirección solicitada no existe.' }
   }
 ];

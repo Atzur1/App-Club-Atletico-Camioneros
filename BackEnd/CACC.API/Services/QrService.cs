@@ -4,16 +4,16 @@ namespace CACC.API.Services
 {
     public interface IQrService
     {
-        byte[] GenerarQrCodePng(string dni);
+        byte[] GenerarQrCodePng(string credentialToken);
     }
 
     public class QrService : IQrService
     {
-        public byte[] GenerarQrCodePng(string dni)
+        public byte[] GenerarQrCodePng(string credentialToken)
         {
-            // El QR se genera dinámicamente a partir del DNI de la persona
+            // The QR contains only the opaque, signed credential token.
             using var qrGenerator = new QRCodeGenerator();
-            using var qrCodeData = qrGenerator.CreateQrCode(dni, QRCodeGenerator.ECCLevel.Q);
+            using var qrCodeData = qrGenerator.CreateQrCode(credentialToken, QRCodeGenerator.ECCLevel.Q);
 
             // Usamos PngByteQRCode tal como exigen las convenciones del proyecto
             using var qrCode = new PngByteQRCode(qrCodeData);

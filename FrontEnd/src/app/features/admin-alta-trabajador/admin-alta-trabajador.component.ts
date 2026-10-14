@@ -4,7 +4,6 @@ import { FormsModule } from '@angular/forms';
 import { Router, RouterModule } from '@angular/router';
 import { HttpClient } from '@angular/common/http';
 import { AuthService } from '../../shared/services/auth.service';
-import { AdminPopupCredencial } from '../admin-popup-credencial/admin-popup-credencial';
 
 export interface CategoriaSimple {
   idCategoria: number;
@@ -14,7 +13,7 @@ export interface CategoriaSimple {
 @Component({
   selector: 'app-admin-alta-trabajador',
   standalone: true,
-  imports: [CommonModule, FormsModule, RouterModule, AdminPopupCredencial],
+  imports: [CommonModule, FormsModule, RouterModule],
   templateUrl: './admin-alta-trabajador.component.html',
   styleUrl: './admin-alta-trabajador.component.css'
 })
@@ -210,7 +209,7 @@ export class AdminAltaTrabajadorComponent implements OnInit {
       next: () => {
         this.isLoading = false;
         this.mensajeExito = true;
-        this.mostrarPopupCredencial = true;
+        this.mostrarPopupCredencial = false;
       },
       error: (err) => {
         this.isLoading = false;

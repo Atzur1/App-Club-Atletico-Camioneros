@@ -1,54 +1,47 @@
-# See https://docs.github.com/get-started/getting-started-with-git/ignoring-files for more about ignoring files.
+# Dependencies and generated output
+node_modules/
+dist/
+tmp/
+out-tsc/
+bazel-out/
+bin/
+obj/
+coverage/
+.angular/
 
-# Compiled output
-/dist
-/tmp
-/out-tsc
-/bazel-out
+# Local runtime state
+.runtime/
+*.log
+*.pid
+npm-debug.log*
+yarn-error.log*
 
-# Node
-/node_modules
-npm-debug.log
-yarn-error.log
-
-# IDEs and editors
+# IDE and OS files
+.vs/
 .idea/
-.project
-.classpath
-.c9/
-*.launch
-.settings/
-*.sublime-workspace
-
-# Visual Studio Code
 .vscode/*
 !.vscode/settings.json
 !.vscode/tasks.json
 !.vscode/launch.json
 !.vscode/extensions.json
-.history/*
-
-# Miscellaneous
-/.angular/cache
-.sass-cache/
-/connect.lock
-/coverage
-/libpeerconnection.log
-testem.log
-/typings
-__screenshots__/
-
-# System files
+.history/
+*.user
+*.suo
 .DS_Store
 Thumbs.db
-/.vs
-*.zip
 
-# Backend build output
-**/bin/
-**/obj/
-.vs/
-*.dll
-*.pdb
-*.exe
-*.cache
+# Local secrets and database exports
+.env
+.env.*
+!.env.example
+appsettings.Local.json
+appsettings.*.local.json
+*.bak
+*.bacpac
+*.mdf
+*.ldf
+Bbdd CACC.sql
+bbdd(camioneros).sql
+
+# Archives
+*.zip

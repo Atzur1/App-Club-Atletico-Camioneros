@@ -1,0 +1,391 @@
+<div class="cacc-layout" [class.sidebar-collapsed]="sidebarOculto">
+    <!-- Left Sidebar (Verde Institucional CACC) -->
+    <aside class="sidebar">
+      <div class="sidebar-header">
+        <!-- CACC Logo Shield Emblem -->
+        <div class="logo-wrapper">
+          <img src="cacc-logo.png" alt="Escudo CACC" class="cacc-shield-img" />
+        </div>
+        <h2 class="club-title">CLUB ATLETICO SOCIAL Y DEPORTIVO CAMIONEROS</h2>
+        <p class="club-subtitle">Sistema de Gestión Integral</p>
+      </div>
+
+      <nav class="sidebar-nav">
+        <a *ngFor="let item of navItems"
+           class="nav-item"
+           [class.active]="item.active"
+           (click)="selectNav(item.label)">
+          <span class="nav-icon" [ngSwitch]="item.icon">
+            <svg *ngSwitchCase="'home'" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" aria-hidden="true"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path><polyline points="9 22 9 12 15 12 15 22"></polyline></svg>
+            <svg *ngSwitchCase="'group'" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" aria-hidden="true"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M23 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg>
+            <svg *ngSwitchCase="'badge'" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" aria-hidden="true"><rect x="2" y="7" width="20" height="14" rx="2" ry="2"></rect><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"></path></svg>
+            <svg *ngSwitchCase="'category'" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" aria-hidden="true"><circle cx="12" cy="5" r="3"></circle><circle cx="5" cy="19" r="3"></circle><circle cx="19" cy="19" r="3"></circle><line x1="8.5" y1="16.5" x2="10.5" y2="7.5"></line><line x1="15.5" y1="16.5" x2="13.5" y2="7.5"></line></svg>
+          </span>
+          <span class="nav-label">{{ item.label }}</span>
+        </a>
+      </nav>
+
+      <div class="sidebar-footer">
+        <a *ngIf="puedeGenerarCredencial" class="footer-action-btn portal-btn" (click)="irASeleccionPortales()" title="Volver a Selección de Portales">
+          <span class="footer-icon">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" aria-hidden="true"><polyline points="15 18 9 12 15 6"></polyline></svg>
+          </span>
+          <span>Selección de Portales</span>
+        </a>
+
+        <a class="footer-action-btn logout-btn" (click)="cerrarSesion()" title="Cerrar Sesión">
+          <span class="footer-icon">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" aria-hidden="true"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path><polyline points="16 17 21 12 16 7"></polyline><line x1="21" y1="12" x2="9" y2="12"></line></svg>
+          </span>
+          <span>Cerrar Sesión</span>
+        </a>
+      </div>
+    </aside>
+
+    <!-- Contenedor Principal -->
+    <div class="main-wrapper">
+      <header class="top-header">
+        <div class="header-left">
+          <button type="button" class="sidebar-toggle-btn" (click)="toggleSidebar()" title="Ocultar/Mostrar Menú">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" aria-hidden="true"><line x1="3" y1="12" x2="21" y2="12"></line><line x1="3" y1="6" x2="21" y2="6"></line><line x1="3" y1="18" x2="21" y2="18"></line></svg>
+          </button>
+          <h1 class="header-title">Ficha Oficial del Jugador</h1>
+        </div>
+
+        <div class="header-right">
+          <div class="admin-profile" (click)="toggleMenuUsuario($event)">
+            <div class="profile-avatar">
+              <svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 3c1.66 0 3 1.34 3 3s-1.34 3-3 3-3-1.34-3-3 1.34-3 3-3zm0 14.2c-2.5 0-4.71-1.28-6-3.22.03-1.99 4-3.08 6-3.08 1.99 0 5.97 1.09 6 3.08-1.29 1.94-3.5 3.22-6 3.22z" /></svg>
+            </div>
+            <div class="profile-info">
+              <span class="profile-name">{{ usuarioActual.nombre || 'Usuario' }}</span>
+              <span class="profile-email">{{ usuarioActual.email || '' }}</span>
+            </div>
+            <span class="chevron-down" [class.rotated]="menuUsuarioAbierto">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#475569" stroke-width="2.5" aria-hidden="true"><polyline points="6 9 12 15 18 9"></polyline></svg>
+            </span>
+
+            <div class="user-dropdown-menu" *ngIf="menuUsuarioAbierto" (click)="$event.stopPropagation()">
+              <button type="button" class="dropdown-item" (click)="irAConfiguracion()">
+                <span class="dropdown-icon">⚙</span> Configuración de cuenta
+              </button>
+              <div class="dropdown-divider"></div>
+              <button type="button" class="dropdown-item text-danger" (click)="cerrarSesion()">
+                <span class="dropdown-icon">↪</span> Cerrar Sesión
+              </button>
+            </div>
+          </div>
+        </div>
+      </header>
+
+      <main class="content-body">
+        <div *ngIf="cargando" class="load-state" role="status">Cargando ficha del jugador...</div>
+
+        <div *ngIf="!cargando && noEncontrado" class="load-state load-state-error" role="alert">
+          <strong>Jugador no encontrado.</strong>
+          <span>El identificador no es válido o el jugador ya no existe.</span>
+          <button class="btn-cancel mt-2" type="button" (click)="volver()">Volver al listado</button>
+        </div>
+
+        <div *ngIf="!cargando && errorCarga" class="load-state load-state-error" role="alert">
+          <span>{{ errorCarga }}</span>
+          <div class="state-actions mt-2">
+            <button class="btn-solid-green" type="button" (click)="cargarJugador()">Reintentar</button>
+            <button class="btn-cancel ml-2" type="button" (click)="volver()">Volver al listado</button>
+          </div>
+        </div>
+
+        <div class="ficha-content-wrapper" *ngIf="!cargando && !noEncontrado && !errorCarga && jugador as player">
+          <div class="cards-grid-row">
+
+            <!-- CARD 1: PERFIL & DATOS PERSONALES -->
+            <section class="card-box card-perfil">
+              <div class="photo-banner">
+                <div class="avatar-banner-circle">
+                  <svg width="40" height="40" viewBox="0 0 24 24" fill="#007A3D" aria-hidden="true"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 3c1.66 0 3 1.34 3 3s-1.34 3-3 3-3-1.34-3-3 1.34-3 3-3zm0 14.2c-2.5 0-4.71-1.28-6-3.22.03-1.99 4-3.08 6-3.08 1.99 0 5.97 1.09 6 3.08-1.29 1.94-3.5 3.22-6 3.22z" /></svg>
+                </div>
+              </div>
+
+              <div class="profile-name-header">
+                <h2 class="player-name">{{ nombreCompleto }}</h2>
+                <div class="tags-header-row">
+                  <span class="player-pos-badge">{{ player.posicion || sinInformar }}</span>
+                  <span class="player-dni-badge">DNI: {{ player.dni }}</span>
+                </div>
+
+                <div class="category-pills-row" *ngIf="getCategoriasAsignadas().length > 0">
+                  <span *ngFor="let cat of getCategoriasAsignadas()" class="category-pill">
+                    {{ cat }}
+                  </span>
+                </div>
+              </div>
+
+              <hr class="card-divider" />
+              <h3 class="section-subtitle">DATOS PERSONALES Y FÍSICOS</h3>
+
+              <div class="personal-data-grid">
+                <div class="data-item-card">
+                  <div class="data-icon">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#007A3D" stroke-width="2.2"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>
+                  </div>
+                  <div class="data-label-group">
+                    <span class="data-label">F. Nacimiento</span>
+                    <span class="data-val">{{ fechaNacimiento }}</span>
+                  </div>
+                </div>
+
+                <div class="data-item-card">
+                  <div class="data-icon">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#007A3D" stroke-width="2.2"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
+                  </div>
+                  <div class="data-label-group">
+                    <span class="data-label">Edad</span>
+                    <span class="data-val">{{ edad }}</span>
+                  </div>
+                </div>
+
+                <div class="data-item-card">
+                  <div class="data-icon">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#007A3D" stroke-width="2.2"><path d="M6 2v6h12V2H6z"></path><path d="M4 8h16l-2 14H6L4 8z"></path></svg>
+                  </div>
+                  <div class="data-label-group">
+                    <span class="data-label">Peso</span>
+                    <span class="data-val">{{ player.peso ? player.peso + ' Kg' : sinInformar }}</span>
+                  </div>
+                </div>
+
+                <div class="data-item-card">
+                  <div class="data-icon">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#007A3D" stroke-width="2.2"><polyline points="8 6 12 2 16 6"></polyline><line x1="12" y1="2" x2="12" y2="22"></line><polyline points="8 18 12 22 16 18"></polyline></svg>
+                  </div>
+                  <div class="data-label-group">
+                    <span class="data-label">Altura</span>
+                    <span class="data-val">{{ player.altura ? player.altura + ' m' : sinInformar }}</span>
+                  </div>
+                </div>
+
+                <div class="data-item-card">
+                  <div class="data-icon">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#007A3D" stroke-width="2.2"><circle cx="12" cy="12" r="10"></circle><path d="M12 2a14.5 14.5 0 0 0 0 20 14.5 14.5 0 0 0 0-20"></path></svg>
+                  </div>
+                  <div class="data-label-group">
+                    <span class="data-label">Pie Hábil</span>
+                    <span class="data-val">{{ player.pieHabil || sinInformar }}</span>
+                  </div>
+                </div>
+
+                <div class="data-item-card">
+                  <div class="data-icon">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#007A3D" stroke-width="2.2"><path d="M12 2.69l5.66 5.66a8 8 0 1 1-11.31 0z"></path></svg>
+                  </div>
+                  <div class="data-label-group">
+                    <span class="data-label">Gr. Sanguíneo</span>
+                    <span class="data-val blood-badge">{{ player.fichaMedica?.grupoSanguineo || sinInformar }}</span>
+                  </div>
+                </div>
+              </div>
+
+              <div class="domicilio-card">
+                <div class="data-icon">
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#007A3D" stroke-width="2.2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path><circle cx="12" cy="10" r="3"></circle></svg>
+                </div>
+                <div class="data-label-group">
+                  <span class="data-label">Domicilio</span>
+                  <span class="data-val">{{ player.domicilio || sinInformar }}</span>
+                </div>
+              </div>
+
+              <!-- BLOQUE DETALLADO TUTOR / RESPONSABLE LEGAL -->
+              <hr class="card-divider" />
+              <div class="tutor-section-box">
+                <div class="tutor-header-row">
+                  <h3 class="section-subtitle mb-0">TUTOR / RESPONSABLE LEGAL</h3>
+                  <span class="badge-req" *ngIf="esMenorDeEdad">Requerido por menores</span>
+                </div>
+
+                <div class="personal-data-grid mt-2">
+                  <div class="data-item-card full-span">
+                    <div class="data-icon">
+                      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#007A3D" stroke-width="2.2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
+                    </div>
+                    <div class="data-label-group">
+                      <span class="data-label">Nombre y Apellido</span>
+                      <span class="data-val">{{ tutorNombreCompleto }}</span>
+                    </div>
+                  </div>
+
+                  <div class="data-item-card">
+                    <div class="data-icon">
+                      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#007A3D" stroke-width="2.2"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line></svg>
+                    </div>
+                    <div class="data-label-group">
+                      <span class="data-label">DNI Tutor</span>
+                      <span class="data-val">{{ player.tutor?.dni || sinInformar }}</span>
+                    </div>
+                  </div>
+
+                  <div class="data-item-card">
+                    <div class="data-icon">
+                      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#007A3D" stroke-width="2.2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle></svg>
+                    </div>
+                    <div class="data-label-group">
+                      <span class="data-label">Parentesco</span>
+                      <span class="data-val">{{ player.tutor?.parentesco || 'Padre / Tutor' }}</span>
+                    </div>
+                  </div>
+
+                  <div class="data-item-card full-span">
+                    <div class="data-icon">
+                      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#007A3D" stroke-width="2.2"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"></path></svg>
+                    </div>
+                    <div class="data-label-group">
+                      <span class="data-label">Teléfono de Contacto</span>
+                      <span class="data-val">{{ player.tutor?.telefono || sinInformar }}</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </section>
+
+            <!-- CARD 2: FICHA MÉDICA (CENTRO) -->
+            <section class="card-box card-medica" *ngIf="puedeVerFichaMedica">
+              <div class="card-header-row">
+                <h2 class="card-title">FICHA MÉDICA</h2>
+              </div>
+
+              <div class="medical-section">
+                <span class="medical-subtitle">Patologías</span>
+                <div class="medical-box" [class.medical-empty]="!player.fichaMedica?.patologias">
+                  {{ player.fichaMedica?.patologias || sinInformar }}
+                </div>
+              </div>
+
+              <div class="medical-section mt-2">
+                <span class="medical-subtitle">Historial de lesiones</span>
+                <div class="lesiones-container" *ngIf="lesionesList.length > 0; else noLesiones">
+                  <div class="lesion-item-row" *ngFor="let lesion of lesionesList">
+                    <span class="lesion-dot"></span>
+                    <span class="lesion-text">{{ lesion }}</span>
+                  </div>
+                </div>
+                <ng-template #noLesiones>
+                  <div class="medical-box medical-empty">{{ sinInformar }}</div>
+                </ng-template>
+              </div>
+
+              <div class="medical-section mt-2">
+                <span class="medical-subtitle">Observaciones médicas</span>
+                <div class="medical-box" [class.medical-empty]="!player.fichaMedica?.observaciones">
+                  {{ player.fichaMedica?.observaciones || sinInformar }}
+                </div>
+              </div>
+
+              <div class="medical-action-box" *ngIf="puedeEditarFichaMedica">
+                <button type="button" class="btn-card-action" (click)="editarFichaMedica()">
+                  Editar ficha médica
+                </button>
+              </div>
+            </section>
+
+            <!-- CARD 3: HISTORIAL DE PARTIDOS (DERECHA) -->
+            <section class="card-box card-partidos">
+              <div class="card-header-row card-header-flex">
+                <h2 class="card-title">HISTORIAL DE PARTIDOS</h2>
+
+                <div class="stats-pills-row" *ngIf="partidosFiltrados.length > 0">
+                  <span class="badge-count badge-res-g">{{ statsPartidos.ganados }} G</span>
+                  <span class="badge-count badge-res-e">{{ statsPartidos.empatados }} E</span>
+                  <span class="badge-count badge-res-p">{{ statsPartidos.perdidos }} P</span>
+                </div>
+              </div>
+
+              <div class="partidos-filter-toolbar" *ngIf="getCategoriasPartidos().length > 1">
+                <label class="filter-label" for="selectCategoriaPartido">Ver división:</label>
+                <div class="select-box select-filtro-categoria">
+                  <select id="selectCategoriaPartido" [(ngModel)]="categoriaFiltroPartido">
+                    <option value="">Todas las divisiones</option>
+                    <option *ngFor="let cat of getCategoriasPartidos()" [value]="cat">{{ cat }}</option>
+                  </select>
+                  <span class="select-arrow">
+                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#334155" stroke-width="2.5"><polyline points="6 9 12 15 18 9"></polyline></svg>
+                  </span>
+                </div>
+              </div>
+
+              <div class="match-table-responsive">
+                <table class="match-table">
+                  <thead>
+                    <tr>
+                      <th class="th-fecha">FECHA</th>
+                      <th class="th-division" *ngIf="!categoriaFiltroPartido && getCategoriasPartidos().length > 1">DIVISIÓN</th>
+                      <th class="th-rival">RIVAL</th>
+                      <th class="th-condicion">CONDICIÓN</th>
+                      <th class="th-resultado">RESULTADO</th>
+                      <th class="th-minutos">MINUTOS</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr *ngFor="let partido of partidosFiltrados">
+                      <td class="td-fecha">{{ partido.fecha | date:'dd/MM/yyyy' }}</td>
+                      <td class="td-division" *ngIf="!categoriaFiltroPartido && getCategoriasPartidos().length > 1">
+                        <span class="badge-division-mini">{{ partido.categoria }}</span>
+                      </td>
+                      <td class="td-rival" [title]="partido.rival">{{ partido.rival }}</td>
+                      <td class="td-condicion">
+                        <span class="badge-posicion">{{ partido.condicion }}</span>
+                      </td>
+                      <td class="td-resultado">
+                        <span class="badge-resultado" [ngClass]="{
+                        'res-g': esResultado(partido.resultado, 'G'),
+                        'res-p': esResultado(partido.resultado, 'P'),
+                        'res-e': esResultado(partido.resultado, 'E')
+                      }">
+                          {{ partido.resultado }}
+                        </span>
+                      </td>
+                      <td class="td-minutos">{{ partido.minutos }}'</td>
+                    </tr>
+                    <tr *ngIf="partidosFiltrados.length === 0">
+                      <td [attr.colspan]="(!categoriaFiltroPartido && getCategoriasPartidos().length > 1) ? 6 : 5" class="no-records">
+                        No hay partidos registrados para los filtros seleccionados.
+                      </td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+
+              <div class="total-minutos-footer">
+                <span class="total-label">TOTAL MINUTOS DISPUTADOS:</span>
+                <span class="total-val">{{ totalMinutosJugados }}'</span>
+              </div>
+
+              <div class="match-action-box">
+                <button type="button" class="btn-card-action" (click)="mostrarPopupPartidos = true">
+                  Ver historial de partidos completo
+                </button>
+              </div>
+            </section>
+
+          </div>
+
+          <footer class="bottom-actions-row">
+            <button *ngIf="puedeEditarPerfil" type="button" class="btn-solid-green btn-editar-perfil" (click)="editarPerfil()">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#ffffff" stroke-width="2.5"><path d="M12 20h9"></path><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"></path></svg>
+              <span>Editar perfil</span>
+            </button>
+
+            <div class="right-actions-group">
+              <button type="button" class="btn-cancel" (click)="volver()">
+                <span>← Volver a Lista</span>
+              </button>
+
+              <button *ngIf="puedeGenerarCredencial" type="button" class="btn-solid-green btn-credencial" (click)="generarCredencial()">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><rect x="7" y="7" width="3" height="3"></rect><rect x="14" y="7" width="3" height="3"></rect><rect x="7" y="14" width="3" height="3"></rect></svg>
+                <span>Generar credencial</span>
+              </button>
+            </div>
+          </footer>
+        </div>
+      </main>
+    </div>
+  </div>

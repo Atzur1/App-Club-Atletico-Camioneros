@@ -4,6 +4,7 @@ import { FormsModule } from '@angular/forms';
 import { Router, RouterModule } from '@angular/router';
 import { HttpClient } from '@angular/common/http';
 import { AuthService } from '../../shared/services/auth.service';
+import { RoleId } from '../../core/auth/roles';
 
 interface TutorInfo {
   nombre?: string;
@@ -72,7 +73,13 @@ export class AdminHomeComponent implements OnInit {
   players: Player[] = [];
   listaCategorias: Categoria[] = [];
 
+  get esAdministrador(): boolean { return this.authService.getRoleId() === RoleId.Administrador; }
+  get tituloPanel(): string { return `Panel Principal de ${this.limpiarNombreRol(this.authService.getRol() ?? '')}`; }
+
   ngOnInit(): void {
+    if (!this.esAdministrador && this.authService.getRoleId() !== RoleId.Coordinador) {
+      this.navItems = this.navItems.filter(item => item.label !== 'Staff');
+    }
     this.cargarUsuario();
     this.cargarDatos();
     this.cargarCategoriasBd();
@@ -232,10 +239,16 @@ export class AdminHomeComponent implements OnInit {
   selectNav(label: string): void {
     this.navItems.forEach(item => item.active = (item.label === label));
     this.activeTab = label;
-    if (label === 'Jugadores') this.router.navigate(['/admin/lista-jugadores']);
-    else if (label === 'Inicio') this.router.navigate(['/admin']);
-    else if (label === 'Categorias' || label === 'Categorías') this.router.navigate(['/admin/categorias']);
-    else if (label === 'Staff') this.router.navigate(['/admin/staff']);
+    this.router.navigate([this.rutaPorRol(label)]);
+  }
+
+  private rutaPorRol(label: string): string {
+    const roleId = this.authService.getRoleId();
+    const categorias = label === 'Categorias' || label === 'Categorías';
+    if (roleId === RoleId.Medico) return label === 'Inicio' ? '/medico' : categorias ? '/medico/categorias' : '/medico/lista-jugadores';
+    if (roleId === RoleId.DirectorTecnico || roleId === RoleId.PreparadorFisico) return label === 'Inicio' ? '/dt' : categorias ? '/dt/categorias' : '/dt-categoria-jugadores';
+    if (roleId === RoleId.Coordinador) return label === 'Inicio' ? '/coordinador' : categorias ? '/coordinador-seleccion-categorias' : label === 'Staff' ? '/coordinador/visualizar-staff' : '/coordinador-lista-jugadores';
+    return label === 'Inicio' ? '/admin' : categorias ? '/admin/categorias' : label === 'Staff' ? '/admin/staff' : '/admin/lista-jugadores';
   }
 
   getBadgeClass(estado: Player['estadoCuota']): string {

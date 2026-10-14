@@ -1,60 +1,20 @@
-using CACC.API.DTOs;
+using System.Text.RegularExpressions;
+using CACC.API.Authorization;
+using CACC.API.Services;
 using CACC.DAO;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-
-namespace CACC.API.Controllers
+namespace CACC.API.Controllers;
+[ApiController, Route("api/asistencias")]
+[Authorize(Roles = RoleNames.Administrador + "," + RoleNames.DonQr)]
+public sealed partial class AsistenciasController(ICredentialTokenService tokens, ICredentialDao credentials, IAttendanceRegistrationService attendance) : ControllerBase
 {
-    [ApiController]
-    [Route("api/asistencias")]
-    [Authorize]
-    public class AsistenciasController : ControllerBase
-    {
-        private readonly IAsistenciaDao _asistenciaDao;
-
-        public AsistenciasController(IAsistenciaDao asistenciaDao)
-        {
-            _asistenciaDao = asistenciaDao;
-        }
-
-        [HttpPost("verificar-y-registrar")]
-        [Authorize(Roles = "Don QR,Tesorero,Coordinador")] // Accesible por Don QR y administradores
-        public async Task<IActionResult> VerificarYRegistrar([FromBody] AsistenciaRequestDto request)
-        {
-            if (string.IsNullOrWhiteSpace(request.Dni))
-            {
-                return BadRequest(new { message = "El DNI es obligatorio." });
-            }
-
-            // Verificamos si tiene deuda (si es jugador)
-            var estadoDeuda = await _asistenciaDao.ObtenerEstadoDeudaPorDniAsync(request.Dni);
-
-            // Regla de acceso: Si tiene cuotas vencidas (ej: más de 0 o según política del club), denegamos o admitimos.
-            // Asumimos que si CantidadCuotasVencidas > 0, el acceso es denegado (false), de lo contrario admitido (true).
-            bool estadoAcceso = true;
-            string mensaje = "Acceso permitido. ¡Bienvenido!";
-
-            if (estadoDeuda != null && estadoDeuda.CantidadCuotasVencidas > 0)
-            {
-                estadoAcceso = false;
-                mensaje = $"Acceso denegado. El jugador posee {estadoDeuda.CantidadCuotasVencidas} cuota(s) vencida(s).";
-            }
-
-            // Registramos el intento de acceso / asistencia 
-            bool registrado = await _asistenciaDao.RegistrarAsistenciaAsync(request.Dni, estadoAcceso, request.Observaciones ?? string.Empty);
-
-            if (!registrado)
-            {
-                return NotFound(new { message = "Persona no encontrada con el DNI proporcionado." });
-            }
-
-            return Ok(new
-            {
-                accesoPermitido = estadoAcceso,
-                mensaje = mensaje,
-                deudaTotal = estadoDeuda?.DeudaTotal ?? 0,
-                cuotasVencidas = estadoDeuda?.CantidadCuotasVencidas ?? 0
-            });
-        }
-    }
+ [HttpPost("registrar-por-qr")] public async Task<IActionResult> RegisterByQr([FromBody] QrAttendanceRequest request,CancellationToken ct){var token=tokens.Validate(request.QrToken);if(token is null)return BadRequest(new{message="La credencial QR no es válida."});var dni=await credentials.GetActiveDniAsync(token.CredentialId,ct);if(dni is null)return NotFound(new{message="La credencial no existe, fue revocada o está inactiva."});return Result(await attendance.RegisterAsync(dni,"QR",null));}
+ [HttpPost("registrar-manual")] public Task<IActionResult> RegisterManual([FromBody] ManualAttendanceRequest request)=>RegisterManualCore(request.Dni,request.Reason);
+ [HttpPost("verificar-y-registrar")] public Task<IActionResult> Legacy([FromBody] DTOs.AsistenciaRequestDto request)=>RegisterManualCore(request.Dni,request.Observaciones);
+ private async Task<IActionResult> RegisterManualCore(string? rawDni,string? reason){var dni=rawDni?.Trim()??string.Empty;if(!DniPattern().IsMatch(dni))return BadRequest(new{message="Ingresá un DNI válido de 7 u 8 números."});return Result(await attendance.RegisterAsync(dni,"DNI_MANUAL",reason));}
+ private IActionResult Result(AttendanceRegistrationResult r)=>r.PersonFound?Ok(new{accesoPermitido=r.AccessAllowed,mensaje=r.Message,deudaTotal=r.DebtTotal,cuotasVencidas=r.OverdueInstallments}):NotFound(new{message=r.Message});
+ [GeneratedRegex("^[0-9]{7,8}$")] private static partial Regex DniPattern();
 }
+public sealed record QrAttendanceRequest(string QrToken);
+public sealed record ManualAttendanceRequest(string Dni,string? Reason);

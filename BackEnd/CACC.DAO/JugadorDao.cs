@@ -293,52 +293,8 @@ namespace CACC.DAO
                     return false;
                 }
 
-                // 3. Extracción de grupo sanguíneo y factor
-                string? grupo = null;
-                string? factor = null;
-                if (!string.IsNullOrWhiteSpace(jugador.FichaMedica?.GrupoSanguineo))
-                {
-                    var gs = jugador.FichaMedica.GrupoSanguineo.Trim();
-                    if (gs.EndsWith("+") || gs.EndsWith("-"))
-                    {
-                        factor = gs.Substring(gs.Length - 1, 1);
-                        grupo = gs.Substring(0, gs.Length - 1).Trim();
-                    }
-                    else
-                    {
-                        grupo = gs;
-                    }
-                }
-
-                // 4. Persistencia en FICHAS_MEDICAS
-                var queryFicha = @"
-                    IF EXISTS (SELECT 1 FROM FICHAS_MEDICAS WHERE FK_id_jugador = @Id)
-                    BEGIN
-                        UPDATE FICHAS_MEDICAS 
-                        SET grupo_sanguineo = @Grupo, 
-                            factor = @Factor, 
-                            antecedentes_salud = @Patologias, 
-                            condiciones_cronicas = @Lesiones, 
-                            observaciones = @Observaciones, 
-                            fecha_actualizacion = GETDATE()
-                        WHERE FK_id_jugador = @Id;
-                    END
-                    ELSE
-                    BEGIN
-                        INSERT INTO FICHAS_MEDICAS (FK_id_jugador, grupo_sanguineo, factor, antecedentes_salud, condiciones_cronicas, observaciones, fecha_actualizacion)
-                        VALUES (@Id, @Grupo, @Factor, @Patologias, @Lesiones, @Observaciones, GETDATE());
-                    END;";
-
-                using var cmdFicha = new SqlCommand(queryFicha, connection, transaction);
-                cmdFicha.Parameters.AddWithValue("@Id", id);
-                cmdFicha.Parameters.AddWithValue("@Grupo", (object?)grupo ?? DBNull.Value);
-                cmdFicha.Parameters.AddWithValue("@Factor", (object?)factor ?? DBNull.Value);
-                cmdFicha.Parameters.AddWithValue("@Patologias", (object?)jugador.FichaMedica?.Patologias ?? DBNull.Value);
-                cmdFicha.Parameters.AddWithValue("@Lesiones", (object?)jugador.FichaMedica?.HistorialLesiones ?? DBNull.Value);
-                cmdFicha.Parameters.AddWithValue("@Observaciones", (object?)jugador.FichaMedica?.Observaciones ?? DBNull.Value);
-                await cmdFicha.ExecuteNonQueryAsync();
-
-                // 5. Minutos jugados en partidos usando IdPartido o fecha/rival
+                // 3. Minutos jugados en partidos usando IdPartido o fecha/rival.
+                // La ficha médica se modifica exclusivamente desde FichasMedicasController (rol Médico).
                 if (jugador.Partidos != null && jugador.Partidos.Count > 0)
                 {
                     var queryPartidos = @"

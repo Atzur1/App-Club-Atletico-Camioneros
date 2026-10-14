@@ -4,6 +4,7 @@ import { FormsModule } from '@angular/forms';
 import { Router, RouterModule } from '@angular/router';
 import { HttpClient } from '@angular/common/http';
 import { AuthService } from '../../shared/services/auth.service';
+import { RoleId } from '../../core/auth/roles';
 
 export interface CategoriaItem {
   id: number;
@@ -74,6 +75,10 @@ export class AdminListaCategoria implements OnInit {
 
   categorias: CategoriaItem[] = [];
 
+  get puedeAdministrarCategorias(): boolean { return this.authService.puede('admin'); }
+  get puedeGestionarPlantel(): boolean { return this.authService.puede('categories:membership'); }
+  get esAdministrador(): boolean { return this.authService.getRoleId() === RoleId.Administrador; }
+
   // Modales de Categoría (Crear/Editar)
   modalCategoriaVisible = false;
   modoEdicion = false;
@@ -125,6 +130,9 @@ export class AdminListaCategoria implements OnInit {
   };
 
   ngOnInit(): void {
+    if (!this.esAdministrador) {
+      this.navItems = this.navItems.filter(item => item.label !== 'Staff');
+    }
     this.cargarUsuario();
     this.cargarDatos();
   }
@@ -299,9 +307,9 @@ export class AdminListaCategoria implements OnInit {
     this.staffSeleccionadoId = null;
 
     this.cargarPlantel(cat.id);
-    this.cargarJugadoresDisponibles(cat.id);
+    if (this.puedeGestionarPlantel) this.cargarJugadoresDisponibles(cat.id);
     this.cargarStaff(cat.id);
-    this.cargarStaffDisponibles(cat.id);
+    if (this.puedeAdministrarCategorias) this.cargarStaffDisponibles(cat.id);
     this.cargarPartidos(cat.id);
   }
 
@@ -570,9 +578,26 @@ export class AdminListaCategoria implements OnInit {
   selectNav(label: string): void {
     this.navItems.forEach(item => item.active = (item.label === label));
     this.activeTab = label;
-    if (label === 'Inicio') this.router.navigate(['/admin']);
-    else if (label === 'Jugadores') this.router.navigate(['/admin/lista-jugadores']);
-    else if (label === 'Categorias' || label === 'Categorías') this.router.navigate(['/admin/categorias']);
-    else if (label === 'Staff') this.router.navigate(['/admin/staff']);
+    const roleId = this.authService.getRoleId();
+    const coordinador = roleId === RoleId.Coordinador;
+    const medico = roleId === RoleId.Medico;
+    const deportivoAsignado = roleId === RoleId.DirectorTecnico || roleId === RoleId.PreparadorFisico;
+    if (medico) {
+      if (label === 'Inicio' || label === 'Jugadores') this.router.navigate(['/medico/lista-jugadores']);
+      else if (label === 'Categorias' || label === 'Categorías') this.router.navigate(['/medico/categorias']);
+    } else if (deportivoAsignado) {
+      if (label === 'Inicio') this.router.navigate(['/dt']);
+      else if (label === 'Jugadores') this.router.navigate(['/dt-categoria-jugadores']);
+      else if (label === 'Categorias' || label === 'Categorías') this.router.navigate(['/dt/categorias']);
+    } else if (coordinador) {
+      if (label === 'Inicio') this.router.navigate(['/coordinador']);
+      else if (label === 'Jugadores') this.router.navigate(['/coordinador-lista-jugadores']);
+      else if (label === 'Categorias' || label === 'Categorías') this.router.navigate(['/coordinador-seleccion-categorias']);
+    } else {
+      if (label === 'Inicio') this.router.navigate(['/admin']);
+      else if (label === 'Jugadores') this.router.navigate(['/admin/lista-jugadores']);
+      else if (label === 'Categorias' || label === 'Categorías') this.router.navigate(['/admin/categorias']);
+      else if (label === 'Staff') this.router.navigate(['/admin/staff']);
+    }
   }
 }

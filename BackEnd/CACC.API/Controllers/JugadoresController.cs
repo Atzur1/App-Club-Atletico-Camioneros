@@ -4,6 +4,11 @@ using CACC.Entities;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Data.SqlClient;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
+using CACC.API.Authorization;
 
 namespace CACC.API.Controllers
 {
@@ -13,18 +18,37 @@ namespace CACC.API.Controllers
     public class JugadoresController : ControllerBase
     {
         private readonly IJugadorDao _jugadorDao;
+        private readonly IUserScopeService _scope;
 
-        public JugadoresController(IJugadorDao jugadorDao)
+        public JugadoresController(IJugadorDao jugadorDao, IUserScopeService scope)
         {
             _jugadorDao = jugadorDao;
+            _scope = scope;
         }
 
         [HttpGet]
+        [Authorize(Roles = RoleNames.LecturaDeportiva)]
         public async Task<IActionResult> GetJugadores([FromQuery] int? categoriaId)
         {
             IEnumerable<JugadorDetalle> jugadoresDb;
+            var roleId = _scope.GetRoleId(User);
 
-            if (categoriaId.HasValue && categoriaId.Value > 0)
+            if (roleId is 4 or 6)
+            {
+                var assigned = _scope.GetAssignedCategoryIds(User);
+                if (categoriaId.HasValue && !assigned.Contains(categoriaId.Value)) return Forbid();
+                if (categoriaId.HasValue)
+                    jugadoresDb = await _jugadorDao.ObtenerPorCategoriaAsync(categoriaId.Value);
+                else
+                {
+                    var all = new List<JugadorDetalle>();
+                    foreach (var category in assigned)
+                        all.AddRange(await _jugadorDao.ObtenerPorCategoriaAsync(category));
+                    jugadoresDb = all.GroupBy(j => j.IdJugador).Select(group => group.First());
+                }
+            }
+
+            else if (categoriaId.HasValue && categoriaId.Value > 0)
             {
                 jugadoresDb = await _jugadorDao.ObtenerPorCategoriaAsync(categoriaId.Value);
             }
@@ -53,6 +77,7 @@ namespace CACC.API.Controllers
                 EstadoCuota = j.EstadoCuota,
                 Tutor = j.Tutor == null ? null : new TutorDto
                 {
+                    Dni = j.Tutor.Dni,
                     Nombre = j.Tutor.Nombre,
                     Apellido = j.Tutor.Apellido,
                     Telefono = j.Tutor.Telefono ?? string.Empty,
@@ -67,6 +92,7 @@ namespace CACC.API.Controllers
         [HttpGet("{id}")]
         public async Task<IActionResult> GetJugadorPorId(int id)
         {
+            if (!await _scope.CanReadPlayerAsync(User, id)) return Forbid();
             var j = await _jugadorDao.ObtenerPorIdAsync(id);
             if (j == null)
             {
@@ -93,19 +119,20 @@ namespace CACC.API.Controllers
                 EstadoCuota = j.EstadoCuota,
                 Tutor = j.Tutor == null ? null : new TutorDto
                 {
+                    Dni = j.Tutor.Dni,
                     Nombre = j.Tutor.Nombre,
                     Apellido = j.Tutor.Apellido,
                     Telefono = j.Tutor.Telefono ?? string.Empty,
                     Email = j.Tutor.Email,
                     Parentesco = j.Tutor.Parentesco
                 },
-                FichaMedica = j.FichaMedica == null ? null : new FichaMedicaDto
+                FichaMedica = j.FichaMedica != null ? new FichaMedicaDto
                 {
                     GrupoSanguineo = j.FichaMedica.GrupoSanguineo,
                     Patologias = j.FichaMedica.Patologias,
                     HistorialLesiones = j.FichaMedica.HistorialLesiones,
                     Observaciones = j.FichaMedica.Observaciones
-                },
+                } : null,
                 Partidos = j.Partidos?.Select(p => new PartidoDto
                 {
                     Fecha = p.Fecha,
@@ -120,7 +147,7 @@ namespace CACC.API.Controllers
         }
 
         [HttpPut("{id}")]
-        [Authorize(Roles = "Tesorero")]
+        [Authorize(Roles = RoleNames.Administrador)]
         public async Task<IActionResult> ActualizarPerfil(int id, [FromBody] JugadorUpdateDto dto)
         {
             if (dto == null)
@@ -130,27 +157,33 @@ namespace CACC.API.Controllers
 
             try
             {
+                // 1. Normalización de Altura (cm -> metros) y validación de rango
+                decimal? alturaNormalizada = dto.Altura;
+                if (alturaNormalizada.HasValue)
+                {
+                    // Si es mayor a 3, se ingresó en centímetros (ej: 169 cm -> 1.69 m)
+                    if (alturaNormalizada.Value > 3.0m)
+                    {
+                        alturaNormalizada = Math.Round(alturaNormalizada.Value / 100m, 2);
+                    }
+
+                    // Validación de límites biológicos razonables (entre 0.50m y 2.50m)
+                    if (alturaNormalizada.Value <= 0.50m || alturaNormalizada.Value > 2.50m)
+                    {
+                        return BadRequest(new { message = "La altura ingresada debe estar entre 0.50 m y 2.50 m (o entre 50 y 250 cm)." });
+                    }
+                }
+
                 var jugador = new JugadorDetalle
                 {
                     Nombre = dto.Nombre,
                     Apellido = dto.Apellido,
                     Dni = dto.Dni,
-                    Genero = dto.Genero,
                     FechaDeNacimiento = dto.FechaDeNacimiento,
-                    Domicilio = dto.Domicilio,
-                    IdCategoria = dto.IdCategoria,
-                    ClubOrigen = dto.ClubOrigen,
                     PosicionCancha = dto.Posicion,
                     Peso = dto.Peso,
-                    Altura = dto.Altura,
+                    Altura = alturaNormalizada, // Pasamos la altura ya normalizada a metros
                     PieHabil = dto.PieHabil,
-                    FichaMedica = dto.FichaMedica == null ? null : new FichaMedicaDetalle
-                    {
-                        GrupoSanguineo = dto.FichaMedica.GrupoSanguineo,
-                        Patologias = dto.FichaMedica.Patologias,
-                        HistorialLesiones = dto.FichaMedica.HistorialLesiones,
-                        Observaciones = dto.FichaMedica.Observaciones
-                    },
                     Partidos = dto.Partidos?.Select(p => new PartidoDetalle
                     {
                         Fecha = p.Fecha,
@@ -174,7 +207,7 @@ namespace CACC.API.Controllers
         }
 
         [HttpPost]
-        [Authorize(Roles = "Tesorero")]
+        [Authorize(Roles = RoleNames.Administrador)]
         public async Task<IActionResult> CrearJugador([FromBody] JugadorCreateDto dto)
         {
             if (dto == null || string.IsNullOrWhiteSpace(dto.Nombre) || string.IsNullOrWhiteSpace(dto.Dni))
@@ -227,7 +260,7 @@ namespace CACC.API.Controllers
         }
 
         [HttpDelete("{id}")]
-        [Authorize(Roles = "Tesorero")]
+        [Authorize(Roles = RoleNames.Administrador)]
         public async Task<IActionResult> EliminarJugador(int id)
         {
             try
@@ -247,7 +280,7 @@ namespace CACC.API.Controllers
         }
 
         [HttpPut("{id}/tutor")]
-        [Authorize(Roles = "Administrador (Tesorero),Tesorero,Coordinador")]
+        [Authorize(Roles = RoleNames.Administrador)]
         public async Task<IActionResult> GuardarTutor(int id, [FromBody] GuardarTutorDto dto)
         {
             if (dto == null || string.IsNullOrWhiteSpace(dto.Dni) || string.IsNullOrWhiteSpace(dto.Nombre) || string.IsNullOrWhiteSpace(dto.Apellido) || string.IsNullOrWhiteSpace(dto.Telefono))
@@ -272,7 +305,9 @@ namespace CACC.API.Controllers
 
             return Ok(new { message = "Tutor guardado y vinculado con éxito." });
         }
+
         [HttpGet("tutores/{dni}")]
+        [Authorize(Roles = RoleNames.Administrador)]
         public async Task<IActionResult> BuscarTutorPorDni(string dni)
         {
             if (string.IsNullOrWhiteSpace(dni))

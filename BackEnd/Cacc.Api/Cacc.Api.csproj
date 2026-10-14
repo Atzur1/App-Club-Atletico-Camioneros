@@ -4,6 +4,7 @@
     <TargetFramework>net9.0</TargetFramework>
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
+    <UserSecretsId>73abc728-c7f6-41e7-b8ac-8b8d022c495b</UserSecretsId>
   </PropertyGroup>
 
   <ItemGroup>
@@ -19,4 +20,7 @@
     <ProjectReference Include="..\CACC.Entities\CACC.Entities.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Content Include="Assets\Credentials\**\*" CopyToOutputDirectory="PreserveNewest" />
+  </ItemGroup>
 </Project>
