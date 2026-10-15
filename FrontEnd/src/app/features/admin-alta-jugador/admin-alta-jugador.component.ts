@@ -26,7 +26,6 @@ export class AdminAltaJugadorComponent implements OnInit {
   private readonly http = inject(HttpClient);
   private readonly jugadorService = inject(JugadorService);
   private readonly authService = inject(AuthService);
-  private jugadorCreadoId: number | null = null;
 
   usuarioActual = {
     nombre: 'Cargando...',
@@ -71,8 +70,6 @@ export class AdminAltaJugadorComponent implements OnInit {
   tutorEmail = '';
   tutorParentesco = 'Padre';
   tutorParentescoOtro = '';
-  buscandoTutor = false;
-  tutorEncontradoMensaje = '';
 
   edadCalculada: number | null = null;
   esMenorDeEdad = true;
@@ -189,33 +186,32 @@ export class AdminAltaJugadorComponent implements OnInit {
     this.tutorEmail = '';
     this.tutorParentesco = 'Padre';
     this.tutorParentescoOtro = '';
-    this.tutorEncontradoMensaje = '';
   }
 
-  // Búsqueda directa en el endpoint de tutores por DNI
   buscarTutor(): void {
     const dniLimpio = this.tutorDni.trim();
     if (!this.esMenorDeEdad || !dniLimpio) return;
 
-    this.buscandoTutor = true;
-    this.tutorEncontradoMensaje = '';
-
-    this.http.get<any>(`http://localhost:5191/api/jugadores/tutores/${dniLimpio}`).subscribe({
+    this.http.get<any[]>('http://localhost:5191/api/jugadores').subscribe({
       next: (data) => {
-        this.buscandoTutor = false;
-        this.tutorNombre = data.nombre || '';
-        this.tutorApellido = data.apellido || '';
-        this.tutorTelefono = data.telefono || '';
-        this.tutorEmail = data.email || '';
-        if (data.parentesco) {
-          this.tutorParentesco = data.parentesco;
+        const jugadorConTutor = data.find(j => {
+          const t = j.tutor || j.Tutor;
+          return t && t.dni === dniLimpio;
+        });
+
+        const tutor = jugadorConTutor?.tutor || jugadorConTutor?.Tutor;
+        if (tutor && tutor.nombre) {
+          this.tutorNombre = tutor.nombre || '';
+          this.tutorApellido = tutor.apellido || '';
+          this.tutorTelefono = tutor.telefono || '';
+          this.tutorEmail = tutor.email || '';
+          this.tutorParentesco = tutor.parentesco || 'Padre';
+        } else {
+          alert('No se encontró un tutor previo con ese DNI. Por favor complete los datos manualmente para registrarlo.');
         }
-        this.tutorEncontradoMensaje = `Tutor existente encontrado: ${data.nombre} ${data.apellido}. Datos autocompletados.`;
       },
       error: () => {
-        this.buscandoTutor = false;
-        this.tutorEncontradoMensaje = '';
-        alert('No se encontró ningún tutor previo con ese DNI. Por favor complete los datos manualmente para registrarlo.');
+        alert('No se encontró un tutor previo con ese DNI. Por favor complete los datos manualmente para registrarlo.');
       }
     });
   }
@@ -271,7 +267,6 @@ export class AdminAltaJugadorComponent implements OnInit {
     this.guardando = true;
     this.jugadorService.crear(nuevoJugador).subscribe({
       next: (jugador) => {
-        this.jugadorCreadoId = (jugador as any).idJugador ?? jugador.id;
         this.dni = jugador.dni;
         this.nombre = jugador.nombre;
         this.apellido = jugador.apellido;
@@ -289,18 +284,11 @@ export class AdminAltaJugadorComponent implements OnInit {
   }
 
   descargarCredencial(): void {
-    if (!this.jugadorCreadoId) return;
-    this.http.get(`http://localhost:5191/api/credenciales/jugador/${this.jugadorCreadoId}/pdf`, { responseType: 'blob' }).subscribe({
-      next: blob => {
-        const url = URL.createObjectURL(blob); const link = document.createElement('a');
-        link.href = url; link.download = `credencial_jugador_${this.jugadorCreadoId}.pdf`; link.click(); URL.revokeObjectURL(url);
-        this.mostrarPopupCredencial = false;
-      }, error: () => alert('No se pudo generar la credencial del jugador.')
-    });
+    alert('Descargando credencial oficial en formato PDF...');
   }
 
   volver(): void {
-    this.router.navigate(['/admin/lista-jugadores']);
+    this.router.navigate(['/admin/jugadores']);
   }
 
   toggleSidebar(): void {
@@ -318,7 +306,7 @@ export class AdminAltaJugadorComponent implements OnInit {
   }
 
   irASeleccionPortales(): void {
-    this.router.navigate(['/seleccion-portales']);
+    this.router.navigate(['/admin/portales']);
   }
 
   irAConfiguracion(): void {
@@ -328,7 +316,7 @@ export class AdminAltaJugadorComponent implements OnInit {
   selectNav(label: string): void {
     this.navItems.forEach(item => item.active = (item.label === label));
     if (label === 'Inicio') this.router.navigate(['/admin']);
-    else if (label === 'Jugadores') this.router.navigate(['/admin/lista-jugadores']);
+    else if (label === 'Jugadores') this.router.navigate(['/admin/jugadores']);
     else if (label === 'Categorias' || label === 'Categorías') this.router.navigate(['/admin/categorias']);
     else if (label === 'Staff') this.router.navigate(['/admin/staff']);
   }

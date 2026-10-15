@@ -347,7 +347,7 @@ export class AdminPartidosCategoria implements OnInit {
   }
 
   irASeleccionPortales(): void {
-    this.router.navigate(['/seleccion-portales']);
+    this.router.navigate(['/admin/portales']);
   }
 
   irAConfiguracion(): void {
@@ -363,7 +363,7 @@ export class AdminPartidosCategoria implements OnInit {
     this.navItems.forEach(item => item.active = (item.label === label));
     this.activeTab = label;
     if (label === 'Inicio') this.router.navigate(['/admin']);
-    else if (label === 'Jugadores') this.router.navigate(['/admin/lista-jugadores']);
+    else if (label === 'Jugadores') this.router.navigate(['/admin/jugadores']);
     else if (label === 'Categorias' || label === 'Categorías') this.router.navigate(['/admin/categorias']);
     else if (label === 'Staff') this.router.navigate(['/admin/staff']);
   }

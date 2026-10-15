@@ -69,11 +69,16 @@ namespace CACC.API.Controllers
             string apellido = reader.IsDBNull(reader.GetOrdinal("apellido")) ? string.Empty : reader.GetString(reader.GetOrdinal("apellido"));
             var categoriasAsignadas = new HashSet<int>();
             if (!reader.IsDBNull(reader.GetOrdinal("FK_id_categoria")))
+            {
                 categoriasAsignadas.Add(reader.GetInt32(reader.GetOrdinal("FK_id_categoria")));
+            }
+
             while (await reader.ReadAsync())
             {
                 if (!reader.IsDBNull(reader.GetOrdinal("FK_id_categoria")))
+                {
                     categoriasAsignadas.Add(reader.GetInt32(reader.GetOrdinal("FK_id_categoria")));
+                }
             }
 
             // Verificación con hash BCrypt
@@ -102,7 +107,9 @@ namespace CACC.API.Controllers
 };
 
             foreach (var idCategoria in categoriasAsignadas)
+            {
                 claims.Add(new Claim("id_categoria", idCategoria.ToString()));
+            }
 
             var tokenDescriptor = new SecurityTokenDescriptor
             {
@@ -128,7 +135,7 @@ namespace CACC.API.Controllers
                 role = nombreRol,
                 idRol = idRol,
                 usuario = email,
-                categoriasAsignadas = categoriasAsignadas.OrderBy(id => id).ToArray()
+                categoriasIds = categoriasAsignadas
             });
         }
     }

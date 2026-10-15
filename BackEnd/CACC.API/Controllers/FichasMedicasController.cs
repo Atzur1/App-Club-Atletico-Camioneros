@@ -2,28 +2,36 @@ using CACC.DAO;
 using CACC.Entities;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using CACC.API.Authorization;
+using CACC.API.Security;
 
 namespace CACC.API.Controllers
 {
     [ApiController]
     [Route("api/fichas-medicas")]
-    [Authorize]
+    [Authorize(Roles = AppRoles.LecturaDeportiva)]
     public class FichasMedicasController : ControllerBase
     {
         private readonly IFichaMedicaDao _fichaMedicaDao;
-        private readonly IUserScopeService _scope;
+        private readonly IJugadorDao _jugadorDao;
+        private readonly ICurrentUserAccess _access;
 
-        public FichasMedicasController(IFichaMedicaDao fichaMedicaDao, IUserScopeService scope)
+        public FichasMedicasController(IFichaMedicaDao fichaMedicaDao, IJugadorDao jugadorDao, ICurrentUserAccess access)
         {
             _fichaMedicaDao = fichaMedicaDao;
-            _scope = scope;
+            _jugadorDao = jugadorDao;
+            _access = access;
         }
 
         [HttpGet("jugador/{idJugador}")]
         public async Task<IActionResult> GetFichaPorJugador(int idJugador)
         {
-            if (!await _scope.CanReadPlayerAsync(User, idJugador)) return Forbid();
+            var jugador = await _jugadorDao.ObtenerPorIdAsync(idJugador);
+            if (jugador == null)
+            {
+                return NotFound(new { message = "Jugador no encontrado." });
+            }
+
+            if (!_access.PuedeAccederAlgunaCategoria(jugador.CategoriasIds)) return Forbid();
 
             var ficha = await _fichaMedicaDao.ObtenerPorJugadorIdAsync(idJugador);
             if (ficha == null)
@@ -35,7 +43,7 @@ namespace CACC.API.Controllers
         }
 
         [HttpPut("{id}")]
-        [Authorize(Roles = RoleNames.EscrituraFichaMedica)]
+        [Authorize(Roles = AppRoles.Administradores + "," + AppRoles.Medico)]
         public async Task<IActionResult> ActualizarFicha(int id, [FromBody] FichaMedica ficha)
         {
             if (id != ficha.IdFichaMedica)

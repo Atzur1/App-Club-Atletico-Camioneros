@@ -4,9 +4,9 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
 using QuestPDF.Infrastructure;
-using CACC.API.Authorization;
+using CACC.API.Security;
 
-// Configuramos la licencia Community de QuestPDF
+// Configuramos la licencia Community de QuestPDF 
 QuestPDF.Settings.License = LicenseType.Community;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -16,27 +16,22 @@ builder.Services.AddCors(options =>
 {
     options.AddPolicy("AllowAngular", policy =>
     {
-        policy.WithOrigins(
-                  "http://localhost:4200",
-                  "http://127.0.0.1:4200")
+        policy.WithOrigins("http://localhost:4200", "http://127.0.0.1:4200")
               .AllowAnyHeader()
               .AllowAnyMethod();
     });
 });
 
-//Inyección de Dependencias
+//Inyección de Dependencias 
 builder.Services.AddScoped<IUsuarioDao, UsuarioDao>();
 builder.Services.AddScoped<ICategoriaDao, CategoriaDao>();
 builder.Services.AddScoped<IStaffDao, StaffDao>();
 builder.Services.AddScoped<IJugadorDao, JugadorDao>();
 builder.Services.AddScoped<IFichaMedicaDao, FichaMedicaDao>();
 builder.Services.AddScoped<IAsistenciaDao, AsistenciaDao>();
-builder.Services.AddScoped<ICredentialDao, CredentialDao>();
-builder.Services.AddScoped<IAttendanceRegistrationService, AttendanceRegistrationService>();
-builder.Services.AddSingleton<ICredentialTokenService, CredentialTokenService>();
-builder.Services.AddSingleton<ICredentialPdfService>(_ => new CredentialPdfService(Path.Combine(builder.Environment.ContentRootPath, "Assets", "Credentials")));
 builder.Services.AddScoped<IQrService, QrService>();
-builder.Services.AddScoped<IUserScopeService, UserScopeService>();
+builder.Services.AddHttpContextAccessor();
+builder.Services.AddScoped<ICurrentUserAccess, CurrentUserAccess>();
 
 //  Agregar soporte para los Controllers
 builder.Services.AddControllers();
@@ -64,7 +59,6 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
             ClockSkew = TimeSpan.Zero
         };
     });
-builder.Services.AddAuthorization();
 
 var app = builder.Build();
 

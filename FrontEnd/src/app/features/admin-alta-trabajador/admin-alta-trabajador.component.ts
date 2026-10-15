@@ -4,6 +4,7 @@ import { FormsModule } from '@angular/forms';
 import { Router, RouterModule } from '@angular/router';
 import { HttpClient } from '@angular/common/http';
 import { AuthService } from '../../shared/services/auth.service';
+import { AdminPopupCredencial } from '../admin-popup-credencial/admin-popup-credencial';
 
 export interface CategoriaSimple {
   idCategoria: number;
@@ -13,7 +14,7 @@ export interface CategoriaSimple {
 @Component({
   selector: 'app-admin-alta-trabajador',
   standalone: true,
-  imports: [CommonModule, FormsModule, RouterModule],
+  imports: [CommonModule, FormsModule, RouterModule, AdminPopupCredencial],
   templateUrl: './admin-alta-trabajador.component.html',
   styleUrl: './admin-alta-trabajador.component.css'
 })
@@ -209,7 +210,7 @@ export class AdminAltaTrabajadorComponent implements OnInit {
       next: () => {
         this.isLoading = false;
         this.mensajeExito = true;
-        this.mostrarPopupCredencial = false;
+        this.mostrarPopupCredencial = true;
       },
       error: (err) => {
         this.isLoading = false;
@@ -242,7 +243,7 @@ export class AdminAltaTrabajadorComponent implements OnInit {
   }
 
   irASeleccionPortales(): void {
-    this.router.navigate(['/seleccion-portales']);
+    this.router.navigate(['/admin/portales']);
   }
 
   irAConfiguracion(): void {
@@ -258,7 +259,7 @@ export class AdminAltaTrabajadorComponent implements OnInit {
     if (label === 'Inicio') {
       this.router.navigate(['/admin']);
     } else if (label === 'Jugadores') {
-      this.router.navigate(['/admin/lista-jugadores']);
+      this.router.navigate(['/admin/jugadores']);
     } else if (label === 'Staff') {
       this.router.navigate(['/admin/staff']);
     } else if (label === 'Categorias' || label === 'Categorías') {

@@ -1,0 +1,54 @@
+<main class="profile-page">
+  <a [routerLink]="['/', role, 'jugadores']" class="back-link">← Volver a jugadores</a>
+  <p *ngIf="loading" class="state">Cargando perfil…</p>
+  <p *ngIf="error" class="state error">{{ error }}</p>
+
+  <ng-container *ngIf="player as p">
+    <header class="profile-header">
+      <div class="avatar">{{ p.nombre.charAt(0) }}{{ p.apellido.charAt(0) }}</div>
+      <div>
+        <p class="eyebrow">Perfil del jugador</p>
+        <h1>{{ p.nombre }} {{ p.apellido }}</h1>
+        <p>{{ p.nombreCategoria || 'Sin categoría' }} · {{ p.posicionCancha || 'Sin posición' }}</p>
+      </div>
+      <div class="actions">
+        <button *ngIf="capabilities.canEditPlayers" type="button" class="secondary-button" (click)="editPlayer()">Editar perfil</button>
+        <button *ngIf="capabilities.canViewMedicalRecord" type="button" class="primary-button" (click)="openMedicalRecord()">
+          {{ capabilities.canEditMedicalRecord ? 'Ver o editar ficha médica' : 'Ver ficha médica' }}
+        </button>
+      </div>
+    </header>
+
+    <section class="info-grid">
+      <article class="panel">
+        <h2>Datos personales</h2>
+        <dl>
+          <div><dt>DNI</dt><dd>{{ p.dni }}</dd></div>
+          <div><dt>Fecha de nacimiento</dt><dd>{{ p.fechaDeNacimiento ? (p.fechaDeNacimiento | date:'dd/MM/yyyy') : 'Sin informar' }}</dd></div>
+          <div><dt>Domicilio</dt><dd>{{ p.domicilio || 'Sin informar' }}</dd></div>
+          <div><dt>Estado de cuota</dt><dd>{{ p.estadoCuota || 'Sin informar' }}</dd></div>
+        </dl>
+      </article>
+      <article class="panel">
+        <h2>Datos deportivos</h2>
+        <dl>
+          <div><dt>Categoría</dt><dd>{{ p.nombreCategoria || 'Sin categoría' }}</dd></div>
+          <div><dt>Posición</dt><dd>{{ p.posicionCancha || 'Sin informar' }}</dd></div>
+          <div><dt>Club de origen</dt><dd>{{ p.clubOrigen || 'Sin informar' }}</dd></div>
+          <div><dt>Pie hábil</dt><dd>{{ p.pieHabil || 'Sin informar' }}</dd></div>
+          <div><dt>Peso</dt><dd>{{ p.peso ? p.peso + ' kg' : 'Sin informar' }}</dd></div>
+          <div><dt>Altura</dt><dd>{{ p.altura ? p.altura + ' m' : 'Sin informar' }}</dd></div>
+        </dl>
+      </article>
+      <article class="panel medical" *ngIf="capabilities.canViewMedicalRecord">
+        <div class="panel-heading"><h2>Resumen médico</h2><span [class.editable]="capabilities.canEditMedicalRecord">{{ capabilities.canEditMedicalRecord ? 'Edición habilitada' : 'Solo lectura' }}</span></div>
+        <dl>
+          <div><dt>Grupo sanguíneo</dt><dd>{{ p.fichaMedica?.grupoSanguineo || 'Sin informar' }}</dd></div>
+          <div><dt>Patologías</dt><dd>{{ p.fichaMedica?.patologias || 'Sin registrar' }}</dd></div>
+          <div><dt>Lesiones</dt><dd>{{ p.fichaMedica?.historialLesiones || 'Sin registrar' }}</dd></div>
+        </dl>
+      </article>
+    </section>
+  </ng-container>
+</main>
+

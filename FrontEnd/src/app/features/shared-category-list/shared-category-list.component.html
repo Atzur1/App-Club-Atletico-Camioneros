@@ -1,0 +1,17 @@
+<main class="feature-page">
+  <header class="page-header">
+    <div><p class="eyebrow">{{ role === 'dt' ? 'Asignación técnica' : 'Organización deportiva' }}</p><h1>Categorías</h1><p>{{ role === 'dt' ? 'Solamente se muestran tus categorías asignadas.' : 'Consultá los planteles y su información.' }}</p></div>
+    <a [routerLink]="['/', role, 'jugadores']" class="secondary-button">Ver jugadores</a>
+  </header>
+  <label class="search-field"><span>Buscar</span><input [(ngModel)]="searchTerm" placeholder="Nombre o asociación" /></label>
+  <p *ngIf="loading" class="state">Cargando categorías…</p><p *ngIf="error" class="state error">{{ error }}</p>
+  <p *ngIf="!loading && !error && filteredCategories.length === 0" class="state">{{ role === 'dt' ? 'No tenés categorías asignadas.' : 'No se encontraron categorías.' }}</p>
+  <section class="category-grid" *ngIf="!loading && filteredCategories.length">
+    <article class="category-card" *ngFor="let category of filteredCategories">
+      <div class="category-icon">C</div><h2>{{ category.nombreCategoria }}</h2><p>{{ category.asociacion || 'Sin asociación' }}</p>
+      <div class="stats"><span>{{ category.cantidadJugadores || 0 }} jugadores</span><span>{{ category.cantidadStaff || 0 }} integrantes del staff</span></div>
+      <button type="button" class="primary-button" (click)="openCategory(category.idCategoria)">{{ capabilities.canManageCategoryRoster ? 'Ver y gestionar plantel' : 'Ver plantel' }}</button>
+    </article>
+  </section>
+</main>
+

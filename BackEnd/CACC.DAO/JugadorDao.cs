@@ -24,6 +24,11 @@ namespace CACC.DAO
                 p.domicilio AS Domicilio,
                 j.FK_id_categoria AS IdCategoria,
                 ISNULL((
+                    SELECT STRING_AGG(CAST(jc_ids.FK_id_categoria AS VARCHAR), ',')
+                    FROM JUGADORES_CATEGORIAS jc_ids
+                    WHERE jc_ids.FK_id_jugador = j.PK_id_jugador
+                ), '') AS CategoriasIdsString,
+                ISNULL((
                     SELECT STRING_AGG(c_sub.nombre_categoria, ', ')
                     FROM (
                         SELECT DISTINCT c2.nombre_categoria
@@ -189,6 +194,22 @@ namespace CACC.DAO
                 ? "INHABILITADO"
                 : (cuotasVencidas == 1 ? "PENDIENTE" : "AL DÍA");
 
+            var categoriasIdsString = reader.IsDBNull(reader.GetOrdinal("CategoriasIdsString"))
+                ? string.Empty
+                : reader.GetString(reader.GetOrdinal("CategoriasIdsString"));
+
+            var idCategoriaPrincipal = reader.IsDBNull(reader.GetOrdinal("IdCategoria"))
+                ? 0
+                : reader.GetInt32(reader.GetOrdinal("IdCategoria"));
+            var categoriasIds = categoriasIdsString
+                .Split(',', StringSplitOptions.RemoveEmptyEntries)
+                .Select(int.Parse)
+                .ToHashSet();
+            if (idCategoriaPrincipal > 0)
+            {
+                categoriasIds.Add(idCategoriaPrincipal);
+            }
+
             var jugador = new JugadorDetalle
             {
                 IdJugador = reader.GetInt32(reader.GetOrdinal("IdJugador")),
@@ -198,7 +219,8 @@ namespace CACC.DAO
                 Genero = reader.IsDBNull(reader.GetOrdinal("Genero")) ? null : reader.GetString(reader.GetOrdinal("Genero")),
                 FechaDeNacimiento = reader.IsDBNull(reader.GetOrdinal("FechaDeNacimiento")) ? null : reader.GetDateTime(reader.GetOrdinal("FechaDeNacimiento")),
                 Domicilio = reader.IsDBNull(reader.GetOrdinal("Domicilio")) ? null : reader.GetString(reader.GetOrdinal("Domicilio")),
-                IdCategoria = reader.IsDBNull(reader.GetOrdinal("IdCategoria")) ? 0 : reader.GetInt32(reader.GetOrdinal("IdCategoria")),
+                IdCategoria = idCategoriaPrincipal,
+                CategoriasIds = categoriasIds.ToList(),
                 NombreCategoria = reader.IsDBNull(reader.GetOrdinal("NombreCategoria")) ? "Sin categoría" : reader.GetString(reader.GetOrdinal("NombreCategoria")),
                 ClubOrigen = reader.IsDBNull(reader.GetOrdinal("ClubOrigen")) ? null : reader.GetString(reader.GetOrdinal("ClubOrigen")),
                 FichaMedicaLiga = !reader.IsDBNull(reader.GetOrdinal("FichaMedicaLiga")) && reader.GetBoolean(reader.GetOrdinal("FichaMedicaLiga")),
@@ -293,8 +315,52 @@ namespace CACC.DAO
                     return false;
                 }
 
-                // 3. Minutos jugados en partidos usando IdPartido o fecha/rival.
-                // La ficha médica se modifica exclusivamente desde FichasMedicasController (rol Médico).
+                // 3. Extracción de grupo sanguíneo y factor
+                string? grupo = null;
+                string? factor = null;
+                if (!string.IsNullOrWhiteSpace(jugador.FichaMedica?.GrupoSanguineo))
+                {
+                    var gs = jugador.FichaMedica.GrupoSanguineo.Trim();
+                    if (gs.EndsWith("+") || gs.EndsWith("-"))
+                    {
+                        factor = gs.Substring(gs.Length - 1, 1);
+                        grupo = gs.Substring(0, gs.Length - 1).Trim();
+                    }
+                    else
+                    {
+                        grupo = gs;
+                    }
+                }
+
+                // 4. Persistencia en FICHAS_MEDICAS
+                var queryFicha = @"
+                    IF EXISTS (SELECT 1 FROM FICHAS_MEDICAS WHERE FK_id_jugador = @Id)
+                    BEGIN
+                        UPDATE FICHAS_MEDICAS 
+                        SET grupo_sanguineo = @Grupo, 
+                            factor = @Factor, 
+                            antecedentes_salud = @Patologias, 
+                            condiciones_cronicas = @Lesiones, 
+                            observaciones = @Observaciones, 
+                            fecha_actualizacion = GETDATE()
+                        WHERE FK_id_jugador = @Id;
+                    END
+                    ELSE
+                    BEGIN
+                        INSERT INTO FICHAS_MEDICAS (FK_id_jugador, grupo_sanguineo, factor, antecedentes_salud, condiciones_cronicas, observaciones, fecha_actualizacion)
+                        VALUES (@Id, @Grupo, @Factor, @Patologias, @Lesiones, @Observaciones, GETDATE());
+                    END;";
+
+                using var cmdFicha = new SqlCommand(queryFicha, connection, transaction);
+                cmdFicha.Parameters.AddWithValue("@Id", id);
+                cmdFicha.Parameters.AddWithValue("@Grupo", (object?)grupo ?? DBNull.Value);
+                cmdFicha.Parameters.AddWithValue("@Factor", (object?)factor ?? DBNull.Value);
+                cmdFicha.Parameters.AddWithValue("@Patologias", (object?)jugador.FichaMedica?.Patologias ?? DBNull.Value);
+                cmdFicha.Parameters.AddWithValue("@Lesiones", (object?)jugador.FichaMedica?.HistorialLesiones ?? DBNull.Value);
+                cmdFicha.Parameters.AddWithValue("@Observaciones", (object?)jugador.FichaMedica?.Observaciones ?? DBNull.Value);
+                await cmdFicha.ExecuteNonQueryAsync();
+
+                // 5. Minutos jugados en partidos usando IdPartido o fecha/rival
                 if (jugador.Partidos != null && jugador.Partidos.Count > 0)
                 {
                     var queryPartidos = @"

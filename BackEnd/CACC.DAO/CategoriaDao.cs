@@ -53,10 +53,19 @@ namespace CACC.DAO
             c.PK_id_categoria, 
             ISNULL(c.nombre_categoria, '') AS nombre_categoria,
             ISNULL(c.asociacion, CASE WHEN c.nombre_categoria LIKE '%AFA%' THEN 'AFA' ELSE 'Liga Cordobesa' END) AS asociacion,
-            ISNULL(COUNT(DISTINCT jc.FK_id_jugador), 0) AS cantidad_jugadores,
+            (
+                SELECT COUNT(*)
+                FROM JUGADORES j
+                WHERE j.FK_id_categoria = c.PK_id_categoria
+                   OR EXISTS (
+                       SELECT 1
+                       FROM JUGADORES_CATEGORIAS jc
+                       WHERE jc.FK_id_jugador = j.PK_id_jugador
+                         AND jc.FK_id_categoria = c.PK_id_categoria
+                   )
+            ) AS cantidad_jugadores,
             ISNULL(COUNT(DISTINCT sc.FK_id_staff), 0) AS cantidad_staff
         FROM CATEGORIAS c
-        LEFT JOIN JUGADORES_CATEGORIAS jc ON c.PK_id_categoria = jc.FK_id_categoria
         LEFT JOIN STAFF_CATEGORIAS sc ON c.PK_id_categoria = sc.FK_id_categoria
         GROUP BY c.PK_id_categoria, c.nombre_categoria, c.asociacion
         ORDER BY c.nombre_categoria ASC;";
@@ -244,10 +253,15 @@ namespace CACC.DAO
                     p.dni,
                     p.fecha_de_nacimiento,
                     ISNULL(j.posicion_cancha, 'Sin definir') AS posicion_cancha
-                FROM JUGADORES_CATEGORIAS jc
-                INNER JOIN JUGADORES j ON jc.FK_id_jugador = j.PK_id_jugador
+                FROM JUGADORES j
                 INNER JOIN PERSONAS p ON j.FK_id_persona = p.PK_id_persona
-                WHERE jc.FK_id_categoria = @IdCategoria
+                WHERE j.FK_id_categoria = @IdCategoria
+                   OR EXISTS (
+                       SELECT 1
+                       FROM JUGADORES_CATEGORIAS jc
+                       WHERE jc.FK_id_jugador = j.PK_id_jugador
+                         AND jc.FK_id_categoria = @IdCategoria
+                   )
                 ORDER BY p.apellido ASC, p.nombre ASC;";
 
             using var command = new SqlCommand(query, connection);
@@ -289,10 +303,12 @@ namespace CACC.DAO
                     ISNULL(j.posicion_cancha, 'Sin definir') AS posicion_cancha
                 FROM JUGADORES j
                 INNER JOIN PERSONAS p ON j.FK_id_persona = p.PK_id_persona
-                WHERE j.PK_id_jugador NOT IN (
-                    SELECT jc.FK_id_jugador 
-                    FROM JUGADORES_CATEGORIAS jc 
-                    WHERE jc.FK_id_categoria = @IdCategoria
+                WHERE (j.FK_id_categoria IS NULL OR j.FK_id_categoria <> @IdCategoria)
+                AND NOT EXISTS (
+                    SELECT 1
+                    FROM JUGADORES_CATEGORIAS jc
+                    WHERE jc.FK_id_jugador = j.PK_id_jugador
+                      AND jc.FK_id_categoria = @IdCategoria
                 )
                 AND (@Search IS NULL OR p.dni LIKE '%' + @Search + '%' OR p.nombre LIKE '%' + @Search + '%' OR p.apellido LIKE '%' + @Search + '%')
                 ORDER BY p.apellido ASC, p.nombre ASC;";

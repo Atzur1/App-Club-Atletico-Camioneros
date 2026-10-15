@@ -1,0 +1,12 @@
+<main class="roster-page">
+  <a [routerLink]="['/', role, 'categorias']" class="back-link">← Volver a categorías</a>
+  <header class="page-header"><div><p class="eyebrow">Plantel</p><h1>{{ category?.nombreCategoria || 'Categoría' }}</h1><p>{{ category?.asociacion || 'Información de jugadores asignados' }}</p></div><span class="mode-badge" [class.editable]="capabilities.canManageCategoryRoster">{{ capabilities.canManageCategoryRoster ? 'Gestión de plantel' : 'Solo lectura' }}</span></header>
+  <section class="manager" *ngIf="capabilities.canManageCategoryRoster">
+    <label><span>Agregar jugador</span><select [(ngModel)]="selectedPlayerId"><option [ngValue]="null">Seleccionar jugador</option><option *ngFor="let player of availablePlayers" [ngValue]="player.idJugador">{{ player.nombreCompleto }} · {{ player.dni }}</option></select></label>
+    <button type="button" class="primary-button" [disabled]="!selectedPlayerId" (click)="addPlayer()">Agregar</button>
+  </section>
+  <label class="search-field"><span>Buscar en el plantel</span><input [(ngModel)]="searchTerm" placeholder="Nombre, DNI o posición" /></label>
+  <p *ngIf="loading" class="state">Cargando plantel…</p><p *ngIf="error" class="state error">{{ error }}</p><p *ngIf="!loading && !error && filteredPlayers.length === 0" class="state">La categoría no tiene jugadores asignados.</p>
+  <section class="table-card" *ngIf="!loading && filteredPlayers.length"><table><thead><tr><th>Jugador</th><th>DNI</th><th>Posición</th><th>Fecha de nacimiento</th><th></th></tr></thead><tbody><tr *ngFor="let player of filteredPlayers"><td>{{ player.nombreCompleto }}</td><td>{{ player.dni }}</td><td>{{ player.posicionCancha || 'Sin informar' }}</td><td>{{ player.fechaNacimiento ? (player.fechaNacimiento | date:'dd/MM/yyyy') : 'Sin informar' }}</td><td class="row-actions"><button type="button" (click)="openProfile(player.idJugador)">Ver perfil</button><button *ngIf="capabilities.canManageCategoryRoster" type="button" class="danger" (click)="removePlayer(player.idJugador)">Quitar</button></td></tr></tbody></table></section>
+</main>
+

@@ -1,47 +1,50 @@
-# Dependencies and generated output
-node_modules/
-dist/
-tmp/
-out-tsc/
-bazel-out/
-bin/
-obj/
-coverage/
-.angular/
+# Dependencies and generated frontend output
+**/node_modules/
+**/.angular/
+**/dist/
+**/tmp/
+**/out-tsc/
+**/bazel-out/
+**/coverage/
 
-# Local runtime state
-.runtime/
-*.log
-*.pid
-npm-debug.log*
-yarn-error.log*
-
-# IDE and OS files
-.vs/
-.idea/
-.vscode/*
-!.vscode/settings.json
-!.vscode/tasks.json
-!.vscode/launch.json
-!.vscode/extensions.json
-.history/
+# .NET build and user output
+**/bin/
+**/obj/
+**/.vs/
+**/TestResults/
 *.user
 *.suo
-.DS_Store
-Thumbs.db
 
-# Local secrets and database exports
+# Local runtime state
+/.runtime/
+
+# Local machine-specific configuration
+/BackEnd/CACC.API/appsettings.*.local.json
 .env
 .env.*
 !.env.example
-appsettings.Local.json
-appsettings.*.local.json
-*.bak
-*.bacpac
-*.mdf
-*.ldf
-Bbdd CACC.sql
-bbdd(camioneros).sql
 
-# Archives
+# IDEs and editors
+.idea/
+.project
+.classpath
+.c9/
+*.launch
+.settings/
+*.sublime-workspace
+.history/
+
+# Logs and temporary files
+npm-debug.log*
+yarn-error.log*
+*.log
+/connect.lock
+/libpeerconnection.log
+/testem.log
+/typings/
+__screenshots__/
+
+# Archives and operating-system files
 *.zip
+.DS_Store
+Thumbs.db

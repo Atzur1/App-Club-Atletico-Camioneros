@@ -66,17 +66,3 @@ Abrir el navegador en http://localhost:4200.
 
 🛡️ LicenciaProyecto institucional desarrollado de manera exclusiva para el Club Atlético Camioneros de Córdoba (CACC). Uso interno y reservado.
 
-# Configuración local de credenciales QR
-
-La credencial del jugador usa un identificador opaco firmado con HMAC-SHA256; el QR no contiene DNI ni datos personales. Configure una clave aleatoria de 32 bytes fuera del repositorio:
-
-```powershell
-dotnet user-secrets set "CredentialQr:HmacKey" "<clave-base64-de-32-bytes>" --project .\BackEnd\CACC.API\CACC.API.csproj
-```
-
-En otros entornos use la variable `CredentialQr__HmacKey`. Ejecute `BackEnd/scripts/database/001-create-credential-qr.sql` una vez por base (es idempotente). La cámara móvil requiere HTTPS, salvo en `localhost`.
-
-Durante desarrollo, `npm start` publica Angular en la red local y reenvía `/api` a `http://localhost:5191` mediante `FrontEnd/proxy.conf.json`. Desde un teléfono no use una URL `localhost`: abra el host de la computadora. La API del scanner usa una ruta relativa para conservar el mismo origen. Para que la cámara funcione en un dispositivo móvil, el frontend debe servirse mediante HTTPS; en producción, el reverse proxy HTTPS debe reenviar `/api` al backend. No es necesario exponer la clave HMAC ni agregar orígenes CORS desconocidos.
-
-Las credenciales QR de personal no están soportadas; el flujo habilitado corresponde únicamente a jugadores.
-

@@ -1,0 +1,37 @@
+<main class="feature-page">
+  <header class="page-header">
+    <div>
+      <p class="eyebrow">{{ role === 'dt' ? 'Mis categorías' : 'Plantel general' }}</p>
+      <h1>Jugadores</h1>
+      <p>{{ role === 'dt' ? 'Jugadores asignados a tus categorías.' : 'Consulta de jugadores y perfiles del club.' }}</p>
+    </div>
+    <a [routerLink]="['/', role, 'categorias']" class="secondary-button">Ver categorías</a>
+  </header>
+
+  <label class="search-field">
+    <span>Buscar</span>
+    <input [(ngModel)]="searchTerm" placeholder="Nombre, DNI o categoría" />
+  </label>
+
+  <p *ngIf="loading" class="state">Cargando jugadores…</p>
+  <p *ngIf="error" class="state error">{{ error }}</p>
+  <p *ngIf="!loading && !error && filteredPlayers.length === 0" class="state">
+    {{ role === 'dt' ? 'No hay jugadores dentro de tus categorías asignadas.' : 'No se encontraron jugadores.' }}
+  </p>
+
+  <section class="card-grid" *ngIf="!loading && filteredPlayers.length">
+    <article class="player-card" *ngFor="let player of filteredPlayers">
+      <div class="avatar">{{ player.nombre.charAt(0) }}{{ player.apellido.charAt(0) }}</div>
+      <div class="card-content">
+        <h2>{{ player.nombre }} {{ player.apellido }}</h2>
+        <p>DNI {{ player.dni }}</p>
+        <div class="badges">
+          <span>{{ player.nombreCategoria || 'Sin categoría' }}</span>
+          <span>{{ player.posicionCancha || 'Sin posición' }}</span>
+        </div>
+      </div>
+      <button type="button" class="primary-button" (click)="openProfile(player.idJugador)">Ver perfil</button>
+    </article>
+  </section>
+</main>
+

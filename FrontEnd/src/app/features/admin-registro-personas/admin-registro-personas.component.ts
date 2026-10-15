@@ -14,15 +14,15 @@ export class AdminRegistroPersonasComponent {
 
   navegar(tipo: 'jugador' | 'staff') {
     if (tipo === 'jugador') {
-      this.router.navigate(['/admin/alta-jugador']);
+      this.router.navigate(['/admin/jugadores/nuevo']);
     } else if (tipo === 'staff') {
-      this.router.navigate(['/admin/alta-trabajador']);
+      this.router.navigate(['/admin/staff/nuevo']);
     }
   }
 
   volver() {
     // Redirige correctamente a la pantalla de los tres portales
-    this.router.navigate(['/seleccion-portales']);
+    this.router.navigate(['/admin/portales']);
   }
   
 }

@@ -1,63 +1,30 @@
+using System.Text.Json;
 using CACC.API.Controllers;
 using CACC.API.DTOs;
-using CACC.API.Services;
 using CACC.DAO;
+using CACC.Entities;
 using Microsoft.AspNetCore.Mvc;
-
+using Xunit;
 namespace CACC.Tests;
-
-public sealed class AsistenciasControllerTests
-{
-    [Fact]
-    public async Task Legacy_manual_endpoint_rejects_the_same_invalid_dni_as_the_current_endpoint()
-    {
-        var attendance = new RecordingAttendanceService();
-        var controller = new AsistenciasController(new StubTokenService(), new StubCredentialDao(), attendance);
-
-        var current = await controller.RegisterManual(new ManualAttendanceRequest("abc", "test"));
-        var legacy = await controller.Legacy(new AsistenciaRequestDto { Dni = "abc", Observaciones = "test" });
-
-        Assert.IsType<BadRequestObjectResult>(current);
-        Assert.IsType<BadRequestObjectResult>(legacy);
-        Assert.Equal(0, attendance.CallCount);
-    }
-
-    [Fact]
-    public async Task Legacy_manual_endpoint_uses_the_same_normalized_registration_path()
-    {
-        var attendance = new RecordingAttendanceService();
-        var controller = new AsistenciasController(new StubTokenService(), new StubCredentialDao(), attendance);
-
-        var result = await controller.Legacy(new AsistenciaRequestDto { Dni = " 12345678 ", Observaciones = "legacy" });
-
-        Assert.IsType<OkObjectResult>(result);
-        Assert.Equal(1, attendance.CallCount);
-        Assert.Equal(("12345678", "DNI_MANUAL", "legacy"), attendance.LastCall);
-    }
-
-    private sealed class RecordingAttendanceService : IAttendanceRegistrationService
-    {
-        public int CallCount { get; private set; }
-        public (string Dni, string Method, string? Detail)? LastCall { get; private set; }
-
-        public Task<AttendanceRegistrationResult> RegisterAsync(string dni, string method, string? detail)
-        {
-            CallCount++;
-            LastCall = (dni, method, detail);
-            return Task.FromResult(new AttendanceRegistrationResult(true, true, "ok", 0, 0));
-        }
-    }
-
-    private sealed class StubTokenService : ICredentialTokenService
-    {
-        public string Create(Guid id) => throw new NotSupportedException();
-        public CredentialToken? Validate(string token) => null;
-    }
-
-    private sealed class StubCredentialDao : ICredentialDao
-    {
-        public Task<Guid?> GetOrCreateActiveCredentialForPlayerAsync(int playerId, CancellationToken cancellationToken) => throw new NotSupportedException();
-        public Task<string?> GetActiveDniAsync(Guid credentialId, CancellationToken cancellationToken) => Task.FromResult<string?>(null);
-        public Task<CredentialPlayerData?> GetPlayerAsync(int playerId, CancellationToken cancellationToken) => throw new NotSupportedException();
-    }
+public class AsistenciasControllerTests {
+ [Theory][InlineData(0,true,true)][InlineData(1,true,true)][InlineData(2,false,false)]
+ public async Task AppliesDebtPolicyAtomically(int cuotas,bool acceso,bool registrada){
+  var dao=new FakeDao(new ResultadoIngreso{PersonaEncontrada=true,CuotasVencidas=cuotas,AccesoPermitido=acceso,AsistenciaRegistrada=registrada});
+  var result=await new AsistenciasController(dao).VerificarYRegistrar(new AsistenciaRequestDto{Dni="40111222"});
+  var ok=Assert.IsType<OkObjectResult>(result); using var doc=JsonDocument.Parse(JsonSerializer.Serialize(ok.Value));
+  Assert.Equal(acceso,doc.RootElement.GetProperty("accesoPermitido").GetBoolean()); Assert.Equal(registrada,doc.RootElement.GetProperty("asistenciaRegistrada").GetBoolean()); Assert.Equal(1,dao.Calls);
+ }
+ [Fact] public async Task ReportsIdempotentSameDayScan(){
+  var dao=new FakeDao(new ResultadoIngreso{PersonaEncontrada=true,CuotasVencidas=0,AccesoPermitido=true,AsistenciaRegistrada=true,YaRegistrada=true});
+  var result=await new AsistenciasController(dao).VerificarYRegistrar(new AsistenciaRequestDto{Dni="40111222"});
+  var ok=Assert.IsType<OkObjectResult>(result); using var doc=JsonDocument.Parse(JsonSerializer.Serialize(ok.Value));
+  Assert.True(doc.RootElement.GetProperty("yaRegistrada").GetBoolean()); Assert.Contains("ya estaba registrada",doc.RootElement.GetProperty("mensaje").GetString());
+ }
+ [Theory][InlineData("El DNI no pertenece a un jugador.")][InlineData("El DNI está asociado a múltiples jugadores.")]
+ public async Task RejectsMissingOrAmbiguousPlayers(string error){
+  var result=await new AsistenciasController(new FakeDao(new ResultadoIngreso{Error=error})).VerificarYRegistrar(new AsistenciaRequestDto{Dni="40111222"});
+  var invalid=Assert.IsType<UnprocessableEntityObjectResult>(result); using var doc=JsonDocument.Parse(JsonSerializer.Serialize(invalid.Value)); Assert.Equal(error,doc.RootElement.GetProperty("message").GetString());
+ }
+ private sealed class FakeDao(ResultadoIngreso result):IAsistenciaDao { public int Calls{get;private set;} public Task<ResultadoIngreso> ProcesarIngresoAsync(string d,string o){Calls++;return Task.FromResult(result);} }
 }
+

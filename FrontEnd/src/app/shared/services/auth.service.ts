@@ -1,98 +1,120 @@
 import { Injectable, inject } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable, tap } from 'rxjs';
-import { Capability, RoleId, hasCapability } from '../../core/auth/roles';
 
-export interface AuthResponse {
-  token: string;
-  rol: string;
-  role: string;
-  idRol: RoleId;
-  usuario: string;
-  categoriasAsignadas: number[];
-}
-
-export interface AuthSession {
-  token: string;
-  roleId: RoleId;
-  roleName: string;
-  email: string;
-  categoryIds: number[];
-  expiresAt: number;
-}
-
-@Injectable({ providedIn: 'root' })
+@Injectable({
+  providedIn: 'root'
+})
 export class AuthService {
   private readonly http = inject(HttpClient);
-  private readonly apiUrl = '/api/auth';
-  private readonly sessionKey = 'cacc_session';
+  // Keep the API host aligned with the development frontend host. Browsers treat
+  // localhost and 127.0.0.1 as different origins even when they reach this machine.
+  private readonly apiUrl = 'http://127.0.0.1:5191/api/auth';
 
-  login(credenciales: { email: string; password: string }): Observable<AuthResponse> {
-    return this.http.post<AuthResponse>(`${this.apiUrl}/login`, credenciales).pipe(
-      tap(response => this.guardarSesion(response))
+  login(credenciales: { email: string; password: string }): Observable<any> {
+    return this.http.post<any>(`${this.apiUrl}/login`, credenciales).pipe(
+      tap(response => {
+        if (response && response.token) {
+          this.storage?.setItem('jwt_token', response.token);
+
+          // 1. Intentar leer rol desde el body
+          let rolDetectado = response.rol || response.role || response.Rol;
+
+          // 2. Si no vino en el body, extraerlo del payload del JWT
+          if (!rolDetectado) {
+            try {
+              const payload = this.decodeTokenPayload(response.token);
+              rolDetectado = payload['http://schemas.microsoft.com/ws/2008/06/identity/claims/role']
+                || payload['role']
+                || payload['rol'];
+            } catch { /* The guard rejects tokens without a readable role. */ }
+          }
+
+          if (rolDetectado) {
+            this.storage?.setItem('user_rol', rolDetectado);
+          } else {
+            this.storage?.removeItem('user_rol');
+          }
+        }
+      })
     );
   }
 
-  private guardarSesion(response: AuthResponse): void {
-    const payload = this.decodePayload(response.token);
-    if (!response.token || !payload || !Number.isInteger(Number(response.idRol))) {
-      throw new Error('La respuesta de autenticación no contiene una sesión válida.');
-    }
-    const session: AuthSession = {
-      token: response.token,
-      roleId: Number(response.idRol) as RoleId,
-      roleName: response.rol,
-      email: response.usuario,
-      categoryIds: (response.categoriasAsignadas ?? []).map(Number).filter(Number.isInteger),
-      expiresAt: Number(payload['exp'] ?? 0) * 1000
-    };
-    localStorage.setItem(this.sessionKey, JSON.stringify(session));
-    localStorage.removeItem('jwt_token');
-    localStorage.removeItem('user_rol');
+  getToken(): string | null {
+    return this.storage?.getItem('jwt_token') ?? null;
   }
 
-  getSession(): AuthSession | null {
-    try {
-      const raw = localStorage.getItem(this.sessionKey);
-      if (!raw) return null;
-      const session = JSON.parse(raw) as AuthSession;
-      if (!session.token || !session.roleId || session.expiresAt <= Date.now()) {
-        this.logout();
+  getRol(): string | null {
+    const rolLocal = this.storage?.getItem('user_rol');
+    if (rolLocal && rolLocal !== 'undefined' && rolLocal !== 'null') {
+      return rolLocal;
+    }
+
+    // Respaldo: leer directo del token si user_rol estuviera vacío
+    const token = this.getToken();
+    if (token) {
+      try {
+        const payload = this.decodeTokenPayload(token);
+        return payload['http://schemas.microsoft.com/ws/2008/06/identity/claims/role']
+          || payload['role']
+          || payload['rol']
+          || null;
+      } catch {
         return null;
       }
-      return session;
-    } catch {
-      this.logout();
-      return null;
     }
+    return null;
   }
-
-  getToken(): string | null { return this.getSession()?.token ?? null; }
-  getRol(): string | null { return this.getSession()?.roleName ?? null; }
-  getRoleId(): RoleId | null { return this.getSession()?.roleId ?? null; }
-  getCategoryIds(): number[] { return this.getSession()?.categoryIds ?? []; }
-  puede(capability: Capability): boolean { return hasCapability(this.getRoleId(), capability); }
 
   logout(): void {
-    localStorage.removeItem(this.sessionKey);
-    localStorage.removeItem('jwt_token');
-    localStorage.removeItem('user_rol');
-    localStorage.removeItem('cacc_jwt_token');
+    this.storage?.removeItem('jwt_token');
+    this.storage?.removeItem('user_rol');
   }
 
-  estaAutenticado(): boolean { return this.getSession() !== null; }
+  estaAutenticado(): boolean {
+    const token = this.getToken();
+    if (!token) return false;
 
-  obtenerDatosUsuario(): { email: string; rol: string } {
-    const session = this.getSession();
-    return { email: session?.email ?? '', rol: session?.roleName ?? '' };
-  }
-
-  private decodePayload(token: string): Record<string, unknown> | null {
     try {
-      const base64 = token.split('.')[1].replace(/-/g, '+').replace(/_/g, '/');
-      return JSON.parse(atob(base64)) as Record<string, unknown>;
+      const payload = this.decodeTokenPayload(token);
+      if (typeof payload['exp'] === 'number' && payload['exp'] * 1000 <= Date.now()) {
+        this.logout();
+        return false;
+      }
+      return true;
     } catch {
-      return null;
+      this.logout();
+      return false;
     }
   }
+
+  obtenerDatosUsuario(): { email: string, rol: string } {
+    const token = this.getToken();
+    const rolLocal = this.getRol() || 'Sin rol';
+
+    if (!token) return { email: 'usuario@cacc.com.ar', rol: rolLocal };
+
+    try {
+      const decoded = this.decodeTokenPayload(token);
+
+      return {
+        email: decoded['http://schemas.xmlsoap.org/ws/2005/05/identity/claims/emailaddress'] || decoded['email'] || 'usuario@cacc.com.ar',
+        rol: decoded['http://schemas.microsoft.com/ws/2008/06/identity/claims/role'] || decoded['role'] || decoded['rol'] || rolLocal
+      };
+    } catch {
+      return { email: 'usuario@cacc.com.ar', rol: rolLocal };
+    }
+  }
+
+  private get storage(): Storage | null {
+    return typeof localStorage === 'undefined' ? null : localStorage;
+  }
+
+  private decodeTokenPayload(token: string): Record<string, any> {
+    const encoded = token.split('.')[1];
+    if (!encoded) throw new Error('Invalid JWT');
+    const base64 = encoded.replace(/-/g, '+').replace(/_/g, '/').padEnd(Math.ceil(encoded.length / 4) * 4, '=');
+    return JSON.parse(atob(base64));
+  }
 }
+

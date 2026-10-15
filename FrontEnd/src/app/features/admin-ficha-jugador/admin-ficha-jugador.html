@@ -1,0 +1,367 @@
+<div class="content-body role-content">
+      <div *ngIf="cargando" class="load-state" role="status">Cargando ficha del jugador...</div>
+
+      <div *ngIf="noEncontrado" class="load-state load-state-error" role="alert">
+        <strong>Jugador no encontrado.</strong>
+        <span>El identificador no es válido o el jugador ya no existe.</span>
+        <button class="btn-action-outline mt-2" type="button" (click)="volver()">Volver al listado</button>
+      </div>
+
+      <div *ngIf="errorCarga" class="load-state load-state-error" role="alert">
+        <span>{{ errorCarga }}</span>
+        <div class="state-actions mt-2">
+          <button class="btn-action-outline" type="button" (click)="cargarJugador()">Reintentar</button>
+          <button class="btn-action-outline ml-2" type="button" (click)="volver()">Volver al listado</button>
+        </div>
+      </div>
+
+      <div class="ficha-content-wrapper" *ngIf="!cargando && jugador as player">
+        <div class="cards-grid-row">
+
+          <!-- CARD 1: PERFIL & DATOS PERSONALES -->
+          <section class="card-box card-perfil">
+            <div class="photo-banner">
+              <div class="avatar-banner-circle">
+                <svg width="44" height="44" viewBox="0 0 24 24" fill="#007A3D"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 3c1.66 0 3 1.34 3 3s-1.34 3-3 3-3-1.34-3-3 1.34-3 3-3zm0 14.2c-2.5 0-4.71-1.28-6-3.22.03-1.99 4-3.08 6-3.08 1.99 0 5.97 1.09 6 3.08-1.29 1.94-3.5 3.22-6 3.22z" /></svg>
+              </div>
+            </div>
+
+            <div class="profile-name-header">
+              <h2 class="player-name">{{ nombreCompleto }}</h2>
+              <span class="player-pos-badge">{{ player.posicion }}</span>
+            </div>
+
+            <hr class="card-divider" />
+            <h3 class="section-subtitle">DATOS PERSONALES</h3>
+
+            <!-- Grid de datos personales mejorado con tarjetas individuales -->
+            <div class="personal-data-grid">
+              <!-- Nacimiento -->
+              <div class="data-item-card">
+                <div class="data-icon">
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#007A3D" stroke-width="2.2"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>
+                </div>
+                <div class="data-label-group">
+                  <span class="data-label">F. Nacimiento</span>
+                  <span class="data-val">{{ fechaNacimiento }}</span>
+                </div>
+              </div>
+
+              <!-- Edad -->
+              <div class="data-item-card">
+                <div class="data-icon">
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#007A3D" stroke-width="2.2"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
+                </div>
+                <div class="data-label-group">
+                  <span class="data-label">Edad</span>
+                  <span class="data-val">{{ edad }}</span>
+                </div>
+              </div>
+
+              <!-- Peso -->
+              <div class="data-item-card">
+                <div class="data-icon">
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#007A3D" stroke-width="2.2"><path d="M6 2v6h12V2H6z"></path><path d="M4 8h16l-2 14H6L4 8z"></path></svg>
+                </div>
+                <div class="data-label-group">
+                  <span class="data-label">Peso</span>
+                  <span class="data-val">{{ player.peso ? player.peso + ' Kg' : sinInformar }}</span>
+                </div>
+              </div>
+
+              <!-- Altura -->
+              <div class="data-item-card">
+                <div class="data-icon">
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#007A3D" stroke-width="2.2"><polyline points="8 6 12 2 16 6"></polyline><line x1="12" y1="2" x2="12" y2="22"></line><polyline points="8 18 12 22 16 18"></polyline></svg>
+                </div>
+                <div class="data-label-group">
+                  <span class="data-label">Altura</span>
+                  <span class="data-val">{{ player.altura ? player.altura + ' m' : sinInformar }}</span>
+                </div>
+              </div>
+
+              <!-- Pie Hábil -->
+              <div class="data-item-card">
+                <div class="data-icon">
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#007A3D" stroke-width="2.2"><circle cx="12" cy="12" r="10"></circle><path d="M12 2a14.5 14.5 0 0 0 0 20 14.5 14.5 0 0 0 0-20"></path></svg>
+                </div>
+                <div class="data-label-group">
+                  <span class="data-label">Pie Hábil</span>
+                  <span class="data-val">{{ player.pieHabil || sinInformar }}</span>
+                </div>
+              </div>
+
+              <!-- Grupo Sanguíneo -->
+              <div class="data-item-card">
+                <div class="data-icon">
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#007A3D" stroke-width="2.2"><path d="M12 2.69l5.66 5.66a8 8 0 1 1-11.31 0z"></path></svg>
+                </div>
+                <div class="data-label-group">
+                  <span class="data-label">Gr. Sanguíneo</span>
+                  <span class="data-val blood-badge">{{ player.fichaMedica?.grupoSanguineo || sinInformar }}</span>
+                </div>
+              </div>
+
+              <!-- Tutor -->
+              <div class="data-item-card tutor-card">
+                <div class="data-icon">
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#007A3D" stroke-width="2.2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M23 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg>
+                </div>
+                <div class="data-label-group">
+                  <span class="data-label">Tutor</span>
+                  <span class="data-val">{{ tutor }}</span>
+                </div>
+              </div>
+
+              <!-- Teléfono Tutor -->
+              <div class="data-item-card tutor-card">
+                <div class="data-icon">
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#007A3D" stroke-width="2.2"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"></path></svg>
+                </div>
+                <div class="data-label-group">
+                  <span class="data-label">Teléfono Tutor</span>
+                  <span class="data-val">{{ player.tutor?.telefono || sinInformar }}</span>
+                </div>
+              </div>
+            </div>
+
+            <!-- Domicilio Full Width -->
+            <div class="domicilio-card">
+              <div class="data-icon">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#007A3D" stroke-width="2.2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path><circle cx="12" cy="10" r="3"></circle></svg>
+              </div>
+              <div class="data-label-group">
+                <span class="data-label">Domicilio</span>
+                <span class="data-val">{{ player.domicilio || sinInformar }}</span>
+              </div>
+            </div>
+          </section>
+
+          <!-- CARD 2: HISTORIAL DE PARTIDOS -->
+          <section class="card-box card-partidos">
+            <div class="card-header-row">
+              <h2 class="card-title">HISTORIAL DE PARTIDOS</h2>
+            </div>
+
+            <!-- Tabla de Partidos con diseño balanceado -->
+            <div class="match-table-responsive">
+              <table class="match-table">
+                <thead>
+                  <tr>
+                    <th class="th-fecha">FECHA</th>
+                    <th class="th-rival">RIVAL</th>
+                    <th class="th-condicion">CONDICIÓN</th>
+                    <th class="th-resultado">RESULTADO</th>
+                    <th class="th-minutos">MINUTOS</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr *ngFor="let partido of player.partidos">
+                    <td class="td-fecha">{{ partido.fecha | date:'dd/MM/yyyy' }}</td>
+                    <td class="td-rival" [title]="partido.rival">{{ partido.rival }}</td>
+                    <td class="td-condicion">
+                      <span class="badge-condicion" [ngClass]="partido.condicion === 'Local' ? 'badge-local' : 'badge-visitante'">
+                        {{ partido.condicion }}
+                      </span>
+                    </td>
+                    <td class="td-resultado">
+                      <span class="badge-resultado" [ngClass]="{
+                        'res-g': partido.resultado.startsWith('G'),
+                        'res-p': partido.resultado.startsWith('P'),
+                        'res-e': partido.resultado.startsWith('E')
+                      }">
+                        {{ partido.resultado }}
+                      </span>
+                    </td>
+                    <td class="td-minutos">{{ partido.minutos }}'</td>
+                  </tr>
+                  <tr *ngIf="player.partidos?.length === 0">
+                    <td colspan="5" class="no-records">Sin partidos informados para este jugador.</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+
+            <!-- Total Minutos -->
+            <div class="total-minutos-footer">
+              <span class="total-label">TOTAL MINUTOS JUGADOS:</span>
+              <span class="total-val">{{ totalMinutosJugados }}</span>
+            </div>
+
+            <!-- Botón Ver Historial Completo -->
+            <div class="match-action-box">
+              <button type="button" class="btn-action-outline btn-full-history" (click)="mostrarPopupPartidos = true">
+                Ver historial de partidos completo
+              </button>
+            </div>
+          </section>
+
+          <!-- CARD 3: FICHA MÉDICA -->
+          <section class="card-box card-medica">
+            <div class="card-header-row">
+              <h2 class="card-title">FICHA MÉDICA</h2>
+            </div>
+
+            <!-- Patologías -->
+            <div class="medical-section">
+              <span class="medical-subtitle">Patologías</span>
+              <div class="medical-box" [class.medical-empty]="!player.fichaMedica?.patologias">
+                {{ player.fichaMedica?.patologias || sinInformar }}
+              </div>
+            </div>
+
+            <!-- Historial de Lesiones (1 renglón por cada una) -->
+            <div class="medical-section mt-2">
+              <span class="medical-subtitle">Historial de lesiones</span>
+              <div class="lesiones-container" *ngIf="lesionesList.length > 0; else noLesiones">
+                <div class="lesion-item-row" *ngFor="let lesion of lesionesList">
+                  <span class="lesion-dot"></span>
+                  <span class="lesion-text">{{ lesion }}</span>
+                </div>
+              </div>
+              <ng-template #noLesiones>
+                <div class="medical-box medical-empty">{{ sinInformar }}</div>
+              </ng-template>
+            </div>
+
+            <!-- Observaciones Médicas -->
+            <div class="medical-section mt-2">
+              <span class="medical-subtitle">Observaciones médicas</span>
+              <div class="medical-box" [class.medical-empty]="!player.fichaMedica?.observaciones">
+                {{ player.fichaMedica?.observaciones || sinInformar }}
+              </div>
+            </div>
+
+            <div class="medical-action-box">
+              <button type="button" class="btn-action-outline btn-ficha-completa" (click)="mostrarPopupFichaMedica = true">
+                Ver ficha médica completa
+              </button>
+            </div>
+          </section>
+
+        </div>
+
+        <!-- FOOTER ACCIONES -->
+        <footer class="bottom-actions-row">
+          <button *ngIf="canEditPlayers" type="button" class="btn-solid-green btn-editar-perfil" (click)="editarPerfil()">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#ffffff" stroke-width="2.5"><path d="M12 20h9"></path><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"></path></svg>
+            <span>Editar perfil</span>
+          </button>
+
+          <div class="right-actions-group">
+            <button type="button" class="btn-action-outline btn-volver" (click)="volver()">
+              <span>← Volver</span>
+            </button>
+
+            <button *ngIf="canEditPlayers" type="button" class="btn-solid-green btn-credencial" (click)="generarCredencial()">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><rect x="7" y="7" width="3" height="3"></rect><rect x="14" y="7" width="3" height="3"></rect><rect x="7" y="14" width="3" height="3"></rect></svg>
+              <span>Generar credencial</span>
+            </button>
+          </div>
+        </footer>
+      </div>
+    </div><!-- Popup Credencial Integrado -->
+  <app-admin-popup-credencial [isVisible]="mostrarPopupCredencial"
+                              [nombre]="nombreCompleto"
+                              [documento]="jugador ? ('DNI: ' + jugador.dni) : sinInformar"
+                              (close)="mostrarPopupCredencial = false"
+                              (descargar)="descargarCredencial()">
+  </app-admin-popup-credencial>
+
+  <!-- Popup Modal: Historial de Partidos Completo -->
+  <div class="popup-overlay" *ngIf="mostrarPopupPartidos" (click)="mostrarPopupPartidos = false">
+    <div class="popup-card popup-card-large" (click)="$event.stopPropagation()">
+      <div class="popup-card-header">
+        <h2 class="popup-card-title">Historial Completo de Partidos</h2>
+        <button type="button" class="btn-close-popup" (click)="mostrarPopupPartidos = false">✕</button>
+      </div>
+
+      <div class="popup-body">
+        <div class="popup-meta-info">
+          <span><strong>Jugador:</strong> {{ nombreCompleto }}</span>
+          <span><strong>Categoría:</strong> {{ jugador?.categoria }}</span>
+          <span><strong>Total Minutos:</strong> {{ totalMinutosJugados }}'</span>
+        </div>
+
+        <div class="match-table-responsive modal-table">
+          <table class="match-table">
+            <thead>
+              <tr>
+                <th>FECHA</th>
+                <th>RIVAL</th>
+                <th>CONDICIÓN</th>
+                <th>RESULTADO</th>
+                <th>MINUTOS</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr *ngFor="let p of jugador?.partidos">
+                <td>{{ p.fecha | date:'dd/MM/yyyy' }}</td>
+                <td style="font-weight: 600;">{{ p.rival }}</td>
+                <td>
+                  <span class="badge-condicion" [ngClass]="p.condicion === 'Local' ? 'badge-local' : 'badge-visitante'">
+                    {{ p.condicion }}
+                  </span>
+                </td>
+                <td>
+                  <span class="badge-resultado" [ngClass]="{
+                    'res-g': p.resultado.startsWith('G'),
+                    'res-p': p.resultado.startsWith('P'),
+                    'res-e': p.resultado.startsWith('E')
+                  }">
+                    {{ p.resultado }}
+                  </span>
+                </td>
+                <td style="font-weight: 700;">{{ p.minutos }}'</td>
+              </tr>
+              <tr *ngIf="jugador?.partidos?.length === 0">
+                <td colspan="5" class="no-records">No hay registros de partidos disponibles.</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <div class="popup-footer">
+        <button type="button" class="btn-solid-green" (click)="mostrarPopupPartidos = false">Cerrar</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Popup Ficha Médica Completa -->
+  <div class="popup-overlay" *ngIf="mostrarPopupFichaMedica" (click)="mostrarPopupFichaMedica = false">
+    <div class="popup-card" (click)="$event.stopPropagation()">
+      <div class="popup-card-header">
+        <h2 class="popup-card-title">Ficha Médica Completa</h2>
+        <button type="button" class="btn-close-popup" (click)="mostrarPopupFichaMedica = false">✕</button>
+      </div>
+
+      <div class="popup-body">
+        <div class="popup-item">
+          <strong>Patologías:</strong>
+          <p>{{ jugador?.fichaMedica?.patologias || sinInformar }}</p>
+        </div>
+        <div class="popup-item">
+          <strong>Historial de lesiones:</strong>
+          <div class="lesiones-container modal-lesiones" *ngIf="lesionesList.length > 0; else noLesionesModal">
+            <div class="lesion-item-row" *ngFor="let lesion of lesionesList">
+              <span class="lesion-dot"></span>
+              <span class="lesion-text">{{ lesion }}</span>
+            </div>
+          </div>
+          <ng-template #noLesionesModal>
+            <p>{{ sinInformar }}</p>
+          </ng-template>
+        </div>
+        <div class="popup-item">
+          <strong>Observaciones clínicas:</strong>
+          <p>{{ jugador?.fichaMedica?.observaciones || sinInformar }}</p>
+        </div>
+      </div>
+
+      <div class="popup-footer">
+        <button type="button" class="btn-solid-green" (click)="mostrarPopupFichaMedica = false">Cerrar</button>
+      </div>
+    </div>
+  </div>
+

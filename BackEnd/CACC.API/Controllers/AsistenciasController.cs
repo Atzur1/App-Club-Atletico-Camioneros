@@ -1,20 +1,50 @@
-using System.Text.RegularExpressions;
-using CACC.API.Authorization;
-using CACC.API.Services;
+using CACC.API.DTOs;
 using CACC.DAO;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-namespace CACC.API.Controllers;
-[ApiController, Route("api/asistencias")]
-[Authorize(Roles = RoleNames.Administrador + "," + RoleNames.DonQr)]
-public sealed partial class AsistenciasController(ICredentialTokenService tokens, ICredentialDao credentials, IAttendanceRegistrationService attendance) : ControllerBase
+using CACC.API.Security;
+
+namespace CACC.API.Controllers
 {
- [HttpPost("registrar-por-qr")] public async Task<IActionResult> RegisterByQr([FromBody] QrAttendanceRequest request,CancellationToken ct){var token=tokens.Validate(request.QrToken);if(token is null)return BadRequest(new{message="La credencial QR no es válida."});var dni=await credentials.GetActiveDniAsync(token.CredentialId,ct);if(dni is null)return NotFound(new{message="La credencial no existe, fue revocada o está inactiva."});return Result(await attendance.RegisterAsync(dni,"QR",null));}
- [HttpPost("registrar-manual")] public Task<IActionResult> RegisterManual([FromBody] ManualAttendanceRequest request)=>RegisterManualCore(request.Dni,request.Reason);
- [HttpPost("verificar-y-registrar")] public Task<IActionResult> Legacy([FromBody] DTOs.AsistenciaRequestDto request)=>RegisterManualCore(request.Dni,request.Observaciones);
- private async Task<IActionResult> RegisterManualCore(string? rawDni,string? reason){var dni=rawDni?.Trim()??string.Empty;if(!DniPattern().IsMatch(dni))return BadRequest(new{message="Ingresá un DNI válido de 7 u 8 números."});return Result(await attendance.RegisterAsync(dni,"DNI_MANUAL",reason));}
- private IActionResult Result(AttendanceRegistrationResult r)=>r.PersonFound?Ok(new{accesoPermitido=r.AccessAllowed,mensaje=r.Message,deudaTotal=r.DebtTotal,cuotasVencidas=r.OverdueInstallments}):NotFound(new{message=r.Message});
- [GeneratedRegex("^[0-9]{7,8}$")] private static partial Regex DniPattern();
+    [ApiController]
+    [Route("api/asistencias")]
+    [Authorize(Roles = AppRoles.Administradores + "," + AppRoles.DonQr)]
+    public class AsistenciasController : ControllerBase
+    {
+        private readonly IAsistenciaDao _asistenciaDao;
+
+        public AsistenciasController(IAsistenciaDao asistenciaDao)
+        {
+            _asistenciaDao = asistenciaDao;
+        }
+
+        [HttpPost("verificar-y-registrar")]
+        public async Task<IActionResult> VerificarYRegistrar([FromBody] AsistenciaRequestDto request)
+        {
+            if (string.IsNullOrWhiteSpace(request.Dni))
+            {
+                return BadRequest(new { message = "El DNI es obligatorio." });
+            }
+
+            var resultado = await _asistenciaDao.ProcesarIngresoAsync(request.Dni.Trim(), request.Observaciones ?? string.Empty);
+            if (!resultado.PersonaEncontrada)
+            {
+                return UnprocessableEntity(new { message = resultado.Error ?? "No se pudo identificar un jugador inequívoco." });
+            }
+            var mensaje = resultado.YaRegistrada ? "La asistencia ya estaba registrada para hoy." : resultado.CuotasVencidas switch {
+                0 => "Asistencia registrada. Acceso permitido.",
+                1 => "Asistencia registrada. El jugador posee un mes de deuda.",
+                _ => $"Acceso denegado. El jugador posee {resultado.CuotasVencidas} cuotas vencidas y la asistencia no fue registrada."
+            };
+            return Ok(new
+            {
+                accesoPermitido = resultado.AccesoPermitido,
+                asistenciaRegistrada = resultado.AsistenciaRegistrada,
+                yaRegistrada = resultado.YaRegistrada,
+                mensaje,
+                deudaTotal = resultado.DeudaTotal,
+                cuotasVencidas = resultado.CuotasVencidas
+            });
+        }
+    }
 }
-public sealed record QrAttendanceRequest(string QrToken);
-public sealed record ManualAttendanceRequest(string Dni,string? Reason);
