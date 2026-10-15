@@ -1,6 +1,7 @@
 import { Injectable, inject } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable, tap } from 'rxjs';
+import { Capability, RoleId, hasCapability, normalizeRole } from '../../core/auth/roles';
 
 @Injectable({
   providedIn: 'root'
@@ -64,6 +65,22 @@ export class AuthService {
       }
     }
     return null;
+  }
+
+  getRoleId(): RoleId | null {
+    const role = normalizeRole(this.getRol());
+    const roleIds: Record<string, RoleId> = {
+      admin: RoleId.Administrador,
+      coordinador: RoleId.Coordinador,
+      medico: RoleId.Medico,
+      dt: RoleId.DirectorTecnico,
+      'don-qr': RoleId.DonQr
+    };
+    return role ? roleIds[role] : null;
+  }
+
+  puede(capability: Capability): boolean {
+    return hasCapability(this.getRoleId(), capability);
   }
 
   logout(): void {

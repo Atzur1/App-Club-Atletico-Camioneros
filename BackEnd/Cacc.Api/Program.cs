@@ -32,6 +32,7 @@ builder.Services.AddScoped<IAsistenciaDao, AsistenciaDao>();
 builder.Services.AddScoped<IQrService, QrService>();
 builder.Services.AddHttpContextAccessor();
 builder.Services.AddScoped<ICurrentUserAccess, CurrentUserAccess>();
+builder.Services.AddScoped<CACC.API.Authorization.IUserScopeService, CACC.API.Authorization.UserScopeService>();
 
 //  Agregar soporte para los Controllers
 builder.Services.AddControllers();

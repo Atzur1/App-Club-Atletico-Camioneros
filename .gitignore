@@ -16,35 +16,30 @@
 *.suo
 
 # Local runtime state
-/.runtime/
+.runtime/
+*.log
+*.pid
+npm-debug.log*
+yarn-error.log*
 
-# Local machine-specific configuration
-/BackEnd/CACC.API/appsettings.*.local.json
+# IDE and OS files
+.idea/
+.vscode/*
+!.vscode/settings.json
+!.vscode/tasks.json
+!.vscode/launch.json
+!.vscode/extensions.json
+.history/
+.DS_Store
+Thumbs.db
+
+# Local-only configuration
 .env
 .env.*
 !.env.example
+.agents/test-users.local.md
 
-# IDEs and editors
-.idea/
-.project
-.classpath
-.c9/
-*.launch
-.settings/
-*.sublime-workspace
-.history/
-
-# Logs and temporary files
-npm-debug.log*
-yarn-error.log*
-*.log
-/connect.lock
-/libpeerconnection.log
-/testem.log
-/typings/
-__screenshots__/
-
-# Archives and operating-system files
+# Archives and temporary files
 *.zip
-.DS_Store
-Thumbs.db
+*.tmp
+*.temp

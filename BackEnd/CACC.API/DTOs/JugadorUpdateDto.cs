@@ -42,26 +42,8 @@ namespace CACC.API.DTOs
         [JsonPropertyName("pieHabil")]
         public string? PieHabil { get; set; }
 
-        [JsonPropertyName("fichaMedica")]
-        public FichaMedicaUpdateDto? FichaMedica { get; set; }
-
         [JsonPropertyName("partidos")]
         public List<PartidoUpdateDto> Partidos { get; set; } = new List<PartidoUpdateDto>();
-    }
-
-    public class FichaMedicaUpdateDto
-    {
-        [JsonPropertyName("grupoSanguineo")]
-        public string? GrupoSanguineo { get; set; }
-
-        [JsonPropertyName("patologias")]
-        public string? Patologias { get; set; }
-
-        [JsonPropertyName("historialLesiones")]
-        public string? HistorialLesiones { get; set; }
-
-        [JsonPropertyName("observaciones")]
-        public string? Observaciones { get; set; }
     }
 
     public class PartidoUpdateDto

@@ -174,13 +174,6 @@ namespace CACC.API.Controllers
                     Peso = dto.Peso,
                     Altura = dto.Altura,
                     PieHabil = dto.PieHabil,
-                    FichaMedica = dto.FichaMedica == null ? null : new FichaMedicaDetalle
-                    {
-                        GrupoSanguineo = dto.FichaMedica.GrupoSanguineo,
-                        Patologias = dto.FichaMedica.Patologias,
-                        HistorialLesiones = dto.FichaMedica.HistorialLesiones,
-                        Observaciones = dto.FichaMedica.Observaciones
-                    },
                     Partidos = dto.Partidos?.Select(p => new PartidoDetalle
                     {
                         Fecha = p.Fecha,
