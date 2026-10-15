@@ -185,7 +185,7 @@ export class AdminStaffComponent implements OnInit {
   }
 
   irASeleccionPortales(): void {
-    this.router.navigate(['/seleccion-portales']);
+    this.router.navigate(['/admin/portales']);
   }
 
   irAConfiguracion(): void {
@@ -203,7 +203,7 @@ export class AdminStaffComponent implements OnInit {
     if (label === 'Inicio') {
       this.router.navigate(['/admin']);
     } else if (label === 'Jugadores') {
-      this.router.navigate(['/admin/lista-jugadores']);
+      this.router.navigate(['/admin/jugadores']);
     } else if (label === 'Categorias' || label === 'Categorías') {
       this.router.navigate(['/admin/categorias']);
     } else if (label === 'Staff') {
@@ -212,14 +212,14 @@ export class AdminStaffComponent implements OnInit {
   }
 
   darDeAltaTrabajador(): void {
-    this.router.navigate(['/admin/alta-trabajador']);
+    this.router.navigate(['/admin/staff/nuevo']);
   }
 
   editarTrabajador(id: number): void {
-    this.router.navigate(['/admin/staff/editar-ficha', id]);
+    this.router.navigate(['/admin/staff', id, 'editar']);
   }
 
   verFicha(id: number): void {
-    this.router.navigate(['/admin/staff/ver-ficha', id]);
+    this.router.navigate(['/admin/staff', id]);
   }
 }

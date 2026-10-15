@@ -4,23 +4,22 @@ using CACC.Entities;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Data.SqlClient;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
+using CACC.API.Security;
 
 namespace CACC.API.Controllers
 {
     [ApiController]
     [Route("api/jugadores")]
-    [Authorize]
+    [Authorize(Roles = AppRoles.LecturaDeportiva)]
     public class JugadoresController : ControllerBase
     {
         private readonly IJugadorDao _jugadorDao;
+        private readonly ICurrentUserAccess _access;
 
-        public JugadoresController(IJugadorDao jugadorDao)
+        public JugadoresController(IJugadorDao jugadorDao, ICurrentUserAccess access)
         {
             _jugadorDao = jugadorDao;
+            _access = access;
         }
 
         [HttpGet]
@@ -28,7 +27,29 @@ namespace CACC.API.Controllers
         {
             IEnumerable<JugadorDetalle> jugadoresDb;
 
-            if (categoriaId.HasValue && categoriaId.Value > 0)
+            if (_access.IsDirectorTecnico)
+            {
+                if (categoriaId.HasValue && categoriaId.Value > 0)
+                {
+                    if (!_access.PuedeAccederCategoria(categoriaId.Value))
+                    {
+                        return Forbid();
+                    }
+
+                    jugadoresDb = await _jugadorDao.ObtenerPorCategoriaAsync(categoriaId.Value);
+                }
+                else
+                {
+                    var jugadoresAsignados = new List<JugadorDetalle>();
+                    foreach (var idCategoria in _access.CategoriaIds)
+                    {
+                        jugadoresAsignados.AddRange(await _jugadorDao.ObtenerPorCategoriaAsync(idCategoria));
+                    }
+
+                    jugadoresDb = jugadoresAsignados.DistinctBy(j => j.IdJugador);
+                }
+            }
+            else if (categoriaId.HasValue && categoriaId.Value > 0)
             {
                 jugadoresDb = await _jugadorDao.ObtenerPorCategoriaAsync(categoriaId.Value);
             }
@@ -57,7 +78,6 @@ namespace CACC.API.Controllers
                 EstadoCuota = j.EstadoCuota,
                 Tutor = j.Tutor == null ? null : new TutorDto
                 {
-                    Dni = j.Tutor.Dni,
                     Nombre = j.Tutor.Nombre,
                     Apellido = j.Tutor.Apellido,
                     Telefono = j.Tutor.Telefono ?? string.Empty,
@@ -76,6 +96,11 @@ namespace CACC.API.Controllers
             if (j == null)
             {
                 return NotFound(new { message = "Jugador no encontrado." });
+            }
+
+            if (!_access.PuedeAccederAlgunaCategoria(j.CategoriasIds))
+            {
+                return Forbid();
             }
 
             var response = new JugadorResponseDto
@@ -98,7 +123,6 @@ namespace CACC.API.Controllers
                 EstadoCuota = j.EstadoCuota,
                 Tutor = j.Tutor == null ? null : new TutorDto
                 {
-                    Dni = j.Tutor.Dni,
                     Nombre = j.Tutor.Nombre,
                     Apellido = j.Tutor.Apellido,
                     Telefono = j.Tutor.Telefono ?? string.Empty,
@@ -126,6 +150,7 @@ namespace CACC.API.Controllers
         }
 
         [HttpPut("{id}")]
+        [Authorize(Roles = AppRoles.Administradores)]
         public async Task<IActionResult> ActualizarPerfil(int id, [FromBody] JugadorUpdateDto dto)
         {
             if (dto == null)
@@ -135,40 +160,20 @@ namespace CACC.API.Controllers
 
             try
             {
-                // 1. Normalización de Altura (cm -> metros) y validación de rango
-                decimal? alturaNormalizada = dto.Altura;
-                if (alturaNormalizada.HasValue)
-                {
-                    // Si es mayor a 3, se ingresó en centímetros (ej: 169 cm -> 1.69 m)
-                    if (alturaNormalizada.Value > 3.0m)
-                    {
-                        alturaNormalizada = Math.Round(alturaNormalizada.Value / 100m, 2);
-                    }
-
-                    // Validación de límites biológicos razonables (entre 0.50m y 2.50m)
-                    if (alturaNormalizada.Value <= 0.50m || alturaNormalizada.Value > 2.50m)
-                    {
-                        return BadRequest(new { message = "La altura ingresada debe estar entre 0.50 m y 2.50 m (o entre 50 y 250 cm)." });
-                    }
-                }
-
                 var jugador = new JugadorDetalle
                 {
                     Nombre = dto.Nombre,
                     Apellido = dto.Apellido,
                     Dni = dto.Dni,
+                    Genero = dto.Genero,
                     FechaDeNacimiento = dto.FechaDeNacimiento,
+                    Domicilio = dto.Domicilio,
+                    IdCategoria = dto.IdCategoria,
+                    ClubOrigen = dto.ClubOrigen,
                     PosicionCancha = dto.Posicion,
                     Peso = dto.Peso,
-                    Altura = alturaNormalizada, // Pasamos la altura ya normalizada a metros
+                    Altura = dto.Altura,
                     PieHabil = dto.PieHabil,
-                    FichaMedica = dto.FichaMedica == null ? null : new FichaMedicaDetalle
-                    {
-                        GrupoSanguineo = dto.FichaMedica.GrupoSanguineo,
-                        Patologias = dto.FichaMedica.Patologias,
-                        HistorialLesiones = dto.FichaMedica.HistorialLesiones,
-                        Observaciones = dto.FichaMedica.Observaciones
-                    },
                     Partidos = dto.Partidos?.Select(p => new PartidoDetalle
                     {
                         Fecha = p.Fecha,
@@ -192,7 +197,7 @@ namespace CACC.API.Controllers
         }
 
         [HttpPost]
-        [Authorize(Roles = "Administrador (Tesorero),Tesorero,Administrador,Coordinador")]
+        [Authorize(Roles = AppRoles.Administradores)]
         public async Task<IActionResult> CrearJugador([FromBody] JugadorCreateDto dto)
         {
             if (dto == null || string.IsNullOrWhiteSpace(dto.Nombre) || string.IsNullOrWhiteSpace(dto.Dni))
@@ -245,7 +250,7 @@ namespace CACC.API.Controllers
         }
 
         [HttpDelete("{id}")]
-        [Authorize(Roles = "Administrador (Tesorero),Tesorero,Administrador")]
+        [Authorize(Roles = AppRoles.Administradores)]
         public async Task<IActionResult> EliminarJugador(int id)
         {
             try
@@ -265,7 +270,7 @@ namespace CACC.API.Controllers
         }
 
         [HttpPut("{id}/tutor")]
-        [Authorize(Roles = "Administrador (Tesorero),Tesorero,Administrador,Coordinador")]
+        [Authorize(Roles = AppRoles.Administradores)]
         public async Task<IActionResult> GuardarTutor(int id, [FromBody] GuardarTutorDto dto)
         {
             if (dto == null || string.IsNullOrWhiteSpace(dto.Dni) || string.IsNullOrWhiteSpace(dto.Nombre) || string.IsNullOrWhiteSpace(dto.Apellido) || string.IsNullOrWhiteSpace(dto.Telefono))
@@ -290,8 +295,8 @@ namespace CACC.API.Controllers
 
             return Ok(new { message = "Tutor guardado y vinculado con éxito." });
         }
-
         [HttpGet("tutores/{dni}")]
+        [Authorize(Roles = AppRoles.Administradores)]
         public async Task<IActionResult> BuscarTutorPorDni(string dni)
         {
             if (string.IsNullOrWhiteSpace(dni))

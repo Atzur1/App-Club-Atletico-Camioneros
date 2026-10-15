@@ -2,6 +2,7 @@ using CACC.DAO;
 using CACC.Entities;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using CACC.API.Authorization;
 
 namespace CACC.API.Controllers
 {
@@ -11,15 +12,19 @@ namespace CACC.API.Controllers
     public class FichasMedicasController : ControllerBase
     {
         private readonly IFichaMedicaDao _fichaMedicaDao;
+        private readonly IUserScopeService _scope;
 
-        public FichasMedicasController(IFichaMedicaDao fichaMedicaDao)
+        public FichasMedicasController(IFichaMedicaDao fichaMedicaDao, IUserScopeService scope)
         {
             _fichaMedicaDao = fichaMedicaDao;
+            _scope = scope;
         }
 
         [HttpGet("jugador/{idJugador}")]
         public async Task<IActionResult> GetFichaPorJugador(int idJugador)
         {
+            if (!await _scope.CanReadPlayerAsync(User, idJugador)) return Forbid();
+
             var ficha = await _fichaMedicaDao.ObtenerPorJugadorIdAsync(idJugador);
             if (ficha == null)
             {
@@ -30,7 +35,7 @@ namespace CACC.API.Controllers
         }
 
         [HttpPut("{id}")]
-        [Authorize(Roles = "Tesorero,Coordinador,Médico")] // Solo roles autorizados para modificar salud
+        [Authorize(Roles = RoleNames.EscrituraFichaMedica)]
         public async Task<IActionResult> ActualizarFicha(int id, [FromBody] FichaMedica ficha)
         {
             if (id != ficha.IdFichaMedica)

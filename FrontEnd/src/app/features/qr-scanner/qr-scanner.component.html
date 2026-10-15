@@ -1,0 +1,44 @@
+<header class="club-header">
+  <img src="/cacc-logo.png" alt="Escudo de CACC" />
+  <strong>CLUB ATLÉTICO SOCIAL Y<br />DEPORTIVO CAMIONEROS</strong>
+</header>
+
+<main class="page-shell">
+  <section class="card scanner-card" aria-labelledby="scanner-title">
+    <div class="camera-frame">
+      <video #preview autoplay muted playsinline aria-label="Vista previa de la cámara"></video>
+      @if (cameraState() === 'idle') {
+        <button type="button" class="camera-start" (click)="openCamera()">Abrir cámara</button>
+      } @else if (cameraState() === 'starting') {
+        <span class="camera-status">Solicitando permiso…</span>
+      }
+      @if (torchAvailable() && cameraState() === 'active') {
+        <button type="button" class="torch" (click)="toggleTorch()" [attr.aria-pressed]="torchEnabled()">
+          {{ torchEnabled() ? 'Apagar linterna' : 'Encender linterna' }}
+        </button>
+      }
+    </div>
+    <h1 id="scanner-title">Apunte al código QR del jugador</h1>
+    <p>Sostenga el teléfono estable sobre la credencial</p>
+    @if (cameraState() === 'active') { <button type="button" class="link-button" (click)="closeCamera()">Cerrar cámara</button> }
+  </section>
+
+  <section class="card manual-card" aria-labelledby="manual-title">
+    <h2 id="manual-title">¿Problemas para leer el código QR?</h2>
+    <label for="dni">Ingresá el DNI del jugador:</label>
+    <input id="dni" type="text" inputmode="numeric" autocomplete="off" maxlength="8" [formControl]="dni" />
+    @if (dni.touched && dni.invalid) { <small>Ingresá un DNI válido de 7 u 8 números.</small> }
+    <button type="button" class="primary" [disabled]="dni.invalid || busy()" (click)="registerManually()">
+      {{ busy() ? 'Registrando…' : 'Registrar ingreso' }}
+    </button>
+  </section>
+
+  @if (result(); as attendance) {
+    <section class="feedback" [class.allowed]="attendance.accesoPermitido" [class.denied]="!attendance.accesoPermitido" aria-live="polite">
+      <h2>{{ attendance.accesoPermitido ? 'Acceso permitido' : 'Acceso denegado' }}</h2>
+      <p>{{ attendance.mensaje }}</p>
+      <button type="button" class="primary" (click)="scanNext()">Escanear siguiente</button>
+    </section>
+  }
+  @if (message()) { <p class="error" role="alert">{{ message() }}</p> }
+</main>

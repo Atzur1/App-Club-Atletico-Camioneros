@@ -1,7 +1,9 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router, RouterModule } from '@angular/router';
+import { ClubPortalApiService } from '../../shared/services/club-portal-api.service';
+import { AuthService } from '../../shared/services/auth.service';
 
 export interface Player {
   id: number;
@@ -30,24 +32,29 @@ export class CoordinadorListaJugadores implements OnInit {
 
   navItems = [
     { label: 'Inicio', icon: 'home', active: false, route: '/coordinador' },
-    { label: 'Jugadores', icon: 'group', active: true, route: '/coordinador-lista-jugadores' },
-    { label: 'Staff', icon: 'badge', active: false, route: '/coordinador/visualizar-staff' },
-    { label: 'Categorias', icon: 'category', active: false, route: '/coordinador-seleccion-categorias' }
+    { label: 'Jugadores', icon: 'group', active: true, route: '/coordinador/jugadores' },
+    { label: 'Categorias', icon: 'category', active: false, route: '/coordinador/categorias' }
   ];
 
-  players: Player[] = [
-    { id: 1, nombreCompleto: 'JUAN PÉREZ', dni: '45.123.456', posicion: 'ARQUERO', edad: '17 Años', categoria: 'CATEGORÍA 2009' },
-    { id: 2, nombreCompleto: 'JUAN PADELA', dni: '43.987.654', posicion: 'DEFENSOR', edad: '19 Años', categoria: 'CATEGORÍA 2006' },
-    { id: 3, nombreCompleto: 'LAURA GONZÁLEZ', dni: '48.555.444', posicion: 'VOLANTE', edad: '14 Años', categoria: 'CATEGORÍA 2012' },
-    { id: 4, nombreCompleto: 'PEDRO SÁNCHEZ', dni: '46.333.222', posicion: 'DELANTERO', edad: '16 Años', categoria: 'CATEGORÍA 2010' },
-    { id: 5, nombreCompleto: 'MATEO GÓMEZ', dni: '46.789.012', posicion: 'DEFENSOR', edad: '15 Años', categoria: 'CATEGORÍA 2009' },
-    { id: 6, nombreCompleto: 'LUCAS FERNÁNDEZ', dni: '45.987.654', posicion: 'VOLANTE', edad: '15 Años', categoria: 'CATEGORÍA 2009' },
-    { id: 7, nombreCompleto: 'SANTIAGO RODRÍGUEZ', dni: '46.321.654', posicion: 'DELANTERO', edad: '15 Años', categoria: 'CATEGORÍA 2009' }
-  ];
+  players: Player[] = [];
+  private readonly api = inject(ClubPortalApiService);
+  private readonly auth = inject(AuthService);
 
   constructor(private router: Router) {}
 
-  ngOnInit(): void {}
+  ngOnInit(): void {
+    const user = this.auth.obtenerDatosUsuario();
+    this.userEmail = user.email;
+    this.userName = user.email.split('@')[0];
+    this.api.listPlayers().subscribe(players => this.players = players.map(player => ({
+      id: player.idJugador,
+      nombreCompleto: player.nombreCompleto || `${player.nombre} ${player.apellido}`,
+      dni: player.dni,
+      posicion: (player.posicionCancha || 'VOLANTE') as Player['posicion'],
+      edad: this.ageLabel(player.fechaNacimiento),
+      categoria: player.nombreCategoria || 'SIN CATEGORÍA',
+    })));
+  }
 
   togglePosicion(pos: string) {
     if (this.posicionFiltro === pos) {
@@ -75,13 +82,21 @@ export class CoordinadorListaJugadores implements OnInit {
   }
 
   verFicha(player: Player) {
-    this.router.navigate(['/coordinador/visualizar-perfil'], {
-      queryParams: { player: player.nombreCompleto }
-    });
+    this.router.navigate(['/coordinador/jugadores', player.id]);
   }
 
   logout() {
-    localStorage.removeItem('cacc_jwt_token');
+    this.auth.logout();
     this.router.navigate(['/login']);
   }
+
+  private ageLabel(value?: string | null): string {
+    if (!value) return 'SIN EDAD';
+    const birth = new Date(value);
+    const now = new Date();
+    let age = now.getFullYear() - birth.getFullYear();
+    if (now < new Date(now.getFullYear(), birth.getMonth(), birth.getDate())) age--;
+    return `${age} Años`;
+  }
 }
+

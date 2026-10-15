@@ -1,7 +1,8 @@
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router, RouterModule } from '@angular/router';
+import { RolePlayerViewService } from '../../shared/services/role-player-view.service';
 
 export interface CategoriaItem {
   id: number;
@@ -17,59 +18,15 @@ export interface CategoriaItem {
   templateUrl: './medico-seleccion-categorias.component.html',
   styleUrl: './medico-seleccion-categorias.component.css'
 })
-export class MedicoSeleccionCategoriasComponent {
-  constructor(private router: Router) {}
+export class MedicoSeleccionCategoriasComponent implements OnInit {
+  constructor(private router: Router, private views: RolePlayerViewService) {}
 
   searchTerm = '';
   asociacionFiltro = '';
   ordenFiltro = '';
 
-  activeTab = 'Categorías';
-
-  navItems = [
-    { label: 'Inicio', icon: 'home', active: false },
-    { label: 'Jugadores', icon: 'group', active: false },
-    { label: 'Categorías', icon: 'category', active: true }
-  ];
-
-  categorias: CategoriaItem[] = [
-    {
-      id: 1,
-      nombre: 'NOMBRE DE LA CATEGORIA',
-      cantidadJugadores: 'CANTIDAD JUGADORES',
-      asociacion: 'Liga Cordobesa'
-    },
-    {
-      id: 2,
-      nombre: 'NOMBRE DE LA CATEGORIA',
-      cantidadJugadores: 'CANTIDAD JUGADORES',
-      asociacion: 'Liga Cordobesa'
-    },
-    {
-      id: 3,
-      nombre: 'NOMBRE DE LA CATEGORIA',
-      cantidadJugadores: 'CANTIDAD JUGADORES',
-      asociacion: 'Liga Cordobesa'
-    },
-    {
-      id: 4,
-      nombre: 'NOMBRE DE LA CATEGORIA',
-      cantidadJugadores: 'CANTIDAD JUGADORES',
-      asociacion: 'AFA'
-    },
-    {
-      id: 5,
-      nombre: 'NOMBRE DE LA CATEGORIA',
-      cantidadJugadores: 'CANTIDAD JUGADORES',
-      asociacion: 'AFA'
-    },
-    {
-      id: 6,
-      nombre: 'NOMBRE DE LA CATEGORIA',
-      cantidadJugadores: 'CANTIDAD JUGADORES',
-      asociacion: 'Liga Cordobesa'
-    }
-  ];
+  categorias: CategoriaItem[] = [];
+  ngOnInit(): void { this.views.categories().subscribe(categories => this.categorias = categories); }
 
   get filteredCategorias(): CategoriaItem[] {
     return this.categorias
@@ -85,20 +42,7 @@ export class MedicoSeleccionCategoriasComponent {
       });
   }
 
-  selectNav(label: string) {
-    this.navItems.forEach(item => item.active = (item.label === label));
-    this.activeTab = label;
-
-    if (label === 'Inicio') {
-      this.router.navigate(['/medico']);
-    } else if (label === 'Jugadores') {
-      this.router.navigate(['/medico/lista-jugadores']);
-    } else if (label === 'Categorias' || label === 'Categorías') {
-      this.router.navigate(['/medico/categorias']);
-    }
-  }
-
   verCategoria(id: number) {
-    this.router.navigate(['/medico/categoria-jugadores']);
+    this.router.navigate(['/medico/categorias', id]);
   }
 }

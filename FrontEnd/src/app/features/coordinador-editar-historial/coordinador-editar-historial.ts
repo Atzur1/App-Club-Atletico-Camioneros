@@ -45,9 +45,9 @@ export class CoordinadorEditarHistorial implements OnInit {
   activeTab = 'Jugadores';
   navItems = [
     { label: 'Inicio', icon: 'home', active: false, route: '/coordinador' },
-    { label: 'Jugadores', icon: 'group', active: true, route: '/coordinador-lista-jugadores' },
+    { label: 'Jugadores', icon: 'group', active: true, route: '/coordinador/jugadores' },
     { label: 'Staff', icon: 'badge', active: false, route: '/coordinador/visualizar-staff' },
-    { label: 'Categorias', icon: 'category', active: false, route: '/coordinador-seleccion-categorias' }
+    { label: 'Categorias', icon: 'category', active: false, route: '/coordinador/categorias' }
   ];
 
   playersDatabase: { [key: string]: PlayerFichaDetail } = {

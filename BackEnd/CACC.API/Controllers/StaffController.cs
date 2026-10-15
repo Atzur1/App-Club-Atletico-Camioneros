@@ -8,12 +8,13 @@ using CACC.Entities;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Data.SqlClient;
+using CACC.API.Security;
 
 namespace CACC.API.Controllers
 {
     [ApiController]
     [Route("api/staff")]
-    [Authorize]
+    [Authorize(Roles = AppRoles.Administradores)]
     public class StaffController : ControllerBase
     {
         private readonly IStaffDao _staffDao;
@@ -80,7 +81,7 @@ namespace CACC.API.Controllers
         }
 
         [HttpPost]
-        [Authorize(Roles = "Administrador (Tesorero),Tesorero")]
+        [Authorize(Roles = AppRoles.Administradores)]
         public async Task<IActionResult> CrearStaff([FromBody] StaffCreateDto dto)
         {
             if (dto == null || string.IsNullOrWhiteSpace(dto.Nombre) || string.IsNullOrWhiteSpace(dto.Dni) || string.IsNullOrWhiteSpace(dto.Email) || string.IsNullOrWhiteSpace(dto.Contrasenia))
@@ -152,7 +153,7 @@ namespace CACC.API.Controllers
         }
 
         [HttpPut("{id}")]
-        [Authorize(Roles = "Administrador (Tesorero),Tesorero")]
+        [Authorize(Roles = AppRoles.Administradores)]
         public async Task<IActionResult> ActualizarStaff(int id, [FromBody] StaffUpdateDto dto)
         {
             if (dto == null || string.IsNullOrWhiteSpace(dto.Nombre) || string.IsNullOrWhiteSpace(dto.Dni) || string.IsNullOrWhiteSpace(dto.Email))

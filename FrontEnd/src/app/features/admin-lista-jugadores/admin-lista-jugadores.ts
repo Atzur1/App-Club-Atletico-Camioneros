@@ -4,6 +4,7 @@ import { FormsModule } from '@angular/forms';
 import { Router, RouterModule } from '@angular/router';
 import { HttpClient } from '@angular/common/http';
 import { AuthService } from '../../shared/services/auth.service';
+import { PortalAccessService } from '../../shared/auth/portal-access.service';
 
 export interface TutorInfo {
   dni?: string;
@@ -41,6 +42,9 @@ export class AdminListaJugadores implements OnInit {
   private readonly router = inject(Router);
   private readonly http = inject(HttpClient);
   private readonly authService = inject(AuthService);
+  private readonly access = inject(PortalAccessService);
+  readonly canEditPlayers = this.access.capabilities.canEditPlayers;
+  readonly portalRoot = `/${this.access.role}`;
 
   usuarioActual = {
     nombre: 'Cargando...',
@@ -226,11 +230,12 @@ export class AdminListaJugadores implements OnInit {
   }
 
   irAAltaJugador(): void {
-    this.router.navigate(['/admin/alta-jugador']);
+    if (!this.canEditPlayers) return;
+    this.router.navigate(['/admin/jugadores/nuevo']);
   }
 
   irASeleccionPortales(): void {
-    this.router.navigate(['/seleccion-portales']);
+    this.router.navigate(['/admin/portales']);
   }
 
   irAConfiguracion(): void {
@@ -241,20 +246,22 @@ export class AdminListaJugadores implements OnInit {
     this.navItems.forEach(item => item.active = (item.label === label));
     this.activeTab = label;
     if (label === 'Inicio') this.router.navigate(['/admin']);
-    else if (label === 'Jugadores') this.router.navigate(['/admin/lista-jugadores']);
+    else if (label === 'Jugadores') this.router.navigate(['/admin/jugadores']);
     else if (label === 'Categorias' || label === 'Categorías') this.router.navigate(['/admin/categorias']);
     else if (label === 'Staff') this.router.navigate(['/admin/staff']);
   }
 
   verFicha(id: number): void {
-    this.router.navigate(['/admin/ficha-jugador', id]);
+    this.router.navigate([this.portalRoot, 'jugadores', id]);
   }
 
   editarPerfil(id: number): void {
-    this.router.navigate(['/admin/editar-perfil', id]);
+    if (!this.canEditPlayers) return;
+    this.router.navigate(['/admin/jugadores', id, 'editar']);
   }
 
   abrirModalEliminar(player: Player): void {
+    if (!this.canEditPlayers) return;
     this.jugadorAEliminar = player;
     this.modalEliminarVisible = true;
   }
@@ -286,6 +293,7 @@ export class AdminListaJugadores implements OnInit {
 
   // --- Modal Tutor con DNI y Búsqueda Reutilizable ---
   abrirModalTutor(player: Player): void {
+    if (!this.canEditPlayers) return;
     this.jugadorTutor = player;
     this.tutorEncontradoMensaje = '';
     if (player.tutor) {

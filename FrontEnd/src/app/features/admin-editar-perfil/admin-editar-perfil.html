@@ -1,505 +1,351 @@
 <div class="cacc-layout" [class.sidebar-collapsed]="sidebarOculto">
-    <!-- Left Sidebar (Verde Institucional CACC) -->
-    <aside class="sidebar">
-      <div class="sidebar-header">
-        <!-- CACC Logo Shield Emblem -->
-        <div class="logo-wrapper">
-          <img src="cacc-logo.png" alt="Escudo CACC" class="cacc-shield-img" />
-        </div>
-        <h2 class="club-title">CLUB ATLETICO SOCIAL Y DEPORTIVO CAMIONEROS</h2>
-        <p class="club-subtitle">Sistema de Gestión Integral</p>
+  <!-- Left Sidebar (Verde Institucional CACC) -->
+  <aside class="sidebar">
+    <div class="sidebar-header">
+      <div class="logo-wrapper">
+        <img src="cacc-logo.png" alt="Escudo CACC" class="cacc-shield-img" />
+      </div>
+      <h2 class="club-title">CLUB ATLETICO SOCIAL Y DEPORTIVO CAMIONEROS</h2>
+      <p class="club-subtitle">Sistema de Gestión Integral</p>
+    </div>
+
+    <!-- Navegación Principal -->
+    <nav class="sidebar-nav">
+      <a *ngFor="let item of navItems"
+         class="nav-item"
+         [class.active]="item.active"
+         (click)="selectNav(item.label)">
+        <span class="nav-icon" [ngSwitch]="item.icon">
+          <svg *ngSwitchCase="'home'" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path><polyline points="9 22 9 12 15 12 15 22"></polyline></svg>
+          <svg *ngSwitchCase="'group'" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M23 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg>
+          <svg *ngSwitchCase="'badge'" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><rect x="2" y="7" width="20" height="14" rx="2" ry="2"></rect><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"></path></svg>
+          <svg *ngSwitchCase="'category'" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="7" r="3"></circle><circle cx="5" cy="9" r="2"></circle><circle cx="19" cy="9" r="2"></circle><path d="M6 20v-1a6 6 0 0 1 12 0v1"></path><path d="M1 20v-1a4 4 0 0 1 4-4"></path><path d="M23 20v-1a4 4 0 0 0-4-4"></path></svg>
+        </span>
+        <span class="nav-label">{{ item.label }}</span>
+      </a>
+    </nav>
+
+    <!-- Footer: Selección de Portales arriba de Cerrar Sesión -->
+    <div class="sidebar-footer">
+      <a class="footer-action-btn portal-btn" (click)="irASeleccionPortales()" title="Volver a Selección de Portales">
+        <span class="footer-icon">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><polyline points="15 18 9 12 15 6"></polyline></svg>
+        </span>
+        <span>Selección de Portales</span>
+      </a>
+
+      <a class="footer-action-btn logout-btn" (click)="cerrarSesion()" title="Cerrar Sesión">
+        <span class="footer-icon">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path><polyline points="16 17 21 12 16 7"></polyline><line x1="21" y1="12" x2="9" y2="12"></line></svg>
+        </span>
+        <span>Cerrar Sesión</span>
+      </a>
+    </div>
+  </aside>
+
+  <!-- Main Content Wrapper -->
+  <div class="main-wrapper">
+    <!-- Header Superior -->
+    <header class="top-header">
+      <div class="header-left">
+        <button type="button" class="sidebar-toggle-btn" (click)="toggleSidebar()" title="Ocultar/Mostrar Menú">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="3" y1="12" x2="21" y2="12"></line><line x1="3" y1="6" x2="21" y2="6"></line><line x1="3" y1="18" x2="21" y2="18"></line></svg>
+        </button>
+        <h1 class="header-title">Edición de Perfil</h1>
       </div>
 
-      <!-- Navegación Principal -->
-      <nav class="sidebar-nav">
-        <a *ngFor="let item of navItems"
-           class="nav-item"
-           [class.active]="item.active"
-           (click)="selectNav(item.label)">
-          <span class="nav-icon" [ngSwitch]="item.icon">
-            <svg *ngSwitchCase="'home'" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path><polyline points="9 22 9 12 15 12 15 22"></polyline></svg>
-            <svg *ngSwitchCase="'group'" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M23 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg>
-            <svg *ngSwitchCase="'badge'" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><rect x="2" y="7" width="20" height="14" rx="2" ry="2"></rect><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"></path></svg>
-            <svg *ngSwitchCase="'category'" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><circle cx="12" cy="5" r="3"></circle><circle cx="5" cy="19" r="3"></circle><circle cx="19" cy="19" r="3"></circle><line x1="8.5" y1="16.5" x2="10.5" y2="7.5"></line><line x1="15.5" y1="16.5" x2="13.5" y2="7.5"></line></svg>
-          </span>
-          <span class="nav-label">{{ item.label }}</span>
-        </a>
-      </nav>
-
-      <!-- Footer: Selección de Portales + Cerrar Sesión -->
-      <div class="sidebar-footer">
-        <a class="footer-action-btn portal-btn" (click)="irASeleccionPortales()" title="Volver a Selección de Portales">
-          <span class="footer-icon">
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><polyline points="15 18 9 12 15 6"></polyline></svg>
-          </span>
-          <span>Selección de Portales</span>
-        </a>
-
-        <a class="footer-action-btn logout-btn" (click)="cerrarSesion()" title="Cerrar Sesión">
-          <span class="footer-icon">
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path><polyline points="16 17 21 12 16 7"></polyline><line x1="21" y1="12" x2="9" y2="12"></line></svg>
-          </span>
-          <span>Cerrar Sesión</span>
-        </a>
-      </div>
-    </aside>
-
-    <!-- Contenedor Principal -->
-    <div class="main-wrapper">
-      <!-- Header Superior -->
-      <header class="top-header">
-        <div class="header-left">
-          <button type="button" class="sidebar-toggle-btn" (click)="toggleSidebar()" title="Ocultar/Mostrar Menú">
-            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="3" y1="12" x2="21" y2="12"></line><line x1="3" y1="6" x2="21" y2="6"></line><line x1="3" y1="18" x2="21" y2="18"></line></svg>
-          </button>
-          <h1 class="header-title">Edición de Perfil del Jugador</h1>
-        </div>
-
-        <div class="header-right">
-          <!-- Perfil con Menú Desplegable Flotante -->
-          <div class="admin-profile" (click)="toggleMenuUsuario($event)">
-            <div class="profile-avatar">
-              <svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 3c1.66 0 3 1.34 3 3s-1.34 3-3 3-3-1.34-3-3 1.34-3 3-3zm0 14.2c-2.5 0-4.71-1.28-6-3.22.03-1.99 4-3.08 6-3.08 1.99 0 5.97 1.09 6 3.08-1.29 1.94-3.5 3.22-6 3.22z" /></svg>
-            </div>
-            <div class="profile-info">
-              <span class="profile-name">{{ usuarioActual.nombre || 'Usuario' }}</span>
-              <span class="profile-email">{{ usuarioActual.email || '' }}</span>
-            </div>
-            <span class="chevron-down" [class.rotated]="menuUsuarioAbierto">
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#475569" stroke-width="2.5"><polyline points="6 9 12 15 18 9"></polyline></svg>
-            </span>
-
-            <div class="user-dropdown-menu" *ngIf="menuUsuarioAbierto" (click)="$event.stopPropagation()">
-              <button type="button" class="dropdown-item" (click)="irAConfiguracion()">
-                <span class="dropdown-icon">⚙</span> Configuración de cuenta
-              </button>
-              <div class="dropdown-divider"></div>
-              <button type="button" class="dropdown-item text-danger" (click)="cerrarSesion()">
-                <span class="dropdown-icon">↪</span> Cerrar Sesión
-              </button>
-            </div>
+      <div class="header-right">
+        <!-- Perfil con Menú Desplegable Flotante -->
+        <div class="admin-profile" (click)="toggleMenuUsuario($event)">
+          <div class="profile-avatar">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 3c1.66 0 3 1.34 3 3s-1.34 3-3 3-3-1.34-3-3 1.34-3 3-3zm0 14.2c-2.5 0-4.71-1.28-6-3.22.03-1.99 4-3.08 6-3.08 1.99 0 5.97 1.09 6 3.08-1.29 1.94-3.5 3.22-6 3.22z" /></svg>
           </div>
-        </div>
-      </header>
+          <div class="profile-info">
+            <span class="profile-name">Administrador</span>
+            <span class="profile-email">{{ usuarioActual.email }}</span>
+          </div>
+          <span class="chevron-down" [class.rotated]="menuUsuarioAbierto">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#475569" stroke-width="2.5"><polyline points="6 9 12 15 18 9"></polyline></svg>
+          </span>
 
-      <!-- Main View Body -->
-      <main class="content-body">
-        <div *ngIf="cargando" class="load-state" role="status">Cargando datos del jugador...</div>
-
-        <div *ngIf="errorCarga" class="error-banner">
-          {{ errorCarga }}
-        </div>
-
-        <form (ngSubmit)="guardar()" #editForm="ngForm" *ngIf="!cargando && !errorCarga" class="edit-form-wrapper">
-          <!-- Barra de Navegación Superior -->
-          <div class="top-nav-bar">
-            <button type="button" class="btn-action-outline btn-volver" (click)="volver()">
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="15 18 9 12 15 6"></polyline></svg>
-              Volver a Ficha
+          <!-- Dropdown Flotante -->
+          <div class="user-dropdown-menu" *ngIf="menuUsuarioAbierto" (click)="$event.stopPropagation()">
+            <button type="button" class="dropdown-item" (click)="irAConfiguracion()">
+              <span class="dropdown-icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 1 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.6 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 1 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.6h.08A1.65 1.65 0 0 0 10 3.09V3a2 2 0 1 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9v.08A1.65 1.65 0 0 0 20.91 10H21a2 2 0 1 1 0 4h-.09A1.65 1.65 0 0 0 19.4 15z"></path></svg></span> Configuración de cuenta
             </button>
-            <span class="page-subtitle-badge">EDICIÓN DE PERFIL Y FICHA TÉCNICA</span>
+            <div class="dropdown-divider"></div>
+            <button type="button" class="dropdown-item text-danger" (click)="cerrarSesion()">
+              <span class="dropdown-icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path><polyline points="16 17 21 12 16 7"></polyline><line x1="21" y1="12" x2="9" y2="12"></line></svg></span> Cerrar Sesión
+            </button>
           </div>
+        </div>
+      </div>
+    </header>
 
-          <div class="cards-grid-row">
+    <!-- Main View Body (Alto fijo 100vh) -->
+    <main class="content-body">
+      <div *ngIf="cargando" class="load-state" role="status">Cargando datos del jugador...</div>
 
-            <!-- CARD 1: PERFIL & DATOS PERSONALES DEL JUGADOR -->
-            <section class="card-box card-perfil">
-              <div class="photo-banner">
-                <div class="avatar-banner-circle">
-                  <svg width="40" height="40" viewBox="0 0 24 24" fill="#007A3D"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 3c1.66 0 3 1.34 3 3s-1.34 3-3 3-3-1.34-3-3 1.34-3 3-3zm0 14.2c-2.5 0-4.71-1.28-6-3.22.03-1.99 4-3.08 6-3.08 1.99 0 5.97 1.09 6 3.08-1.29 1.94-3.5 3.22-6 3.22z" /></svg>
-                </div>
+      <div *ngIf="errorCarga" class="error-banner">
+        {{ errorCarga }}
+      </div>
+
+      <form (ngSubmit)="guardar()" #editForm="ngForm" *ngIf="!cargando && !errorCarga" class="edit-form-wrapper">
+        <div class="cards-grid-row">
+
+          <!-- CARD 1: PERFIL & DATOS PERSONALES -->
+          <section class="card-box card-perfil">
+            <div class="photo-banner">
+              <div class="avatar-banner-circle">
+                <svg width="44" height="44" viewBox="0 0 24 24" fill="#007A3D"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 3c1.66 0 3 1.34 3 3s-1.34 3-3 3-3-1.34-3-3 1.34-3 3-3zm0 14.2c-2.5 0-4.71-1.28-6-3.22.03-1.99 4-3.08 6-3.08 1.99 0 5.97 1.09 6 3.08-1.29 1.94-3.5 3.22-6 3.22z" /></svg>
               </div>
+            </div>
 
-              <!-- Nombre y Apellido -->
-              <div class="form-group mb-2">
-                <label class="data-label">Nombre y Apellido <span class="required-asterisk">*</span></label>
-                <div class="form-row-2">
-                  <input type="text" class="edit-form-control text-uppercase" name="nombre" [(ngModel)]="perfil.nombre" required placeholder="Nombre">
-                  <input type="text" class="edit-form-control text-uppercase" name="apellido" [(ngModel)]="perfil.apellido" required placeholder="Apellido">
-                </div>
+            <div class="form-group">
+              <label class="data-label">Nombre y Apellido</label>
+              <div class="form-row-2">
+                <input type="text" class="edit-form-control text-uppercase" name="nombre" [(ngModel)]="perfil.nombre" required placeholder="Nombre">
+                <input type="text" class="edit-form-control text-uppercase" name="apellido" [(ngModel)]="perfil.apellido" required placeholder="Apellido">
               </div>
+            </div>
 
-              <!-- Posición en la Cancha y Categoría -->
-              <div class="form-row-2 mb-2">
-                <div class="form-group">
-                  <label class="data-label">Posición en la Cancha <span class="required-asterisk">*</span></label>
-                  <div class="select-box">
-                    <select class="edit-form-control" name="posicion" [(ngModel)]="perfil.posicion">
-                      <option *ngFor="let pos of posiciones" [value]="pos">{{ pos }}</option>
-                    </select>
-                    <span class="select-arrow">
-                      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#334155" stroke-width="2.5"><polyline points="6 9 12 15 18 9"></polyline></svg>
-                    </span>
-                  </div>
+            <div class="form-group mt-1">
+              <label class="data-label">Posición</label>
+              <select class="edit-form-control" name="posicion" [(ngModel)]="perfil.posicion">
+                <option *ngFor="let pos of posiciones" [value]="pos">{{ pos }}</option>
+              </select>
+            </div>
+
+            <hr class="card-divider" />
+            <h3 class="section-subtitle">DATOS PERSONALES</h3>
+
+            <div class="personal-data-grid">
+              <!-- Fecha de Nacimiento -->
+              <div class="data-item-card">
+                <div class="data-icon">
+                  <svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M7 2h2v3H7V2Zm8 0h2v3h-2V2ZM5 4h2v2h2V4h6v2h2V4h2a2 2 0 0 1 2 2v15H3V6a2 2 0 0 1 2-2Zm-2 7h18V8H3v3Zm3 3h12v5H6v-5Z"/><path d="M12 0c1.1 1.2 1.5 2.2 1.5 3.1A1.5 1.5 0 0 1 12 4.6a1.5 1.5 0 0 1-1.5-1.5C10.5 2.2 10.9 1.2 12 0Z"/></svg>
                 </div>
-
-                <div class="form-group">
-                  <label class="data-label">Categoría Asignada</label>
-                  <div class="select-box">
-                    <select class="edit-form-control" name="idCategoria" [(ngModel)]="perfil.idCategoria">
-                      <option [ngValue]="0">Sin categoría</option>
-                      <option *ngFor="let cat of categoriasList" [ngValue]="cat.id">
-                        {{ cat.nombre }} ({{ cat.asociacion }})
-                      </option>
-                    </select>
-                    <span class="select-arrow">
-                      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#334155" stroke-width="2.5"><polyline points="6 9 12 15 18 9"></polyline></svg>
-                    </span>
-                  </div>
-                </div>
-              </div>
-
-              <hr class="card-divider" />
-              <h3 class="section-subtitle">DATOS PERSONALES Y FÍSICOS DEL JUGADOR</h3>
-
-              <!-- Datos Personales -->
-              <div class="form-row-2 mb-2">
-                <div class="form-group">
-                  <label class="data-label">DNI Jugador</label>
-                  <input type="text" class="edit-form-control disabled-ctrl" [value]="perfil.dni || ''" disabled title="Identificador único del jugador para QR y asistencia">
-                </div>
-
-                <div class="form-group">
-                  <label class="data-label">F. Nacimiento <span class="required-asterisk">*</span></label>
+                <div class="data-label-group">
+                  <span class="data-label">F. Nacimiento</span>
                   <input type="date" class="edit-form-control" name="fechaNacimiento" [(ngModel)]="perfil.fechaNacimiento" required>
                 </div>
               </div>
 
-              <div class="form-row-2 mb-2">
-                <div class="form-group">
-                  <label class="data-label">Edad (Calculada)</label>
+              <!-- Edad (Calculada) -->
+              <div class="data-item-card">
+                <div class="data-icon">
+                  <svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M5 2h2v2h10V2h2v2h2v18H3V4h2V2Zm-1 8v10h16V10H4Zm2-4v2h12V6H6Zm1 6h3v3H7v-3Zm5 0h3v3h-3v-3Zm5 0h2v3h-2v-3Zm-10 5h3v2H7v-2Zm5 0h3v2h-3v-2Z"/></svg>
+                </div>
+                <div class="data-label-group">
+                  <span class="data-label">Edad (Auto)</span>
                   <input type="text" class="edit-form-control disabled-ctrl" [value]="edadCalculada" disabled>
                 </div>
+              </div>
 
-                <div class="form-group">
-                  <label class="data-label">Pie Hábil</label>
-                  <div class="select-box">
-                    <select class="edit-form-control" name="pieHabil" [(ngModel)]="perfil.pieHabil">
-                      <option *ngFor="let pie of pies" [value]="pie">{{ pie }}</option>
-                    </select>
-                    <span class="select-arrow">
-                      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#334155" stroke-width="2.5"><polyline points="6 9 12 15 18 9"></polyline></svg>
-                    </span>
-                  </div>
+              <!-- Peso -->
+              <div class="data-item-card">
+                <div class="data-icon">
+                  <svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M7 4a5 5 0 0 1 10 0h2l2 18H3L5 4h2Zm2 0h6a3 3 0 0 0-6 0Zm3 2a3 3 0 0 0-3 3h6a3 3 0 0 0-3-3Z"/></svg>
+                </div>
+                <div class="data-label-group">
+                  <span class="data-label">Peso (Kg)</span>
+                  <input type="number" step="0.1" class="edit-form-control" name="peso" [(ngModel)]="perfil.peso" placeholder="00.0">
                 </div>
               </div>
 
-              <div class="form-row-2 mb-2">
-                <div class="form-group">
-                  <label class="data-label">Peso (Kg)</label>
-                  <input type="number" step="0.1" class="edit-form-control" name="peso" [(ngModel)]="perfil.peso" placeholder="Ej: 70.5">
+              <!-- Altura -->
+              <div class="data-item-card">
+                <div class="data-icon">
+                  <svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><circle cx="8" cy="4" r="2.5"/><path d="M5.5 8A2.5 2.5 0 0 1 8 5.5 2.5 2.5 0 0 1 10.5 8v5H9.4v8H6.6v-8H5.5V8ZM16 3l-3 3h2v12h-2l3 3 3-3h-2V6h2l-3-3Z"/></svg>
                 </div>
-
-                <div class="form-group">
-                  <label class="data-label">Altura (m)</label>
-                  <input type="number" step="0.01" class="edit-form-control" name="altura" [(ngModel)]="perfil.altura" placeholder="Ej: 1.75">
-                </div>
-              </div>
-
-              <div class="form-row-2 mb-2">
-                <div class="form-group" *ngIf="perfil.fichaMedica">
-                  <label class="data-label">Grupo Sanguíneo</label>
-                  <div class="select-box">
-                    <select class="edit-form-control" name="grupoSanguineo" [(ngModel)]="perfil.fichaMedica.grupoSanguineo">
-                      <option *ngFor="let gs of gruposSanguineos" [value]="gs">{{ gs }}</option>
-                    </select>
-                    <span class="select-arrow">
-                      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#334155" stroke-width="2.5"><polyline points="6 9 12 15 18 9"></polyline></svg>
-                    </span>
-                  </div>
-                </div>
-
-                <div class="form-group" [class.col-span-2]="!perfil.fichaMedica">
-                  <label class="data-label">Domicilio del Jugador</label>
-                  <input type="text" class="edit-form-control" name="domicilio" [(ngModel)]="perfil.domicilio" placeholder="Calle y número">
+                <div class="data-label-group">
+                  <span class="data-label">Altura (m)</span>
+                  <input type="number" step="0.01" class="edit-form-control" name="altura" [(ngModel)]="perfil.altura" placeholder="0.00">
                 </div>
               </div>
 
-              <div class="form-group mb-2">
-                <label class="data-label">Club de Origen</label>
-                <input type="text" class="edit-form-control" name="clubOrigen" [(ngModel)]="perfil.clubOrigen" placeholder="Ej: Platense">
-              </div>
-
-              <!-- BLOQUE TUTOR / RESPONSABLE LEGAL EN CARD 1 -->
-              <hr class="card-divider" />
-              <div class="card-tutor-banner">
-                <div class="tutor-banner-left">
-                  <div class="tutor-banner-icon-badge">
-                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#007A3D" stroke-width="2.2">
-                      <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
-                      <circle cx="9" cy="7" r="4"></circle>
-                      <path d="M23 21v-2a4 4 0 0 0-3-3.87"></path>
-                      <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
-                    </svg>
-                  </div>
-                  <div class="tutor-banner-header-text">
-                    <div class="tutor-banner-title-row">
-                      <span class="tutor-banner-label">TUTOR / RESPONSABLE LEGAL</span>
-                      <span class="tutor-age-badge" *ngIf="perfil.fechaNacimiento">Requerido para menores</span>
-                    </div>
-                    <p class="tutor-banner-subtext">Información de contacto y vinculación familiar</p>
-                  </div>
+              <!-- Pie Hábil -->
+              <div class="data-item-card">
+                <div class="data-icon">
+                  <svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="m8 2 5 2-1 3 6 4c1.6 1 2.5 2.4 2 4-1 2.7-5.4 4.2-10 2.6L4 15.5 8 2Zm-1 16 2 .7-.7 2.3-2-.7L7 18Zm3 .9 2 .5-.6 2.3-2-.5.6-2.3Z"/></svg>
                 </div>
-
-                <div class="tutor-banner-content">
-                  <div class="tutor-data-pills-row" *ngIf="perfil.tutor?.nombre || perfil.tutor?.apellido || perfil.tutor?.dni; else noTutorAsignado">
-                    <div class="tutor-pill-item">
-                      <span class="pill-label">Nombre:</span>
-                      <span class="pill-value">{{ perfil.tutor?.nombre }} {{ perfil.tutor?.apellido }}</span>
-                    </div>
-                    <div class="tutor-pill-item" *ngIf="perfil.tutor?.dni">
-                      <span class="pill-label">DNI:</span>
-                      <span class="pill-value">{{ perfil.tutor?.dni }}</span>
-                    </div>
-                    <div class="tutor-pill-item" *ngIf="perfil.tutor?.parentesco">
-                      <span class="pill-label">Vínculo:</span>
-                      <span class="pill-value">{{ perfil.tutor?.parentesco }}</span>
-                    </div>
-                    <div class="tutor-pill-item" *ngIf="perfil.tutor?.telefono">
-                      <span class="pill-label">Teléfono:</span>
-                      <span class="pill-value">{{ perfil.tutor?.telefono }}</span>
-                    </div>
-                    <div class="tutor-pill-item full-span" *ngIf="perfil.tutor?.email">
-                      <span class="pill-label">Email:</span>
-                      <span class="pill-value">{{ perfil.tutor?.email }}</span>
-                    </div>
-                  </div>
-
-                  <ng-template #noTutorAsignado>
-                    <div class="tutor-empty-state">
-                      <span class="tutor-empty-text">Sin tutor asignado a este futbolista</span>
-                    </div>
-                  </ng-template>
-                </div>
-
-                <div class="tutor-banner-action">
-                  <button type="button" class="btn-tutor-modal" (click)="abrirModalTutor()">
-                    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path></svg>
-                    <span>{{ (perfil.tutor?.nombre || perfil.tutor?.dni) ? 'Editar Tutor' : 'Agregar o Editar Tutor' }}</span>
-                  </button>
-                </div>
-              </div>
-            </section>
-
-            <!-- CARD 2: FICHA MÉDICA (COLUMNA CENTRAL) -->
-            <section class="card-box card-medica" *ngIf="perfil.fichaMedica">
-              <div class="card-header-row">
-                <h2 class="card-title">FICHA MÉDICA</h2>
-              </div>
-
-              <div class="medical-section">
-                <span class="medical-subtitle">Patologías</span>
-                <textarea class="edit-form-control edit-textarea" name="patologias" [(ngModel)]="perfil.fichaMedica.patologias" placeholder="Ingrese patologías..."></textarea>
-              </div>
-
-              <div class="medical-section mt-2">
-                <span class="medical-subtitle">Historial de lesiones</span>
-
-                <div class="lesiones-container" *ngIf="lesiones && lesiones.length > 0; else noLesiones">
-                  <div class="lesion-item-row" *ngFor="let lesion of lesiones; let i = index">
-                    <div class="lesion-left">
-                      <span class="lesion-dot"></span>
-                      <span class="lesion-text">{{ lesion }}</span>
-                    </div>
-                    <button type="button" class="btn-icon-delete" title="Eliminar lesión" (click)="eliminarLesion(i)">
-                      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M3 6h18"></path><path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"></path><path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"></path></svg>
-                    </button>
-                  </div>
-                </div>
-                <ng-template #noLesiones>
-                  <div class="no-lesiones-box">Sin lesiones registradas.</div>
-                </ng-template>
-
-                <div class="add-lesion-box">
-                  <div class="lesion-input-row">
-                    <input type="text" class="edit-form-control" name="nuevaLesion" [(ngModel)]="nuevaLesion" placeholder="Ej: Esguince tobillo">
-                    <button type="button" class="btn-outline-green" (click)="agregarLesion()">+ Agregar</button>
-                  </div>
-
-                  <label class="checkbox-label">
-                    <input type="checkbox" name="usarFechaHoy" [(ngModel)]="usarFechaHoy">
-                    Agregar automáticamente la fecha de hoy
-                  </label>
-                </div>
-              </div>
-
-              <div class="medical-section mt-2">
-                <span class="medical-subtitle">Observaciones médicas</span>
-                <textarea class="edit-form-control edit-textarea" name="observaciones" [(ngModel)]="perfil.fichaMedica.observaciones" placeholder="Ingrese observaciones médicas..."></textarea>
-              </div>
-            </section>
-
-            <!-- CARD 3: HISTORIAL DE PARTIDOS (COLUMNA DERECHA) -->
-            <section class="card-box card-partidos">
-              <div class="card-header-row card-header-flex">
-                <h2 class="card-title">HISTORIAL DE PARTIDOS</h2>
-
-                <div class="stats-pills-row" *ngIf="partidosFiltrados && partidosFiltrados.length > 0">
-                  <span class="badge-count badge-res-g">{{ statsPartidos.ganados || 0 }} G</span>
-                  <span class="badge-count badge-res-e">{{ statsPartidos.empatados || 0 }} E</span>
-                  <span class="badge-count badge-res-p">{{ statsPartidos.perdidos || 0 }} P</span>
-                </div>
-              </div>
-
-              <div class="partidos-filter-toolbar" *ngIf="getCategoriasPartidos().length > 1">
-                <label class="filter-label">Ver división:</label>
-                <div class="select-box select-filtro-categoria">
-                  <select [(ngModel)]="categoriaFiltroPartido" name="categoriaFiltroPartido">
-                    <option value="">Todas las divisiones</option>
-                    <option *ngFor="let cat of getCategoriasPartidos()" [value]="cat">{{ cat }}</option>
+                <div class="data-label-group">
+                  <span class="data-label">Pie hábil</span>
+                  <select class="edit-form-control" name="pieHabil" [(ngModel)]="perfil.pieHabil">
+                    <option *ngFor="let pie of pies" [value]="pie">{{ pie }}</option>
                   </select>
-                  <span class="select-arrow">
-                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#334155" stroke-width="2.5"><polyline points="6 9 12 15 18 9"></polyline></svg>
-                  </span>
                 </div>
               </div>
 
-              <p class="section-notice">
-                Los partidos son gestionados a nivel Categoría. Modificá únicamente los minutos que jugó este futbolista.
-              </p>
-
-              <div class="match-table-responsive">
-                <table class="match-table">
-                  <thead>
-                    <tr>
-                      <th class="th-fecha">FECHA</th>
-                      <th class="th-division" *ngIf="!categoriaFiltroPartido && getCategoriasPartidos().length > 1">DIVISIÓN</th>
-                      <th class="th-rival">RIVAL</th>
-                      <th class="th-condicion">CONDICIÓN</th>
-                      <th class="th-resultado">RESULTADO</th>
-                      <th class="th-minutos">MINUTOS</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    <tr *ngFor="let partido of partidosFiltrados; let i = index">
-                      <td class="td-fecha">{{ partido.fecha | date:'dd/MM/yyyy' }}</td>
-                      <td class="td-division" *ngIf="!categoriaFiltroPartido && getCategoriasPartidos().length > 1">
-                        <span class="badge-division-mini">{{ partido.categoria }}</span>
-                      </td>
-                      <td class="td-rival" [title]="partido.rival">{{ partido.rival }}</td>
-                      <td class="td-condicion">
-                        <span class="badge-posicion">{{ partido.condicion }}</span>
-                      </td>
-                      <td class="td-resultado">
-                        <span class="badge-resultado" [ngClass]="{
-                        'res-g': esResultado(partido.resultado, 'G'),
-                        'res-p': esResultado(partido.resultado, 'P'),
-                        'res-e': esResultado(partido.resultado, 'E')
-                      }">
-                          {{ partido.resultado }}
-                        </span>
-                      </td>
-                      <td class="td-minutos">
-                        <input type="number" min="0" max="120" class="edit-form-control minutes-input" [name]="'minutos_' + (partido.idPartido || i)" [(ngModel)]="partido.minutos" placeholder="0">
-                      </td>
-                    </tr>
-                    <tr *ngIf="!partidosFiltrados || partidosFiltrados.length === 0">
-                      <td [attr.colspan]="(!categoriaFiltroPartido && getCategoriasPartidos().length > 1) ? 6 : 5" class="no-records">
-                        No hay partidos registrados para la categoría seleccionada.
-                      </td>
-                    </tr>
-                  </tbody>
-                </table>
-              </div>
-            </section>
-
-          </div>
-
-          <!-- FOOTER ACCIONES -->
-          <footer class="bottom-actions-row">
-            <div class="right-actions-group">
-              <button type="button" class="btn-cancel" (click)="volver()">
-                <span>✕ Cancelar</span>
-              </button>
-
-              <button type="submit" class="btn-solid-green" [disabled]="guardando">
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#FFFFFF" stroke-width="2.5"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"></path><polyline points="17 21 17 13 7 13 7 21"></polyline><polyline points="7 3 7 8 15 8"></polyline></svg>
-                <span>{{ guardando ? 'Guardando...' : 'Guardar Cambios' }}</span>
-              </button>
-            </div>
-          </footer>
-
-          <!-- MODAL FORMULARIO TUTOR -->
-          <div class="modal-backdrop-cacc" *ngIf="modalTutorAbierto" (click)="cerrarModalTutor()">
-            <div class="modal-dialog-cacc" (click)="$event.stopPropagation()">
-              <div class="modal-header-cacc">
-                <div class="modal-title-group">
-                  <div class="modal-icon-badge">
-                    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#007A3D" stroke-width="2.2">
-                      <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
-                      <circle cx="9" cy="7" r="4"></circle>
-                      <path d="M23 21v-2a4 4 0 0 0-3-3.87"></path>
-                      <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
-                    </svg>
-                  </div>
-                  <div>
-                    <h3 class="modal-main-title">Tutor / Responsable Legal</h3>
-                    <p class="modal-subtitle-text">Información de contacto del tutor para menores de edad</p>
-                  </div>
+              <!-- Grupo Sanguíneo -->
+              <div class="data-item-card">
+                <div class="data-icon">
+                  <svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 2.5 6.2 9.2A8 8 0 1 0 17.8 9.2L12 2.5Zm0 16.5a5 5 0 0 1-5-5c0-1.4.6-2.7 1.6-3.7L12 6.4l3.4 3.9A5 5 0 0 1 12 19Z"/></svg>
                 </div>
-                <button type="button" class="btn-close-modal" (click)="cerrarModalTutor()" title="Cerrar">✕</button>
+                <div class="data-label-group">
+                  <span class="data-label">Gr. Sanguíneo</span>
+                  <select class="edit-form-control" name="grupoSanguineo" [(ngModel)]="perfil.fichaMedica.grupoSanguineo">
+                    <option *ngFor="let gs of gruposSanguineos" [value]="gs">{{ gs }}</option>
+                  </select>
+                </div>
               </div>
 
-              <div class="modal-body-cacc" *ngIf="perfil.tutor">
-                <!-- DNI del Tutor con Búsqueda -->
-                <div class="form-group">
-                  <label class="data-label">DNI del Tutor</label>
-                  <div class="search-input-group">
-                    <input type="text" class="edit-form-control search-input-field" name="tutorDni" [(ngModel)]="perfil.tutor.dni" placeholder="Ingresá el DNI del tutor" (keyup.enter)="buscarTutor()">
-                    <button type="button" class="btn-search-tutor" [disabled]="buscandoTutor" (click)="buscarTutor()" title="Buscar si ya existe en el club">
-                      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#FFFFFF" stroke-width="2.5"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
-                    </button>
-                  </div>
-                  <span *ngIf="tutorEncontradoMensaje" class="tutor-found-badge">✓ {{ tutorEncontradoMensaje }}</span>
+              <!-- Tutor -->
+              <div class="data-item-card tutor-card">
+                <div class="data-icon">
+                  <svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><circle cx="8" cy="7" r="4"/><circle cx="17" cy="6" r="3"/><path d="M1 22v-3a6 6 0 0 1 12 0v3H1Zm13 0v-3c0-2-.7-3.7-1.8-5A5 5 0 0 1 23 17v5h-9Z"/></svg>
                 </div>
-
-                <!-- Nombre y Apellido del Tutor -->
-                <div class="form-row-2 mt-1">
-                  <div class="form-group">
-                    <label class="data-label">Nombre del Tutor</label>
+                <div class="data-label-group">
+                  <span class="data-label">Tutor (Opcional)</span>
+                  <div class="form-row-2">
                     <input type="text" class="edit-form-control" name="tutorNombre" [(ngModel)]="perfil.tutor.nombre" placeholder="Nombre">
-                  </div>
-                  <div class="form-group">
-                    <label class="data-label">Apellido del Tutor</label>
                     <input type="text" class="edit-form-control" name="tutorApellido" [(ngModel)]="perfil.tutor.apellido" placeholder="Apellido">
                   </div>
                 </div>
-
-                <!-- Parentesco y Teléfono -->
-                <div class="form-row-2 mt-1">
-                  <div class="form-group">
-                    <label class="data-label">Parentesco / Vínculo</label>
-                    <div class="select-box">
-                      <select class="edit-form-control" name="tutorParentesco" [(ngModel)]="perfil.tutor.parentesco">
-                        <option *ngFor="let p of parentescos" [value]="p">{{ p }}</option>
-                      </select>
-                      <span class="select-arrow">
-                        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#334155" stroke-width="2.5"><polyline points="6 9 12 15 18 9"></polyline></svg>
-                      </span>
-                    </div>
-                  </div>
-                  <div class="form-group">
-                    <label class="data-label">Teléfono de Contacto</label>
-                    <input type="text" class="edit-form-control" name="tutorTelefono" [(ngModel)]="perfil.tutor.telefono" placeholder="Ej: 3514001122">
-                  </div>
-                </div>
-
-                <!-- Correo Electrónico del Tutor -->
-                <div class="form-group mt-1">
-                  <label class="data-label">Correo Electrónico del Tutor (Opcional)</label>
-                  <input type="email" class="edit-form-control" name="tutorEmail" [(ngModel)]="perfil.tutor.email" placeholder="correo@ejemplo.com">
-                </div>
               </div>
 
-              <div class="modal-footer-cacc">
-                <button type="button" class="btn-solid-green w-100" (click)="cerrarModalTutor()">
-                  Confirmar Datos del Tutor
-                </button>
+              <!-- Teléfono Tutor -->
+              <div class="data-item-card tutor-card">
+                <div class="data-icon">
+                  <svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="m6.6 2 3 6-2.2 1.8a16 16 0 0 0 6.8 6.8l1.8-2.2 6 3v3A2 2 0 0 1 20 22C10.1 22 2 13.9 2 4a2 2 0 0 1 2-2h2.6Z"/></svg>
+                </div>
+                <div class="data-label-group">
+                  <span class="data-label">Teléfono Tutor</span>
+                  <input type="text" class="edit-form-control" name="tutorTelefono" [(ngModel)]="perfil.tutor.telefono" placeholder="Ej: 3510000000">
+                </div>
               </div>
             </div>
-          </div>
 
-        </form>
-      </main>
-    </div>
+            <!-- Domicilio -->
+            <div class="domicilio-card">
+              <div class="data-icon">
+                <svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 2a8 8 0 0 1 8 8c0 5.7-8 12-8 12S4 15.7 4 10a8 8 0 0 1 8-8Zm0 4.5A3.5 3.5 0 1 0 12 13a3.5 3.5 0 0 0 0-7Z"/></svg>
+              </div>
+              <div class="data-label-group">
+                <span class="data-label">Domicilio</span>
+                <input type="text" class="edit-form-control" name="domicilio" [(ngModel)]="perfil.domicilio" placeholder="Calle falsa 123">
+              </div>
+            </div>
+          </section>
+
+          <!-- CARD 2: HISTORIAL DE PARTIDOS -->
+          <section class="card-box card-partidos">
+            <div class="card-header-row">
+              <h2 class="card-title">HISTORIAL DE PARTIDOS</h2>
+            </div>
+
+            <p class="section-notice">
+              Los partidos son gestionados a nivel Categoría. Modificá únicamente los minutos que jugó este jugador.
+            </p>
+
+            <div class="match-table-responsive">
+              <table class="match-table">
+                <thead>
+                  <tr>
+                    <th class="th-fecha">FECHA</th>
+                    <th class="th-rival">RIVAL</th>
+                    <th class="th-condicion">CONDICIÓN</th>
+                    <th class="th-resultado">RESULTADO</th>
+                    <th class="th-minutos">MINUTOS</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr *ngFor="let partido of perfil.partidos; let i = index">
+                    <td class="td-fecha">{{ partido.fecha | date:'dd/MM/yyyy' }}</td>
+                    <td class="td-rival" [title]="partido.rival">{{ partido.rival }}</td>
+                    <td class="td-condicion">
+                      <span class="badge-condicion" [ngClass]="partido.condicion === 'Local' ? 'badge-local' : 'badge-visitante'">
+                        {{ partido.condicion }}
+                      </span>
+                    </td>
+                    <td class="td-resultado">
+                      <span class="badge-resultado" [ngClass]="{
+                        'res-g': partido.resultado?.startsWith('G'),
+                        'res-p': partido.resultado?.startsWith('P'),
+                        'res-e': partido.resultado?.startsWith('E')
+                      }">
+                        {{ partido.resultado }}
+                      </span>
+                    </td>
+                    <td class="td-minutos">
+                      <input type="number" class="edit-form-control minutes-input" name="minutos{{i}}" [(ngModel)]="partido.minutos" placeholder="0">
+                    </td>
+                  </tr>
+                  <tr *ngIf="perfil.partidos?.length === 0">
+                    <td colspan="5" class="no-records">No hay partidos registrados para la categoría.</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </section>
+
+          <!-- CARD 3: FICHA MÉDICA -->
+          <section class="card-box card-medica">
+            <div class="card-header-row">
+              <h2 class="card-title">FICHA MÉDICA</h2>
+            </div>
+
+            <div class="medical-section">
+              <span class="medical-subtitle">Patologías</span>
+              <textarea class="edit-form-control edit-textarea" name="patologias" [(ngModel)]="perfil.fichaMedica.patologias" placeholder="Ingrese patologías (separadas por coma)"></textarea>
+            </div>
+
+            <div class="medical-section mt-2">
+              <span class="medical-subtitle">Historial de lesiones</span>
+
+              <!-- Lista de Lesiones con filas individuales y botón eliminar -->
+              <div class="lesiones-container" *ngIf="lesiones.length > 0; else noLesiones">
+                <div class="lesion-item-row" *ngFor="let lesion of lesiones; let i = index">
+                  <div class="lesion-left">
+                    <span class="lesion-dot"></span>
+                    <span class="lesion-text">{{ lesion }}</span>
+                  </div>
+                  <button type="button" class="btn-icon-delete" title="Eliminar lesión" (click)="eliminarLesion(i)">
+                    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M3 6h18"></path><path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"></path><path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"></path></svg>
+                  </button>
+                </div>
+              </div>
+              <ng-template #noLesiones>
+                <div class="no-lesiones-box">Sin lesiones registradas.</div>
+              </ng-template>
+
+              <!-- Carga de lesiones + Checkbox inteligente -->
+              <div class="add-lesion-box">
+                <div class="lesion-input-row">
+                  <input type="text" class="edit-form-control" name="nuevaLesion" [(ngModel)]="nuevaLesion" placeholder="Ej: Esguince tobillo">
+                  <button type="button" class="btn-outline-green" (click)="agregarLesion()">+ Agregar</button>
+                </div>
+
+                <label class="checkbox-label">
+                  <input type="checkbox" name="usarFechaHoy" [(ngModel)]="usarFechaHoy">
+                  Agregar automáticamente la fecha de hoy
+                </label>
+              </div>
+            </div>
+
+            <div class="medical-section mt-2">
+              <span class="medical-subtitle">Observaciones médicas</span>
+              <textarea class="edit-form-control edit-textarea" name="observaciones" [(ngModel)]="perfil.fichaMedica.observaciones" placeholder="Ingrese observaciones médicas..."></textarea>
+            </div>
+          </section>
+
+        </div>
+
+        <!-- FOOTER ACCIONES: Barra Horizontal Completa Alineada a la Derecha -->
+        <footer class="bottom-actions-row">
+          <div class="right-actions-group">
+            <button type="button" class="btn-cancel" (click)="volver()">
+              <span>✕ Cancelar</span>
+            </button>
+
+            <button type="submit" class="btn-save" [disabled]="guardando">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#ffffff" stroke-width="2.5"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"></path><polyline points="17 21 17 13 7 13 7 21"></polyline><polyline points="7 3 7 8 15 8"></polyline></svg>
+              <span>{{ guardando ? 'Guardando...' : 'Guardar' }}</span>
+            </button>
+          </div>
+        </footer>
+      </form>
+    </main>
   </div>
+</div>
+

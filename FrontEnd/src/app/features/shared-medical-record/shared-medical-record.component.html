@@ -1,0 +1,23 @@
+<main class="medical-page">
+  <a [routerLink]="['/', role, 'jugadores', playerId]" class="back-link">← Volver al perfil</a>
+  <header>
+    <div><p class="eyebrow">Ficha médica</p><h1>{{ player ? player.nombre + ' ' + player.apellido : 'Jugador' }}</h1></div>
+    <span class="mode" [class.editable]="canEdit">{{ canEdit ? 'Edición habilitada' : 'Solo lectura' }}</span>
+  </header>
+  <p *ngIf="loading" class="state">Cargando ficha médica…</p>
+  <p *ngIf="error" class="state error">{{ error }}</p>
+  <p *ngIf="success" class="state success">{{ success }}</p>
+
+  <form *ngIf="record as ficha" (ngSubmit)="save()" class="record-card">
+    <label>Obra social<input name="obraSocial" [(ngModel)]="ficha.obraSocial" [disabled]="!canEdit"></label>
+    <label>Número de afiliado<input name="numeroAfiliadoOs" type="number" [(ngModel)]="ficha.numeroAfiliadoOs" [disabled]="!canEdit"></label>
+    <label>Grupo sanguíneo<input name="grupoSanguineo" [(ngModel)]="ficha.grupoSanguineo" [disabled]="!canEdit"></label>
+    <label>Factor<input name="factor" [(ngModel)]="ficha.factor" [disabled]="!canEdit"></label>
+    <label>Vencimiento del apto físico<input name="aptoFisicoVencimiento" type="date" [(ngModel)]="ficha.aptoFisicoVencimiento" [disabled]="!canEdit"></label>
+    <label class="wide">Antecedentes de salud<textarea name="antecedentesSalud" [(ngModel)]="ficha.antecedentesSalud" [disabled]="!canEdit"></textarea></label>
+    <label class="wide">Medicamentos crónicos<textarea name="medicamentosCronicos" [(ngModel)]="ficha.medicamentosCronicos" [disabled]="!canEdit"></textarea></label>
+    <label class="wide">Condiciones crónicas<textarea name="condicionesCronicas" [(ngModel)]="ficha.condicionesCronicas" [disabled]="!canEdit"></textarea></label>
+    <label class="wide">Observaciones<textarea name="observaciones" [(ngModel)]="ficha.observaciones" [disabled]="!canEdit"></textarea></label>
+    <div class="actions wide" *ngIf="canEdit"><button type="submit" [disabled]="saving">{{ saving ? 'Guardando…' : 'Guardar cambios' }}</button></div>
+  </form>
+</main>

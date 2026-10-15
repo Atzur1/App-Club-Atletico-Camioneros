@@ -2,4 +2,5 @@
   <Project Path="CACC.API/CACC.API.csproj" />
   <Project Path="CACC.DAO/CACC.DAO.csproj" />
   <Project Path="CACC.Entities/CACC.Entities.csproj" />
+  <Project Path="CACC.Tests/CACC.Tests.csproj" />
 </Solution>

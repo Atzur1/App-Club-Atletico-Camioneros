@@ -7,25 +7,33 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using CACC.API.Security;
 
 namespace CACC.API.Controllers
 {
     [ApiController]
     [Route("api/categorias")]
-    [Authorize]
+    [Authorize(Roles = AppRoles.LecturaDeportiva)]
     public class CategoriasController : ControllerBase
     {
         private readonly ICategoriaDao _categoriaDao;
+        private readonly ICurrentUserAccess _access;
 
-        public CategoriasController(ICategoriaDao categoriaDao)
+        public CategoriasController(ICategoriaDao categoriaDao, ICurrentUserAccess access)
         {
             _categoriaDao = categoriaDao;
+            _access = access;
         }
 
         [HttpGet]
         public async Task<IActionResult> GetCategorias()
         {
             var categoriasConConteo = await _categoriaDao.ObtenerTodasConConteoAsync();
+
+            if (_access.IsDirectorTecnico)
+            {
+                categoriasConConteo = categoriasConConteo.Where(c => _access.CategoriaIds.Contains(c.IdCategoria));
+            }
 
             var response = categoriasConConteo.Select(c => new CategoriaResponseDto
             {
@@ -43,12 +51,17 @@ namespace CACC.API.Controllers
         public async Task<IActionResult> GetCategoriasSimple()
         {
             var categorias = await _categoriaDao.ObtenerTodasAsync();
+            if (_access.IsDirectorTecnico)
+            {
+                categorias = categorias.Where(c => _access.CategoriaIds.Contains(c.IdCategoria));
+            }
             return Ok(categorias);
         }
 
         [HttpGet("{id}")]
         public async Task<IActionResult> GetCategoriaPorId(int id)
         {
+            if (!_access.PuedeAccederCategoria(id)) return Forbid();
             var cat = await _categoriaDao.ObtenerPorIdAsync(id);
             if (cat == null)
             {
@@ -63,7 +76,7 @@ namespace CACC.API.Controllers
         }
 
         [HttpPost]
-        [Authorize(Roles = "Administrador (Tesorero),Tesorero")]
+        [Authorize(Roles = AppRoles.Administradores)]
         public async Task<IActionResult> CrearCategoria([FromBody] CategoriaCreateUpdateDto dto)
         {
             if (dto == null || string.IsNullOrWhiteSpace(dto.NombreCategoria))
@@ -76,7 +89,7 @@ namespace CACC.API.Controllers
         }
 
         [HttpPut("{id}")]
-        [Authorize(Roles = "Administrador (Tesorero),Tesorero")]
+        [Authorize(Roles = AppRoles.Administradores)]
         public async Task<IActionResult> ActualizarCategoria(int id, [FromBody] CategoriaCreateUpdateDto dto)
         {
             if (dto == null || string.IsNullOrWhiteSpace(dto.NombreCategoria))
@@ -94,7 +107,7 @@ namespace CACC.API.Controllers
         }
 
         [HttpDelete("{id}")]
-        [Authorize(Roles = "Administrador (Tesorero),Tesorero")]
+        [Authorize(Roles = AppRoles.Administradores)]
         public async Task<IActionResult> EliminarCategoria(int id)
         {
             bool ok = await _categoriaDao.EliminarAsync(id);
@@ -113,6 +126,7 @@ namespace CACC.API.Controllers
         [HttpGet("{id}/jugadores")]
         public async Task<IActionResult> GetJugadoresPlantel(int id)
         {
+            if (!_access.PuedeAccederCategoria(id)) return Forbid();
             var plantel = await _categoriaDao.ObtenerJugadoresPorCategoriaAsync(id);
 
             var response = plantel.Select(j => new JugadorPlantelDto
@@ -128,6 +142,7 @@ namespace CACC.API.Controllers
         }
 
         [HttpGet("{id}/jugadores-disponibles")]
+        [Authorize(Roles = AppRoles.Administradores + "," + AppRoles.Coordinador)]
         public async Task<IActionResult> GetJugadoresDisponibles(int id, [FromQuery] string? q)
         {
             var disponibles = await _categoriaDao.ObtenerJugadoresDisponiblesAsync(id, q);
@@ -145,7 +160,7 @@ namespace CACC.API.Controllers
         }
 
         [HttpPost("{id}/jugadores")]
-        [Authorize(Roles = "Administrador (Tesorero),Tesorero")]
+        [Authorize(Roles = AppRoles.Administradores + "," + AppRoles.Coordinador)]
         public async Task<IActionResult> AsignarJugador(int id, [FromBody] AsignarJugadorCategoriaDto dto)
         {
             if (dto == null || dto.IdJugador <= 0)
@@ -158,7 +173,7 @@ namespace CACC.API.Controllers
         }
 
         [HttpDelete("{id}/jugadores/{idJugador}")]
-        [Authorize(Roles = "Administrador (Tesorero),Tesorero")]
+        [Authorize(Roles = AppRoles.Administradores + "," + AppRoles.Coordinador)]
         public async Task<IActionResult> QuitarJugador(int id, int idJugador)
         {
             await _categoriaDao.QuitarJugadorAsync(id, idJugador);
@@ -172,6 +187,7 @@ namespace CACC.API.Controllers
         [HttpGet("{id}/staff")]
         public async Task<IActionResult> GetStaffPlantel(int id)
         {
+            if (!_access.PuedeAccederCategoria(id)) return Forbid();
             var staff = await _categoriaDao.ObtenerStaffPorCategoriaAsync(id);
 
             var response = staff.Select(s => new StaffPlantelDto
@@ -187,6 +203,7 @@ namespace CACC.API.Controllers
         }
 
         [HttpGet("{id}/staff-disponibles")]
+        [Authorize(Roles = AppRoles.Administradores)]
         public async Task<IActionResult> GetStaffDisponibles(int id, [FromQuery] string? q)
         {
             var disponibles = await _categoriaDao.ObtenerStaffDisponibleAsync(id, q);
@@ -204,7 +221,7 @@ namespace CACC.API.Controllers
         }
 
         [HttpPost("{id}/staff")]
-        [Authorize(Roles = "Administrador (Tesorero),Tesorero")]
+        [Authorize(Roles = AppRoles.Administradores)]
         public async Task<IActionResult> AsignarStaff(int id, [FromBody] AsignarStaffCategoriaDto dto)
         {
             if (dto == null || dto.IdStaff <= 0)
@@ -217,7 +234,7 @@ namespace CACC.API.Controllers
         }
 
         [HttpDelete("{id}/staff/{idStaff}")]
-        [Authorize(Roles = "Administrador (Tesorero),Tesorero")]
+        [Authorize(Roles = AppRoles.Administradores)]
         public async Task<IActionResult> QuitarStaff(int id, int idStaff)
         {
             await _categoriaDao.QuitarStaffAsync(id, idStaff);
@@ -231,6 +248,7 @@ namespace CACC.API.Controllers
         [HttpGet("{id}/partidos")]
         public async Task<IActionResult> GetPartidos(int id)
         {
+            if (!_access.PuedeAccederCategoria(id)) return Forbid();
             var partidos = await _categoriaDao.ObtenerPartidosPorCategoriaAsync(id);
             var response = partidos.Select(p => new PartidoResponseDto
             {
@@ -246,7 +264,7 @@ namespace CACC.API.Controllers
         }
 
         [HttpPost("{id}/partidos")]
-        [Authorize(Roles = "Administrador (Tesorero),Tesorero,Director Técnico,Coordinador")]
+        [Authorize(Roles = AppRoles.Administradores)]
         public async Task<IActionResult> CrearPartido(int id, [FromBody] PartidoCreateDto dto)
         {
             if (dto == null || string.IsNullOrWhiteSpace(dto.Rival) || string.IsNullOrWhiteSpace(dto.Resultado) || string.IsNullOrWhiteSpace(dto.FechaPartido))
@@ -280,15 +298,16 @@ namespace CACC.API.Controllers
         [HttpGet("{id}/partidos/{idPartido}")]
         public async Task<IActionResult> GetPartidoPorId(int id, int idPartido)
         {
+            if (!_access.PuedeAccederCategoria(id)) return Forbid();
             var p = await _categoriaDao.ObtenerPartidoPorIdAsync(idPartido);
-            if (p == null)
+            if (p == null || p.IdCategoria != id)
                 return NotFound(new { message = $"Partido con ID {idPartido} no encontrado." });
 
             return Ok(p);
         }
 
         [HttpPut("{id}/partidos/{idPartido}")]
-        [Authorize(Roles = "Administrador (Tesorero),Tesorero,Director Técnico,Coordinador")]
+        [Authorize(Roles = AppRoles.Administradores)]
         public async Task<IActionResult> ActualizarPartido(int id, int idPartido, [FromBody] PartidoCreateDto dto)
         {
             if (dto == null || string.IsNullOrWhiteSpace(dto.Rival) || string.IsNullOrWhiteSpace(dto.Resultado) || string.IsNullOrWhiteSpace(dto.FechaPartido))
@@ -325,7 +344,7 @@ namespace CACC.API.Controllers
         }
 
         [HttpDelete("{id}/partidos/{idPartido}")]
-        [Authorize(Roles = "Administrador (Tesorero),Tesorero,Director Técnico,Coordinador")]
+        [Authorize(Roles = AppRoles.Administradores)]
         public async Task<IActionResult> EliminarPartido(int id, int idPartido)
         {
             bool ok = await _categoriaDao.EliminarPartidoAsync(idPartido);

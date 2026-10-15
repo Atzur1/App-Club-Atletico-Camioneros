@@ -2,6 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { ActivatedRoute, Router, RouterModule } from '@angular/router';
+import { RolePlayerViewService } from '../../shared/services/role-player-view.service';
 
 export interface PartidoItem {
   dia: string;
@@ -40,14 +41,6 @@ export interface PlayerFicha {
 })
 export class MedicoFichaJugadorComponent implements OnInit {
   playerId = 1;
-  activeTab = 'Jugadores';
-
-  navItems = [
-    { label: 'Inicio', icon: 'home', active: false },
-    { label: 'Jugadores', icon: 'group', active: true },
-    { label: 'Categorías', icon: 'category', active: false }
-  ];
-
   player: PlayerFicha = {
     id: 1,
     nombreCompleto: 'NOMBRE Y APELLIDO',
@@ -74,35 +67,23 @@ export class MedicoFichaJugadorComponent implements OnInit {
     totalMinutosJugados: "00'"
   };
 
-  constructor(private route: ActivatedRoute, private router: Router) {}
+  constructor(private route: ActivatedRoute, private router: Router, private views: RolePlayerViewService) {}
 
   ngOnInit(): void {
     this.route.params.subscribe(params => {
       const idParam = params['id'];
       if (idParam) {
         this.playerId = Number(idParam);
+        this.views.profile(this.playerId).subscribe(player => this.player = player);
       }
     });
   }
 
-  selectNav(label: string) {
-    this.navItems.forEach(item => item.active = (item.label === label));
-    this.activeTab = label;
-
-    if (label === 'Inicio') {
-      this.router.navigate(['/medico']);
-    } else if (label === 'Jugadores') {
-      this.router.navigate(['/medico/lista-jugadores']);
-    } else if (label === 'Categorias' || label === 'Categorías') {
-      this.router.navigate(['/medico/categorias']);
-    }
-  }
-
   volver() {
-    this.router.navigate(['/medico/lista-jugadores']);
+    this.router.navigate(['/medico/jugadores']);
   }
 
   editarFicha() {
-    this.router.navigate(['/medico/editar-ficha', this.playerId]);
+    this.router.navigate(['/medico/jugadores', this.playerId, 'ficha-medica']);
   }
 }

@@ -1,7 +1,8 @@
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { Router } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
+import { RolePlayerViewService } from '../../shared/services/role-player-view.service';
 
 export interface PlayerCategoriaDT {
   id: number;
@@ -18,27 +19,24 @@ export interface PlayerCategoriaDT {
   templateUrl: './dt-categoria-jugadores.html',
   styleUrl: './dt-categoria-jugadores.css'
 })
-export class DtCategoriaJugadoresComponent {
-  constructor(private router: Router) {}
+export class DtCategoriaJugadoresComponent implements OnInit {
+  constructor(private router: Router, private route: ActivatedRoute, private views: RolePlayerViewService) {}
 
   nombreCategoria = 'Plantel';
   searchTerm = '';
   posicionFiltro = '';
 
-  navItems = [
-    { label: 'Inicio', icon: 'home', active: false },
-    { label: 'Jugadores', icon: 'jugadores', active: true },
-    { label: 'Categorias', icon: 'categorias', active: false }
-  ];
 
-  players: PlayerCategoriaDT[] = [
-    { id: 1, nombreCompleto: 'NOMBRE Y APELLIDO', dni: '43.123.456', posicion: 'Delanteros', edad: '00 AÑOS' },
-    { id: 2, nombreCompleto: 'NOMBRE Y APELLIDO', dni: '43.123.456', posicion: 'Defensores', edad: '00 AÑOS' },
-    { id: 3, nombreCompleto: 'NOMBRE Y APELLIDO', dni: '43.123.456', posicion: 'Arqueros', edad: '00 AÑOS' },
-    { id: 4, nombreCompleto: 'NOMBRE Y APELLIDO', dni: '43.123.456', posicion: 'Volantes', edad: '00 AÑOS' },
-    { id: 5, nombreCompleto: 'NOMBRE Y APELLIDO', dni: '43.123.456', posicion: 'Defensores', edad: '00 AÑOS' },
-    { id: 6, nombreCompleto: 'NOMBRE Y APELLIDO', dni: '43.123.456', posicion: 'Volantes', edad: '00 AÑOS' }
-  ];
+  players: PlayerCategoriaDT[] = [];
+  ngOnInit(): void {
+    const id = Number(this.route.snapshot.paramMap.get('id'));
+    const source = id > 0 ? this.views.categoryPlayers(id) : this.views.players();
+    source.subscribe(players => this.players = players.map(player => ({ ...player, posicion: this.pluralPosition(player.posicion) })) as PlayerCategoriaDT[]);
+  }
+  private pluralPosition(position: string): PlayerCategoriaDT['posicion'] {
+    const values: Record<string, PlayerCategoriaDT['posicion']> = { ARQUERO: 'Arqueros', DEFENSOR: 'Defensores', VOLANTE: 'Volantes', DELANTERO: 'Delanteros' };
+    return values[position] ?? 'Volantes';
+  }
 
   get filteredPlayers(): PlayerCategoriaDT[] {
     return this.players.filter(p => {
@@ -59,16 +57,7 @@ export class DtCategoriaJugadoresComponent {
   }
 
   verFicha(id: number) {
-    this.router.navigate(['/dt/jugador', id]);
+    this.router.navigate(['/dt/jugadores', id]);
   }
 
-  selectNav(label: string) {
-    if (label === 'Inicio') {
-      this.router.navigate(['/dt']);
-    } else if (label === 'Jugadores') {
-      this.router.navigate(['/dt-categoria-jugadores']);
-    } else if (label === 'Categorias') {
-      this.router.navigate(['/dt/categorias']);
-    }
-  }
 }

@@ -4,6 +4,7 @@ import { FormsModule } from '@angular/forms';
 import { Router, RouterModule } from '@angular/router';
 import { HttpClient } from '@angular/common/http';
 import { AuthService } from '../../shared/services/auth.service';
+import { PortalAccessService } from '../../shared/auth/portal-access.service';
 
 export interface CategoriaItem {
   id: number;
@@ -51,6 +52,10 @@ export class AdminListaCategoria implements OnInit {
   private readonly router = inject(Router);
   private readonly http = inject(HttpClient);
   private readonly authService = inject(AuthService);
+  private readonly access = inject(PortalAccessService);
+  readonly canManageCategories = this.access.capabilities.canManageCategories;
+  readonly canManageRoster = this.access.capabilities.canManageCategoryRoster;
+  readonly isCoordinator = this.access.role === 'coordinador';
 
   usuarioActual = {
     nombre: 'Cargando...',
@@ -206,6 +211,7 @@ export class AdminListaCategoria implements OnInit {
 
   // --- Crear / Editar Categoría con Asociación ---
   abrirModalCrear(): void {
+    if (!this.canManageCategories) return;
     this.modoEdicion = false;
     this.categoriaFormId = 0;
     this.categoriaFormNombre = '';
@@ -214,6 +220,7 @@ export class AdminListaCategoria implements OnInit {
   }
 
   abrirModalEditar(cat: CategoriaItem): void {
+    if (!this.canManageCategories) return;
     this.modoEdicion = true;
     this.categoriaFormId = cat.id;
     this.categoriaFormNombre = cat.nombre;
@@ -226,6 +233,7 @@ export class AdminListaCategoria implements OnInit {
   }
 
   guardarCategoria(): void {
+    if (!this.canManageCategories) return;
     if (!this.categoriaFormNombre.trim()) {
       alert('Ingrese el nombre de la categoría.');
       return;
@@ -257,6 +265,7 @@ export class AdminListaCategoria implements OnInit {
 
   // --- Eliminar Categoría ---
   abrirModalEliminarCategoria(cat: CategoriaItem): void {
+    if (!this.canManageCategories) return;
     this.categoriaAEliminar = cat;
     this.modalEliminarVisible = true;
   }
@@ -267,6 +276,7 @@ export class AdminListaCategoria implements OnInit {
   }
 
   confirmarEliminarCategoria(): void {
+    if (!this.canManageCategories) return;
     if (!this.categoriaAEliminar) return;
 
     this.eliminando = true;
@@ -346,6 +356,7 @@ export class AdminListaCategoria implements OnInit {
   }
 
   agregarJugador(): void {
+    if (!this.canManageRoster) return;
     if (!this.categoriaActiva || !this.jugadorSeleccionadoId) {
       alert('Seleccione un jugador para agregar a la categoría.');
       return;
@@ -365,6 +376,7 @@ export class AdminListaCategoria implements OnInit {
   }
 
   quitarJugador(idJugador: number): void {
+    if (!this.canManageRoster) return;
     if (!this.categoriaActiva) return;
     if (!confirm('¿Desea desvincular al jugador de esta categoría?')) return;
 
@@ -419,6 +431,7 @@ export class AdminListaCategoria implements OnInit {
   }
 
   agregarStaff(): void {
+    if (this.isCoordinator) return;
     if (!this.categoriaActiva || !this.staffSeleccionadoId) {
       alert('Seleccione un Director Técnico o Preparador Físico para asignar.');
       return;
@@ -438,6 +451,7 @@ export class AdminListaCategoria implements OnInit {
   }
 
   quitarStaff(idStaff: number): void {
+    if (this.isCoordinator) return;
     if (!this.categoriaActiva) return;
     if (!confirm('¿Desea desvincular a este colaborador del cuerpo técnico de esta categoría?')) return;
 
@@ -472,6 +486,7 @@ export class AdminListaCategoria implements OnInit {
   }
 
   abrirNuevoPartido(): void {
+    if (this.isCoordinator) return;
     this.mostrarFormPartido = true;
     const hoy = new Date().toISOString().split('T')[0];
     this.tipoResultadoSeleccionado = 'G';
@@ -491,6 +506,7 @@ export class AdminListaCategoria implements OnInit {
   }
 
   guardarPartido(): void {
+    if (this.isCoordinator) return;
     if (!this.categoriaActiva) return;
 
     if (!this.partidoForm.fechaPartido || !this.partidoForm.rival.trim() || !this.marcadorResultado.trim()) {
@@ -555,7 +571,7 @@ export class AdminListaCategoria implements OnInit {
   }
 
   irASeleccionPortales(): void {
-    this.router.navigate(['/seleccion-portales']);
+    this.router.navigate(['/admin/portales']);
   }
 
   irAConfiguracion(): void {
@@ -571,7 +587,7 @@ export class AdminListaCategoria implements OnInit {
     this.navItems.forEach(item => item.active = (item.label === label));
     this.activeTab = label;
     if (label === 'Inicio') this.router.navigate(['/admin']);
-    else if (label === 'Jugadores') this.router.navigate(['/admin/lista-jugadores']);
+    else if (label === 'Jugadores') this.router.navigate(['/admin/jugadores']);
     else if (label === 'Categorias' || label === 'Categorías') this.router.navigate(['/admin/categorias']);
     else if (label === 'Staff') this.router.navigate(['/admin/staff']);
   }

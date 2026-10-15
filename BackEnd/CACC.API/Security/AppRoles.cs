@@ -1,0 +1,15 @@
+namespace CACC.API.Security;
+
+public static class AppRoles
+{
+    public const string Administrador = "Administrador (Tesorero)";
+    public const string Tesorero = "Tesorero";
+    public const string Coordinador = "Coordinador";
+    public const string Medico = "Médico";
+    public const string DirectorTecnico = "Director Técnico";
+    public const string DonQr = "Don QR";
+
+    public const string Administradores = Administrador + "," + Tesorero;
+    public const string LecturaDeportiva = Administrador + "," + Tesorero + "," + Coordinador + "," + Medico + "," + DirectorTecnico;
+    public const string LecturaGeneral = Administrador + "," + Tesorero + "," + Coordinador + "," + Medico;
+}

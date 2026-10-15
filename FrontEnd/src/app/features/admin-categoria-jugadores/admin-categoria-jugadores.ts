@@ -128,7 +128,7 @@ export class AdminCategoriaJugadores implements OnInit {
     if (label === 'Inicio') {
       this.router.navigate(['/admin']);
     } else if (label === 'Jugadores') {
-      this.router.navigate(['/admin/lista-jugadores']);
+      this.router.navigate(['/admin/jugadores']);
     } else if (label === 'Categorias' || label === 'Categorías') {
       this.router.navigate(['/admin/categorias']);
     } else if (label === 'Staff') {
@@ -137,10 +137,10 @@ export class AdminCategoriaJugadores implements OnInit {
   }
 
   verFicha(id: number) {
-    this.router.navigate(['/admin/ficha-jugador', id]);
+    this.router.navigate(['/admin/jugadores', id]);
   }
 
   editarJugador(id: number) {
-    this.router.navigate(['/admin/editar-perfil', id]);
+    this.router.navigate(['/admin/jugadores', id, 'editar']);
   }
 }

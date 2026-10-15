@@ -1,7 +1,9 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router, RouterModule, ActivatedRoute } from '@angular/router';
+import { ClubPortalApiService } from '../../shared/services/club-portal-api.service';
+import { AuthService } from '../../shared/services/auth.service';
 
 @Component({
   selector: 'app-coordinador-visualizar-plantel',
@@ -18,29 +20,27 @@ export class CoordinadorVisualizarPlantel implements OnInit {
 
   navItems = [
     { label: 'Inicio', icon: 'home', active: false, route: '/coordinador' },
-    { label: 'Jugadores', icon: 'group', active: true, route: '/coordinador-lista-jugadores' },
-    { label: 'Staff', icon: 'badge', active: false, route: '/coordinador/visualizar-staff' },
-    { label: 'Categorias', icon: 'category', active: false, route: '/coordinador-seleccion-categorias' }
+    { label: 'Jugadores', icon: 'group', active: true, route: '/coordinador/jugadores' },
+    { label: 'Categorias', icon: 'category', active: false, route: '/coordinador/categorias' }
   ];
 
   selectedPosition = '';
   searchTerm = '';
 
-  players = [
-    { name: 'Juan Pérez', dni: '45.123.456', position: 'ARQUERO', age: '15 años' },
-    { name: 'Mateo Gómez', dni: '46.789.012', position: 'DEFENSOR', age: '15 años' },
-    { name: 'Lucas Fernández', dni: '45.987.654', position: 'VOLANTE', age: '15 años' },
-    { name: 'Santiago Rodríguez', dni: '46.321.654', position: 'DELANTERO', age: '15 años' }
-  ];
+  players: Array<{ id: number; name: string; dni: string; position: string; age: string }> = [];
+  private readonly api = inject(ClubPortalApiService);
+  private readonly auth = inject(AuthService);
 
   constructor(private router: Router, private route: ActivatedRoute) {}
 
   ngOnInit(): void {
-    this.route.queryParams.subscribe(params => {
-      if (params['cat']) {
-        this.categoryName = params['cat'];
-      }
-    });
+    const categoryId = Number(this.route.snapshot.paramMap.get('id'));
+    if (!categoryId) return;
+    this.api.getCategory(categoryId).subscribe(category => this.categoryName = category.nombreCategoria);
+    this.api.listRoster(categoryId).subscribe(players => this.players = players.map(player => ({
+      id: player.idJugador, name: player.nombreCompleto, dni: player.dni,
+      position: player.posicionCancha || 'SIN POSICIÓN', age: this.ageLabel(player.fechaNacimiento),
+    })));
   }
 
   get filteredPlayers() {
@@ -56,9 +56,8 @@ export class CoordinadorVisualizarPlantel implements OnInit {
   }
 
   verFicha(name: string) {
-    this.router.navigate(['/coordinador/visualizar-perfil'], {
-      queryParams: { player: name }
-    });
+    const player = this.players.find(candidate => candidate.name === name);
+    if (player) this.router.navigate(['/coordinador/jugadores', player.id]);
   }
 
   selectNav(item: any) {
@@ -70,7 +69,14 @@ export class CoordinadorVisualizarPlantel implements OnInit {
   }
 
   logout() {
-    localStorage.removeItem('cacc_jwt_token');
+    this.auth.logout();
     this.router.navigate(['/login']);
   }
+
+  private ageLabel(value?: string | null): string {
+    if (!value) return 'SIN EDAD';
+    const birth = new Date(value);
+    return `${new Date().getFullYear() - birth.getFullYear()} años`;
+  }
 }
+

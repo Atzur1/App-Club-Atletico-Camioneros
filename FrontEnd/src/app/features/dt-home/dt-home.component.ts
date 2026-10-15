@@ -1,7 +1,9 @@
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
+import { forkJoin } from 'rxjs';
+import { RolePlayerViewService } from '../../shared/services/role-player-view.service';
 
 export interface PlayerDT {
   id: number;
@@ -19,54 +21,28 @@ export interface PlayerDT {
   templateUrl: './dt-home.component.html',
   styleUrl: './dt-home.component.css'
 })
-export class DtHomeComponent {
-  constructor(private router: Router) {}
+export class DtHomeComponent implements OnInit {
+  constructor(private router: Router, private views: RolePlayerViewService) {}
 
-  cantidadJugadores = 20;
-  categoriaAsignada = 'Sub 15';
+  cantidadJugadores = 0;
+  categoriaAsignada = 'Sin categorías asignadas';
+  readonly estadoMedicoActual = 'Sin dato';
 
   searchTerm = '';
   filtroCategoria = '';
   ordenarPor = '';
 
-  navItems = [
-    { label: 'Inicio', icon: 'home', active: true },
-    { label: 'Jugadores', icon: 'jugadores', active: false },
-    { label: 'Categorias', icon: 'categorias', active: false }
-  ];
+  categoriasDisponibles: string[] = [];
+  players: PlayerDT[] = [];
 
-  categoriasDisponibles = ['CEBOLLITAS', 'SUB 13', 'SUB 15', 'SUB 17', 'RESERVA', 'PRIMERA'];
-
-  players: PlayerDT[] = [
-    {
-      id: 1,
-      nombreCompleto: 'LUIS OSCAR DIAZ',
-      dni: '50.123.456',
-      categoria: 'CEBOLLITAS',
-      fechaNacimiento: '01/01/2019'
-    },
-    {
-      id: 2,
-      nombreCompleto: 'LUIS OSCAR DIAZ',
-      dni: '50.123.456',
-      categoria: 'CEBOLLITAS',
-      fechaNacimiento: '01/01/2019'
-    },
-    {
-      id: 3,
-      nombreCompleto: 'LUIS OSCAR DIAZ',
-      dni: '50.123.456',
-      categoria: 'CEBOLLITAS',
-      fechaNacimiento: '01/01/2019'
-    },
-    {
-      id: 4,
-      nombreCompleto: 'LUIS OSCAR DIAZ',
-      dni: '50.123.456',
-      categoria: 'CEBOLLITAS',
-      fechaNacimiento: '01/01/2019'
-    }
-  ];
+  ngOnInit(): void {
+    forkJoin({ players: this.views.players(), categories: this.views.categories(true) }).subscribe(({ players, categories }) => {
+      this.categoriasDisponibles = categories.map(category => category.nombre);
+      this.categoriaAsignada = this.categoriasDisponibles.join(', ') || 'Sin categorías asignadas';
+      this.players = players;
+      this.cantidadJugadores = this.players.length;
+    });
+  }
 
   get filteredPlayers(): PlayerDT[] {
     let result = this.players.filter(p => {
@@ -89,18 +65,8 @@ export class DtHomeComponent {
   }
 
   verFicha(player: PlayerDT) {
-    this.router.navigate(['/dt/jugador', player.id]);
+    this.router.navigate(['/dt/jugadores', player.id]);
   }
 
-  selectNav(label: string) {
-    this.navItems.forEach(item => item.active = (item.label === label));
-    if (label === 'Categorias') {
-      this.router.navigate(['/dt/categorias']);
-    } else if (label === 'Jugadores') {
-      this.router.navigate(['/dt-categoria-jugadores']);
-    } else if (label === 'Inicio') {
-      this.router.navigate(['/dt']);
-    }
-  }
 }
 

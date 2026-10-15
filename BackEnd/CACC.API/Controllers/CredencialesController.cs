@@ -5,12 +5,13 @@ using Microsoft.AspNetCore.Mvc;
 using QuestPDF.Fluent;
 using QuestPDF.Helpers;
 using QuestPDF.Infrastructure;
+using CACC.API.Security;
 
 namespace CACC.API.Controllers
 {
     [ApiController]
     [Route("api/credenciales")]
-    [Authorize]
+    [Authorize(Roles = AppRoles.Administradores)]
     public class CredencialesController : ControllerBase
     {
         private readonly IQrService _qrService;
@@ -26,7 +27,6 @@ namespace CACC.API.Controllers
         }
 
         [HttpGet("jugador/{idJugador}/pdf")]
-        [Authorize(Roles = "Tesorero,Coordinador")]
         public async Task<IActionResult> DescargarCredencialJugador(int idJugador)
         {
             var jugador = await _jugadorDao.ObtenerPorIdAsync(idJugador);

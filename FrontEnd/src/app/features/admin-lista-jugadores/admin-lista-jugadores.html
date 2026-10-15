@@ -1,88 +1,4 @@
-<div class="cacc-layout" [class.sidebar-collapsed]="sidebarOculto">
-  <!-- Sidebar Lateral Institucional -->
-  <aside class="sidebar">
-    <div class="sidebar-header">
-      <div class="logo-wrapper">
-        <img src="cacc-logo.png" alt="Escudo CACC" class="cacc-shield-img" />
-      </div>
-      <h2 class="club-title">CLUB ATLETICO SOCIAL Y DEPORTIVO CAMIONEROS</h2>
-      <p class="club-subtitle">Sistema de Gestión Integral</p>
-    </div>
-
-    <!-- Navegación Principal -->
-    <nav class="sidebar-nav">
-      <a *ngFor="let item of navItems"
-         class="nav-item"
-         [class.active]="item.active"
-         (click)="selectNav(item.label)">
-        <span class="nav-icon" [ngSwitch]="item.icon">
-          <svg *ngSwitchCase="'home'" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path><polyline points="9 22 9 12 15 12 15 22"></polyline></svg>
-          <svg *ngSwitchCase="'group'" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M23 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg>
-          <svg *ngSwitchCase="'badge'" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><rect x="2" y="7" width="20" height="14" rx="2" ry="2"></rect><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"></path></svg>
-          <svg *ngSwitchCase="'category'" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><circle cx="12" cy="5" r="3"></circle><circle cx="5" cy="19" r="3"></circle><circle cx="19" cy="19" r="3"></circle><line x1="8.5" y1="16.5" x2="10.5" y2="7.5"></line><line x1="15.5" y1="16.5" x2="13.5" y2="7.5"></line></svg>
-        </span>
-        <span class="nav-label">{{ item.label }}</span>
-      </a>
-    </nav>
-
-    <!-- Footer del Sidebar: Portales + Cerrar Sesión -->
-    <div class="sidebar-footer">
-      <a class="footer-action-btn portal-btn" (click)="irASeleccionPortales()" title="Volver a Selección de Portales">
-        <span class="footer-icon">
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><polyline points="15 18 9 12 15 6"></polyline></svg>
-        </span>
-        <span>Selección de Portales</span>
-      </a>
-
-      <a class="footer-action-btn logout-btn" (click)="cerrarSesion()" title="Cerrar Sesión">
-        <span class="footer-icon">
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path><polyline points="16 17 21 12 16 7"></polyline><line x1="21" y1="12" x2="9" y2="12"></line></svg>
-        </span>
-        <span>Cerrar Sesión</span>
-      </a>
-    </div>
-  </aside>
-
-  <!-- Contenedor Principal -->
-  <div class="main-wrapper">
-    <!-- Header Superior -->
-    <header class="top-header">
-      <div class="header-left">
-        <button type="button" class="sidebar-toggle-btn" (click)="toggleSidebar()" title="Ocultar/Mostrar Menú">
-          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="3" y1="12" x2="21" y2="12"></line><line x1="3" y1="6" x2="21" y2="6"></line><line x1="3" y1="18" x2="21" y2="18"></line></svg>
-        </button>
-        <h1 class="header-title">Listado General de Jugadores</h1>
-      </div>
-
-      <div class="header-right">
-        <!-- Perfil con Menú Desplegable Flotante -->
-        <div class="admin-profile" (click)="toggleMenuUsuario($event)">
-          <div class="profile-avatar">
-            <svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 3c1.66 0 3 1.34 3 3s-1.34 3-3 3-3-1.34-3-3 1.34-3 3-3zm0 14.2c-2.5 0-4.71-1.28-6-3.22.03-1.99 4-3.08 6-3.08 1.99 0 5.97 1.09 6 3.08-1.29 1.94-3.5 3.22-6 3.22z" /></svg>
-          </div>
-          <div class="profile-info">
-            <span class="profile-name">{{ usuarioActual.nombre }}</span>
-            <span class="profile-email">{{ usuarioActual.email }}</span>
-          </div>
-          <span class="chevron-down" [class.rotated]="menuUsuarioAbierto">
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#475569" stroke-width="2.5"><polyline points="6 9 12 15 18 9"></polyline></svg>
-          </span>
-
-          <div class="user-dropdown-menu" *ngIf="menuUsuarioAbierto" (click)="$event.stopPropagation()">
-            <button type="button" class="dropdown-item" (click)="irAConfiguracion()">
-              <span class="dropdown-icon">⚙️️</span> Configuración de cuenta
-            </button>
-            <div class="dropdown-divider"></div>
-            <button type="button" class="dropdown-item text-danger" (click)="cerrarSesion()">
-              <span class="dropdown-icon">↪</span> Cerrar Sesión
-            </button>
-          </div>
-        </div>
-      </div>
-    </header>
-
-    <!-- Cuerpo de Contenido -->
-    <main class="content-body">
+<div class="content-body role-content">
       <!-- Tarjeta Principal de la Tabla con Filtros Integrados -->
       <section class="table-card">
         <div class="table-controls">
@@ -131,7 +47,7 @@
             </span>
           </div>
 
-          <button type="button" class="btn-add-player" (click)="irAAltaJugador()">
+          <button *ngIf="canEditPlayers" type="button" class="btn-add-player" (click)="irAAltaJugador()">
             <span class="plus-icon">+</span> Dar de alta Jugador
           </button>
         </div>
@@ -188,15 +104,15 @@
                       <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="#007A3D" stroke-width="2.2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle></svg>
                     </button>
                     <!-- Editar Perfil -->
-                    <button type="button" class="action-btn edit-btn" (click)="editarPerfil(p.id)" title="Editar Perfil">
+                    <button *ngIf="canEditPlayers" type="button" class="action-btn edit-btn" (click)="editarPerfil(p.id)" title="Editar Perfil">
                       <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="#2563EB" stroke-width="2.2"><path d="M12 20h9"></path><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"></path></svg>
                     </button>
                     <!-- Agregar / Editar Tutor -->
-                    <button type="button" class="action-btn tutor-btn" (click)="abrirModalTutor(p)" [title]="p.tutor ? 'Editar Tutor Responsable' : 'Asignar Tutor Responsable'">
+                    <button *ngIf="canEditPlayers" type="button" class="action-btn tutor-btn" (click)="abrirModalTutor(p)" [title]="p.tutor ? 'Editar Tutor Responsable' : 'Asignar Tutor Responsable'">
                       <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="#D97706" stroke-width="2.2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M23 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg>
                     </button>
                     <!-- Eliminar Jugador -->
-                    <button type="button" class="action-btn delete-btn" (click)="abrirModalEliminar(p)" title="Eliminar Jugador">
+                    <button *ngIf="canEditPlayers" type="button" class="action-btn delete-btn" (click)="abrirModalEliminar(p)" title="Eliminar Jugador">
                       <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="#DC2626" stroke-width="2.2"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path><line x1="10" y1="11" x2="10" y2="17"></line><line x1="14" y1="11" x2="14" y2="17"></line></svg>
                     </button>
                   </div>
@@ -212,11 +128,8 @@
           </table>
         </div>
       </section>
-    </main>
-  </div>
-
-  <!-- POPUP 1: Modal de Confirmación de Eliminación -->
-  <div class="popup-overlay" *ngIf="modalEliminarVisible" (click)="cancelarEliminar()">
+    </div><!-- POPUP 1: Modal de Confirmación de Eliminación -->
+  <div class="popup-overlay" *ngIf="canEditPlayers && modalEliminarVisible" (click)="cancelarEliminar()">
     <div class="popup-card popup-card-small" (click)="$event.stopPropagation()">
       <div class="popup-card-header header-danger">
         <div class="popup-header-icon-danger">
@@ -246,7 +159,7 @@
   </div>
 
   <!-- POPUP 2: Modal de Agregar / Editar Tutor con DNI y Búsqueda -->
-  <div class="popup-overlay" *ngIf="modalTutorVisible" (click)="cancelarTutor()">
+  <div class="popup-overlay" *ngIf="canEditPlayers && modalTutorVisible" (click)="cancelarTutor()">
     <div class="popup-card" (click)="$event.stopPropagation()">
       <div class="popup-card-header">
         <div class="popup-header-title-box">
@@ -337,4 +250,4 @@
       </div>
     </div>
   </div>
-</div>
+

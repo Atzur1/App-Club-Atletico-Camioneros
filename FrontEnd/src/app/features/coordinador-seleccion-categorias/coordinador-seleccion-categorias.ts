@@ -1,7 +1,9 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router, RouterModule } from '@angular/router';
+import { ClubPortalApiService } from '../../shared/services/club-portal-api.service';
+import { AuthService } from '../../shared/services/auth.service';
 
 export interface CategoriaItem {
   id: number;
@@ -30,23 +32,27 @@ export class CoordinadorSeleccionCategorias implements OnInit {
 
   navItems = [
     { label: 'Inicio', icon: 'home', active: false, route: '/coordinador' },
-    { label: 'Jugadores', icon: 'group', active: false, route: '/coordinador-lista-jugadores' },
-    { label: 'Staff', icon: 'badge', active: false, route: '/coordinador/visualizar-staff' },
-    { label: 'Categorias', icon: 'category', active: true, route: '/coordinador-seleccion-categorias' }
+    { label: 'Jugadores', icon: 'group', active: false, route: '/coordinador/jugadores' },
+    { label: 'Categorias', icon: 'category', active: true, route: '/coordinador/categorias' }
   ];
 
-  categorias: CategoriaItem[] = [
-    { id: 1, nombre: 'CATEGORÍA 2009', cantidadJugadores: '24 JUGADORES', asociacion: 'Liga Cordobesa' },
-    { id: 2, nombre: 'CATEGORÍA 2008', cantidadJugadores: '22 JUGADORES', asociacion: 'Liga Cordobesa' },
-    { id: 3, nombre: 'CATEGORÍA 2004', cantidadJugadores: '18 JUGADORES', asociacion: 'AFA' },
-    { id: 4, nombre: 'CATEGORÍA 2010', cantidadJugadores: '20 JUGADORES', asociacion: 'AFA' },
-    { id: 5, nombre: 'CATEGORÍA 2012', cantidadJugadores: '15 JUGADORES', asociacion: 'Liga Cordobesa' },
-    { id: 6, nombre: 'CATEGORÍA 2006', cantidadJugadores: '19 JUGADORES', asociacion: 'AFA' }
-  ];
+  categorias: CategoriaItem[] = [];
+  private readonly api = inject(ClubPortalApiService);
+  private readonly auth = inject(AuthService);
 
   constructor(private router: Router) {}
 
-  ngOnInit(): void {}
+  ngOnInit(): void {
+    const user = this.auth.obtenerDatosUsuario();
+    this.userEmail = user.email;
+    this.userName = user.email.split('@')[0];
+    this.api.listCategories().subscribe(categories => this.categorias = categories.map(category => ({
+      id: category.idCategoria,
+      nombre: category.nombreCategoria,
+      cantidadJugadores: `${category.cantidadJugadores ?? 0} JUGADORES`,
+      asociacion: category.asociacion || 'Sin asociación',
+    })));
+  }
 
   get filteredCategorias(): CategoriaItem[] {
     return this.categorias
@@ -71,7 +77,7 @@ export class CoordinadorSeleccionCategorias implements OnInit {
   }
 
   logout() {
-    localStorage.removeItem('cacc_jwt_token');
+    this.auth.logout();
     this.router.navigate(['/login']);
   }
 
@@ -82,9 +88,7 @@ export class CoordinadorSeleccionCategorias implements OnInit {
   }
 
   verCategoria(id: number): void {
-    const cat = this.categorias.find(c => c.id === id);
-    if (cat) {
-      this.onViewCategory(cat.nombre);
-    }
+    this.router.navigate(['/coordinador/categorias', id]);
   }
 }
+

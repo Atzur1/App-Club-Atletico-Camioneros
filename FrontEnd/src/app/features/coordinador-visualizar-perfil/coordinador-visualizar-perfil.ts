@@ -1,6 +1,8 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router, RouterModule, ActivatedRoute } from '@angular/router';
+import { ClubPortalApiService } from '../../shared/services/club-portal-api.service';
+import { AuthService } from '../../shared/services/auth.service';
 
 interface MatchRecord {
   day: string;
@@ -123,28 +125,34 @@ export class CoordinadorVisualizarPerfil implements OnInit {
   activeTab = 'Jugadores';
   navItems = [
     { label: 'Inicio', icon: 'home', active: false, route: '/coordinador' },
-    { label: 'Jugadores', icon: 'group', active: true, route: '/coordinador-lista-jugadores' },
-    { label: 'Staff', icon: 'badge', active: false, route: '/coordinador/visualizar-staff' },
-    { label: 'Categorias', icon: 'category', active: false, route: '/coordinador-seleccion-categorias' }
+    { label: 'Jugadores', icon: 'group', active: true, route: '/coordinador/jugadores' },
+    { label: 'Categorias', icon: 'category', active: false, route: '/coordinador/categorias' }
   ];
 
   constructor(private router: Router, private route: ActivatedRoute) {}
 
+  private readonly api = inject(ClubPortalApiService);
+  private readonly auth = inject(AuthService);
+
   ngOnInit(): void {
-    this.route.queryParams.subscribe(params => {
-      if (params['player']) {
-        const playerName = params['player'].toUpperCase();
-        if (this.playersDatabase[playerName]) {
-          this.player = this.playersDatabase[playerName];
-        } else {
-          // Si el jugador viene de otra pantalla sin datos predefinidos, creamos una estructura base
-          this.player = {
-            ...this.player,
-            name: playerName,
-            position: ' JUGADOR'
-          };
-        }
-      }
+    const id = Number(this.route.snapshot.paramMap.get('id'));
+    if (!id) return;
+    const user = this.auth.obtenerDatosUsuario();
+    this.userEmail = user.email;
+    this.userName = user.email.split('@')[0];
+    this.api.getPlayer(id).subscribe(player => this.player = {
+      name: (player.nombreCompleto || `${player.nombre} ${player.apellido}`).toUpperCase(),
+      position: player.posicionCancha || 'SIN POSICIÓN',
+      birthdate: player.fechaDeNacimiento || player.fechaNacimiento || 'Sin informar',
+      age: 'Sin informar',
+      weight: player.peso == null ? 'Sin informar' : `${player.peso} Kg`,
+      height: player.altura == null ? 'Sin informar' : `${player.altura} m`,
+      preferredFoot: player.pieHabil || 'Sin informar',
+      bloodType: player.fichaMedica?.grupoSanguineo || 'Sin informar',
+      tutor: 'Sin informar', phone: 'Sin informar', address: player.domicilio || 'Sin informar',
+      pathologies: player.fichaMedica?.patologias || 'Sin patologías informadas.',
+      lesions: player.fichaMedica?.historialLesiones || 'Sin lesiones registradas.',
+      medicalNotes: player.fichaMedica?.observaciones || 'Sin observaciones médicas.',
     });
   }
 
@@ -161,14 +169,8 @@ export class CoordinadorVisualizarPerfil implements OnInit {
     return lesionsStr.split('\n').map(l => l.replace(/^[•\-\s]+/, '').trim()).filter(l => l.length > 0);
   }
 
-  editarHistorial() {
-    this.router.navigate(['/coordinador/editar-historial'], {
-      queryParams: { player: this.player.name }
-    });
-  }
-
   logout() {
-    localStorage.removeItem('cacc_jwt_token');
+    this.auth.logout();
     this.router.navigate(['/login']);
   }
 }

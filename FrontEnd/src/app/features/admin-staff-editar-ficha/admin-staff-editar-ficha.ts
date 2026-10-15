@@ -313,7 +313,7 @@ export class AdminStaffEditarFicha implements OnInit {
   }
 
   irASeleccionPortales(): void {
-    this.router.navigate(['/seleccion-portales']);
+    this.router.navigate(['/admin/portales']);
   }
 
   irAConfiguracion(): void {
@@ -329,7 +329,7 @@ export class AdminStaffEditarFicha implements OnInit {
     if (label === 'Inicio') {
       this.router.navigate(['/admin']);
     } else if (label === 'Jugadores') {
-      this.router.navigate(['/admin/lista-jugadores']);
+      this.router.navigate(['/admin/jugadores']);
     } else if (label === 'Staff') {
       this.router.navigate(['/admin/staff']);
     } else if (label === 'Categorias' || label === 'Categorías') {

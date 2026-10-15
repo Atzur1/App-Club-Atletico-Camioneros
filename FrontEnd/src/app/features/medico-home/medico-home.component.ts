@@ -39,14 +39,6 @@ export class MedicoHomeComponent {
   categoriaFiltro = '';
   ordenFiltro = '';
 
-  activeTab = '';
-
-  navItems = [
-    { label: 'Inicio', icon: 'home', active: false },
-    { label: 'Jugadores', icon: 'group', active: false },
-    { label: 'Staff', icon: 'badge', active: false }
-  ];
-
   kpiCards = [
     {
       title: 'Total de Jugadores',
@@ -138,21 +130,8 @@ export class MedicoHomeComponent {
     }
   ];
 
-  selectNav(label: string) {
-    this.navItems.forEach(item => item.active = (item.label === label));
-    this.activeTab = label;
-
-    if (label === 'Inicio') {
-      this.router.navigate(['/medico']);
-    } else if (label === 'Jugadores') {
-      this.router.navigate(['/medico/lista-jugadores']);
-    } else if (label === 'Categorias' || label === 'Categorías') {
-      this.router.navigate(['/medico/categorias']);
-    }
-  }
-
   viewFicha(player: Player) {
-    this.router.navigate(['/medico/ficha-jugador', player.id]);
+    this.router.navigate(['/medico/jugadores', player.id]);
   }
 
   closeModal() {

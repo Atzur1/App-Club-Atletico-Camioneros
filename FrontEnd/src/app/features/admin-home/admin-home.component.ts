@@ -222,7 +222,7 @@ export class AdminHomeComponent implements OnInit {
   }
 
   irASeleccionPortales(): void {
-    this.router.navigate(['/seleccion-portales']);
+    this.router.navigate(['/admin/portales']);
   }
 
   irAConfiguracion(): void {
@@ -232,7 +232,7 @@ export class AdminHomeComponent implements OnInit {
   selectNav(label: string): void {
     this.navItems.forEach(item => item.active = (item.label === label));
     this.activeTab = label;
-    if (label === 'Jugadores') this.router.navigate(['/admin/lista-jugadores']);
+    if (label === 'Jugadores') this.router.navigate(['/admin/jugadores']);
     else if (label === 'Inicio') this.router.navigate(['/admin']);
     else if (label === 'Categorias' || label === 'Categorías') this.router.navigate(['/admin/categorias']);
     else if (label === 'Staff') this.router.navigate(['/admin/staff']);

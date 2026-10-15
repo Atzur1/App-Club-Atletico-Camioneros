@@ -12,6 +12,7 @@ namespace CACC.Entities
         public string? Genero { get; set; }
         public DateTime? FechaDeNacimiento { get; set; }
         public int IdCategoria { get; set; }
+        public List<int> CategoriasIds { get; set; } = new();
         public string? NombreCategoria { get; set; }
         public string? ClubOrigen { get; set; }
         public bool FichaMedicaLiga { get; set; }
@@ -35,4 +36,5 @@ namespace CACC.Entities
         public string? HistorialLesiones { get; set; }
         public string? Observaciones { get; set; }
     }
+
 }

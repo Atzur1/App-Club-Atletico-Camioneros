@@ -2,12 +2,13 @@ using CACC.API.DTOs;
 using CACC.DAO;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using CACC.API.Security;
 
 namespace CACC.API.Controllers
 {
     [ApiController]
     [Route("api/asistencias")]
-    [Authorize]
+    [Authorize(Roles = AppRoles.Administradores + "," + AppRoles.DonQr)]
     public class AsistenciasController : ControllerBase
     {
         private readonly IAsistenciaDao _asistenciaDao;
@@ -18,7 +19,6 @@ namespace CACC.API.Controllers
         }
 
         [HttpPost("verificar-y-registrar")]
-        [Authorize(Roles = "Don QR,Tesorero,Coordinador")] // Accesible por Don QR y administradores
         public async Task<IActionResult> VerificarYRegistrar([FromBody] AsistenciaRequestDto request)
         {
             if (string.IsNullOrWhiteSpace(request.Dni))
@@ -26,34 +26,24 @@ namespace CACC.API.Controllers
                 return BadRequest(new { message = "El DNI es obligatorio." });
             }
 
-            // Verificamos si tiene deuda (si es jugador)
-            var estadoDeuda = await _asistenciaDao.ObtenerEstadoDeudaPorDniAsync(request.Dni);
-
-            // Regla de acceso: Si tiene cuotas vencidas (ej: más de 0 o según política del club), denegamos o admitimos.
-            // Asumimos que si CantidadCuotasVencidas > 0, el acceso es denegado (false), de lo contrario admitido (true).
-            bool estadoAcceso = true;
-            string mensaje = "Acceso permitido. ¡Bienvenido!";
-
-            if (estadoDeuda != null && estadoDeuda.CantidadCuotasVencidas > 0)
+            var resultado = await _asistenciaDao.ProcesarIngresoAsync(request.Dni.Trim(), request.Observaciones ?? string.Empty);
+            if (!resultado.PersonaEncontrada)
             {
-                estadoAcceso = false;
-                mensaje = $"Acceso denegado. El jugador posee {estadoDeuda.CantidadCuotasVencidas} cuota(s) vencida(s).";
+                return UnprocessableEntity(new { message = resultado.Error ?? "No se pudo identificar un jugador inequívoco." });
             }
-
-            // Registramos el intento de acceso / asistencia 
-            bool registrado = await _asistenciaDao.RegistrarAsistenciaAsync(request.Dni, estadoAcceso, request.Observaciones ?? string.Empty);
-
-            if (!registrado)
-            {
-                return NotFound(new { message = "Persona no encontrada con el DNI proporcionado." });
-            }
-
+            var mensaje = resultado.YaRegistrada ? "La asistencia ya estaba registrada para hoy." : resultado.CuotasVencidas switch {
+                0 => "Asistencia registrada. Acceso permitido.",
+                1 => "Asistencia registrada. El jugador posee un mes de deuda.",
+                _ => $"Acceso denegado. El jugador posee {resultado.CuotasVencidas} cuotas vencidas y la asistencia no fue registrada."
+            };
             return Ok(new
             {
-                accesoPermitido = estadoAcceso,
-                mensaje = mensaje,
-                deudaTotal = estadoDeuda?.DeudaTotal ?? 0,
-                cuotasVencidas = estadoDeuda?.CantidadCuotasVencidas ?? 0
+                accesoPermitido = resultado.AccesoPermitido,
+                asistenciaRegistrada = resultado.AsistenciaRegistrada,
+                yaRegistrada = resultado.YaRegistrada,
+                mensaje,
+                deudaTotal = resultado.DeudaTotal,
+                cuotasVencidas = resultado.CuotasVencidas
             });
         }
     }

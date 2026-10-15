@@ -1,6 +1,7 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router, RouterModule } from '@angular/router';
+import { AuthService } from '../../shared/services/auth.service';
 
 @Component({
   selector: 'app-dashboard-coordinador',
@@ -10,6 +11,7 @@ import { Router, RouterModule } from '@angular/router';
   styleUrl: './dashboard-coordinador.css'
 })
 export class DashboardCoordinador implements OnInit {
+  private readonly auth = inject(AuthService);
   userName = 'Rubén del Olmo';
   userEmail = 'Ejemplo@mailejemplo.com';
   totalPlayers = '+500';
@@ -18,9 +20,8 @@ export class DashboardCoordinador implements OnInit {
 
   navItems = [
     { label: 'Inicio', icon: 'home', active: true, route: '/coordinador' },
-    { label: 'Jugadores', icon: 'group', active: false, route: '/coordinador-lista-jugadores' },
-    { label: 'Staff', icon: 'badge', active: false, route: '/coordinador/visualizar-staff' },
-    { label: 'Categorias', icon: 'category', active: false, route: '/coordinador-seleccion-categorias' }
+    { label: 'Jugadores', icon: 'group', active: false, route: '/coordinador/jugadores' },
+    { label: 'Categorias', icon: 'category', active: false, route: '/coordinador/categorias' }
   ];
 
   recentRegistrations = [
@@ -49,7 +50,7 @@ export class DashboardCoordinador implements OnInit {
   }
 
   logout() {
-    localStorage.removeItem('cacc_jwt_token');
+    this.auth.logout();
     this.router.navigate(['/login']);
   }
 }

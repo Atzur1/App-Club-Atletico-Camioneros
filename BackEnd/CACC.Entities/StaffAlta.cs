@@ -14,7 +14,7 @@ namespace CACC.Entities
         public string Email { get; set; } = string.Empty;
         public string ContraseniaHasheada { get; set; } = string.Empty;
         public int IdRol { get; set; }
-        public int? IdCategoria { get; set; } 
+        public int? IdCategoria { get; set; }
         public List<int> CategoriasIds { get; set; } = new();
     }
 }

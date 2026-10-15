@@ -1,6 +1,7 @@
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { RouterModule, Router } from '@angular/router';
+import { ActivatedRoute, RouterModule, Router } from '@angular/router';
+import { RolePlayerViewService } from '../../shared/services/role-player-view.service';
 
 export interface PartidoHistorial {
   dia: string;
@@ -36,13 +37,7 @@ export interface PlayerFichaDetail {
   templateUrl: './dt-ficha-jugador.component.html',
   styleUrl: './dt-ficha-jugador.component.css'
 })
-export class DtFichaJugadorComponent {
-  navItems = [
-    { label: 'Inicio', icon: 'home', active: false },
-    { label: 'Jugadores', icon: 'jugadores', active: false },
-    { label: 'Categorias', icon: 'categorias', active: false }
-  ];
-
+export class DtFichaJugadorComponent implements OnInit {
   player: PlayerFichaDetail = {
     nombreCompleto: 'NOMBRE Y APELLIDO',
     posicion: 'POSICION',
@@ -75,23 +70,15 @@ export class DtFichaJugadorComponent {
     }))
   };
 
-  constructor(private router: Router) {}
+  private playerId = 0;
+  constructor(private router: Router, private route: ActivatedRoute, private views: RolePlayerViewService) {}
+  ngOnInit(): void {
+    this.playerId = Number(this.route.snapshot.paramMap.get('id'));
+    this.views.profile(this.playerId).subscribe(player => this.player = player);
+  }
 
   volverAlPlantel() {
-    this.router.navigate(['/dt']);
+    this.router.navigate(['/dt/jugadores']);
   }
 
-  editarHistorial() {
-    this.router.navigate(['/dt-editar-historial']);
-  }
-
-  selectNav(label: string) {
-    if (label === 'Inicio') {
-      this.router.navigate(['/dt']);
-    } else if (label === 'Jugadores') {
-      this.router.navigate(['/dt-categoria-jugadores']);
-    } else if (label === 'Categorias') {
-      this.router.navigate(['/dt/categorias']);
-    }
-  }
 }

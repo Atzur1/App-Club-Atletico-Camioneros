@@ -1,7 +1,8 @@
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
+import { RolePlayerViewService } from '../../shared/services/role-player-view.service';
 
 export interface CategoriaDT {
   id: number;
@@ -17,27 +18,16 @@ export interface CategoriaDT {
   templateUrl: './dt-categoria.component.html',
   styleUrl: './dt-categoria.component.css'
 })
-export class DtCategoriaComponent {
-  constructor(private router: Router) {}
+export class DtCategoriaComponent implements OnInit {
+  constructor(private router: Router, private views: RolePlayerViewService) {}
 
   searchTerm = '';
   asociacionFiltro = '';
   ordenFiltro = '';
 
-  navItems = [
-    { label: 'Inicio', icon: 'home', active: false },
-    { label: 'Jugadores', icon: 'jugadores', active: false },
-    { label: 'Categorias', icon: 'categorias', active: true }
-  ];
 
-  categorias: CategoriaDT[] = [
-    { id: 1, nombre: 'NOMBRE DE LA CATEGORIA', cantidadJugadores: 'CANTIDAD JUGADORES', asociacion: 'Liga Cordobesa' },
-    { id: 2, nombre: 'NOMBRE DE LA CATEGORIA', cantidadJugadores: 'CANTIDAD JUGADORES', asociacion: 'Liga Cordobesa' },
-    { id: 3, nombre: 'NOMBRE DE LA CATEGORIA', cantidadJugadores: 'CANTIDAD JUGADORES', asociacion: 'Liga Cordobesa' },
-    { id: 4, nombre: 'NOMBRE DE LA CATEGORIA', cantidadJugadores: 'CANTIDAD JUGADORES', asociacion: 'AFA' },
-    { id: 5, nombre: 'NOMBRE DE LA CATEGORIA', cantidadJugadores: 'CANTIDAD JUGADORES', asociacion: 'AFA' },
-    { id: 6, nombre: 'NOMBRE DE LA CATEGORIA', cantidadJugadores: 'CANTIDAD JUGADORES', asociacion: 'AFA' }
-  ];
+  categorias: CategoriaDT[] = [];
+  ngOnInit(): void { this.views.categories(true).subscribe(categories => this.categorias = categories); }
 
   get filteredCategorias(): CategoriaDT[] {
     let result = this.categorias.filter(c => {
@@ -55,16 +45,7 @@ export class DtCategoriaComponent {
   }
 
   verCategoria(id: number) {
-    this.router.navigate(['/dt-categoria-jugadores']);
+    this.router.navigate(['/dt/categorias', id]);
   }
 
-  selectNav(label: string) {
-    if (label === 'Inicio') {
-      this.router.navigate(['/dt']);
-    } else if (label === 'Jugadores') {
-      this.router.navigate(['/dt-categoria-jugadores']);
-    } else if (label === 'Categorias') {
-      this.router.navigate(['/dt/categorias']);
-    }
-  }
 }

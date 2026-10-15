@@ -1,7 +1,8 @@
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { Router, RouterModule } from '@angular/router';
+import { ActivatedRoute, Router, RouterModule } from '@angular/router';
+import { RolePlayerViewService } from '../../shared/services/role-player-view.service';
 
 export interface Player {
   id: number;
@@ -18,28 +19,14 @@ export interface Player {
   templateUrl: './medico-categoria-jugadores.component.html',
   styleUrl: './medico-categoria-jugadores.component.css'
 })
-export class MedicoCategoriaJugadoresComponent {
-  constructor(private router: Router) {}
+export class MedicoCategoriaJugadoresComponent implements OnInit {
+  constructor(private router: Router, private route: ActivatedRoute, private views: RolePlayerViewService) {}
 
   searchTerm = '';
   posicionFiltro = '';
 
-  activeTab = 'Jugadores';
-
-  navItems = [
-    { label: 'Inicio', icon: 'home', active: false },
-    { label: 'Jugadores', icon: 'group', active: true },
-    { label: 'Categorías', icon: 'category', active: false }
-  ];
-
-  players: Player[] = [
-    { id: 1, nombreCompleto: 'NOMBRE Y APELLIDO', dni: '43.123.456', posicion: 'DELANTERO', edad: '00 AÑOS' },
-    { id: 2, nombreCompleto: 'NOMBRE Y APELLIDO', dni: '43.123.456', posicion: 'VOLANTE', edad: '00 AÑOS' },
-    { id: 3, nombreCompleto: 'NOMBRE Y APELLIDO', dni: '43.123.456', posicion: 'DEFENSOR', edad: '00 AÑOS' },
-    { id: 4, nombreCompleto: 'NOMBRE Y APELLIDO', dni: '43.123.456', posicion: 'ARQUERO', edad: '00 AÑOS' },
-    { id: 5, nombreCompleto: 'NOMBRE Y APELLIDO', dni: '43.123.456', posicion: 'DELANTERO', edad: '00 AÑOS' },
-    { id: 6, nombreCompleto: 'NOMBRE Y APELLIDO', dni: '43.123.456', posicion: 'DEFENSOR', edad: '00 AÑOS' }
-  ];
+  players: Player[] = [];
+  ngOnInit(): void { const id = Number(this.route.snapshot.paramMap.get('id')); this.views.categoryPlayers(id).subscribe(players => this.players = players as Player[]); }
 
   togglePosicion(pos: string) {
     if (this.posicionFiltro === pos) {
@@ -58,24 +45,7 @@ export class MedicoCategoriaJugadoresComponent {
     });
   }
 
-  selectNav(label: string) {
-    this.navItems.forEach(item => item.active = (item.label === label));
-    this.activeTab = label;
-
-    if (label === 'Inicio') {
-      this.router.navigate(['/medico']);
-    } else if (label === 'Jugadores') {
-      this.router.navigate(['/medico/lista-jugadores']);
-    } else if (label === 'Categorias' || label === 'Categorías') {
-      this.router.navigate(['/medico/categorias']);
-    }
-  }
-
   verFicha(id: number) {
-    this.router.navigate(['/medico/ficha-jugador', id]);
-  }
-
-  editarJugador(id: number) {
-    this.router.navigate(['/medico']);
+    this.router.navigate(['/medico/jugadores', id]);
   }
 }

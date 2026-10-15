@@ -1,0 +1,8 @@
+<div class="cacc-layout coordinator-medical-shell" [attr.data-read-only]="readOnly">
+  <aside class="sidebar">
+    <div class="sidebar-header"><img src="cacc-logo.png" alt="Escudo CACC"><h2>CLUB ATLETICO SOCIAL Y DEPORTIVO CAMIONEROS</h2><p>Sistema de Gestión Integral</p></div>
+    <nav><a routerLink="/coordinador">Inicio</a><a routerLink="/coordinador/jugadores" routerLinkActive="active">Jugadores</a><a routerLink="/coordinador/categorias">Categorías</a></nav>
+    <button class="logout" type="button" (click)="logout()">Cerrar sesión</button>
+  </aside>
+  <main><header><span>COORDINADOR</span><strong>Consulta de ficha médica</strong><em>Solo lectura</em></header><app-shared-medical-record /></main>
+</div>
