@@ -12,8 +12,8 @@ namespace CACC.Tests;
 // El QR decide con la deuda que informa el Portal Administrativo y registra la asistencia en la base del club.
 public class AsistenciasControllerTests
 {
-    private static EstadoDeudaAdministrativo Estado(string estado, int cuotas, bool acceso, decimal deuda = 0) =>
-        new() { Dni = "40111222", IdJugador = 7, Estado = estado, AccesoPermitido = acceso, CuotasVencidas = cuotas, DeudaTotal = deuda };
+    private static EstadoDeudaAdministrativo Estado(string estado, bool acceso) =>
+        new() { Dni = "40111222", IdJugador = 7, Estado = estado, AccesoPermitido = acceso };
 
     private static AsistenciasController Controlador(FakeDao dao, FakeDeuda deuda, string siNoResponde = "Denegar") =>
         new(dao, deuda, Options.Create(new AdministrativoApiOptions { SiNoResponde = siNoResponde }));
@@ -28,12 +28,12 @@ public class AsistenciasControllerTests
     private static readonly AsistenciaRequestDto Pedido = new() { Dni = " 40111222 " };
 
     [Theory]
-    [InlineData("habilitado", 0, "Asistencia registrada. Acceso permitido.")]
-    [InlineData("solo_entrenamientos", 1, "Asistencia registrada. El jugador posee un mes de deuda.")]
-    public async Task UnJugadorConAcceso_QuedaRegistradoComoPermitido(string estado, int cuotas, string mensaje)
+    [InlineData("habilitado", "Asistencia registrada. Acceso permitido.")]
+    [InlineData("solo_entrenamientos", "Asistencia registrada. El jugador posee un mes de deuda.")]
+    public async Task UnJugadorConAcceso_QuedaRegistradoComoPermitido(string estado, string mensaje)
     {
         var dao = new FakeDao(new ResultadoIngreso { PersonaEncontrada = true, AccesoPermitido = true, AsistenciaRegistrada = true });
-        var deuda = new FakeDeuda(new ConsultaEstadoDeuda(ResultadoConsulta.Ok, Estado(estado, cuotas, true, cuotas * 1000m)));
+        var deuda = new FakeDeuda(new ConsultaEstadoDeuda(ResultadoConsulta.Ok, Estado(estado, true)));
 
         var cuerpo = Cuerpo(await Controlador(dao, deuda).VerificarYRegistrar(Pedido), out var codigo);
 
@@ -43,7 +43,6 @@ public class AsistenciasControllerTests
         Assert.True(cuerpo.GetProperty("verificado").GetBoolean());
         Assert.Equal(estado, cuerpo.GetProperty("estado").GetString());
         Assert.Equal(mensaje, cuerpo.GetProperty("mensaje").GetString());
-        Assert.Equal(cuotas, cuerpo.GetProperty("cuotasVencidas").GetInt32());
         Assert.Equal(1, dao.Llamadas);
         Assert.Equal(AsistenciaDao.Permitido, dao.UltimoEstado);
         Assert.Equal("40111222", dao.UltimoDni);
@@ -51,13 +50,12 @@ public class AsistenciasControllerTests
     }
 
     [Theory]
-    [InlineData("inhabilitado", 2)]
-    [InlineData("inhabilitado", 5)]
-    [InlineData("baja", 0)]
-    public async Task UnJugadorSinAcceso_NoSeRegistra(string estado, int cuotas)
+    [InlineData("inhabilitado")]
+    [InlineData("baja")]
+    public async Task UnJugadorSinAcceso_NoSeRegistra(string estado)
     {
         var dao = new FakeDao(new ResultadoIngreso { PersonaEncontrada = true });
-        var deuda = new FakeDeuda(new ConsultaEstadoDeuda(ResultadoConsulta.Ok, Estado(estado, cuotas, false, 5000)));
+        var deuda = new FakeDeuda(new ConsultaEstadoDeuda(ResultadoConsulta.Ok, Estado(estado, false)));
 
         var cuerpo = Cuerpo(await Controlador(dao, deuda).VerificarYRegistrar(Pedido), out _);
 
@@ -68,11 +66,28 @@ public class AsistenciasControllerTests
         Assert.StartsWith("Acceso denegado", cuerpo.GetProperty("mensaje").GetString());
     }
 
+    // Contrato v1 (HU-028): el Deportivo no recibe ni muestra montos ni cantidad de cuotas, en ninguna respuesta del QR.
+    [Theory]
+    [InlineData("habilitado", true)]
+    [InlineData("solo_entrenamientos", true)]
+    [InlineData("inhabilitado", false)]
+    [InlineData("baja", false)]
+    public async Task LaRespuestaDelQrNuncaLlevaDatosFinancieros(string estado, bool acceso)
+    {
+        var dao = new FakeDao(new ResultadoIngreso { PersonaEncontrada = true, AccesoPermitido = true, AsistenciaRegistrada = true });
+        var deuda = new FakeDeuda(new ConsultaEstadoDeuda(ResultadoConsulta.Ok, Estado(estado, acceso)));
+
+        var cuerpo = Cuerpo(await Controlador(dao, deuda).VerificarYRegistrar(Pedido), out _);
+
+        var nombres = cuerpo.EnumerateObject().Select(p => p.Name.ToLowerInvariant()).ToArray();
+        Assert.DoesNotContain(nombres, n => n.Contains("deuda") || n.Contains("cuota") || n.Contains("monto"));
+    }
+
     [Fact]
     public async Task UnSegundoEscaneoDelMismoDia_SeInformaSinDuplicar()
     {
         var dao = new FakeDao(new ResultadoIngreso { PersonaEncontrada = true, AccesoPermitido = true, AsistenciaRegistrada = true, YaRegistrada = true });
-        var deuda = new FakeDeuda(new ConsultaEstadoDeuda(ResultadoConsulta.Ok, Estado("habilitado", 0, true)));
+        var deuda = new FakeDeuda(new ConsultaEstadoDeuda(ResultadoConsulta.Ok, Estado("habilitado", true)));
 
         var cuerpo = Cuerpo(await Controlador(dao, deuda).VerificarYRegistrar(Pedido), out _);
 
@@ -126,6 +141,7 @@ public class AsistenciasControllerTests
         Assert.True(cuerpo.GetProperty("accesoPermitido").GetBoolean());
         Assert.False(cuerpo.GetProperty("verificado").GetBoolean());
         Assert.Equal("sin_verificar", cuerpo.GetProperty("estado").GetString());
+        Assert.False(cuerpo.TryGetProperty("deudaTotal", out _));
         Assert.Equal(AsistenciaDao.SinVerificar, dao.UltimoEstado);
         Assert.Contains("no respondió", dao.UltimaObservacion);
     }

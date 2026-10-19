@@ -70,7 +70,7 @@ namespace CACC.API.Services
 
         public async Task<ConsultaEstadoDeuda> PorDniAsync(string dni, CancellationToken ct = default)
         {
-            using var pedido = NuevoPedido(HttpMethod.Get, $"api/estado-deuda/dni/{Uri.EscapeDataString(dni)}");
+            using var pedido = NuevoPedido(HttpMethod.Get, $"api/integracion/v1/estado-deuda/dni/{Uri.EscapeDataString(dni)}");
             try
             {
                 using var respuesta = await _http.SendAsync(pedido, ct);
@@ -113,7 +113,7 @@ namespace CACC.API.Services
                 for (int i = 0; i < pendientes.Count; i += MaximoPorLote)
                 {
                     var tanda = pendientes.Skip(i).Take(MaximoPorLote).ToList();
-                    using var pedido = NuevoPedido(HttpMethod.Post, "api/estado-deuda/lote");
+                    using var pedido = NuevoPedido(HttpMethod.Post, "api/integracion/v1/estado-deuda/lote");
                     pedido.Content = new StringContent(JsonSerializer.Serialize(new { dnis = tanda }, Json), Encoding.UTF8, "application/json");
                     using var respuesta = await _http.SendAsync(pedido, ct);
                     if (!respuesta.IsSuccessStatusCode)

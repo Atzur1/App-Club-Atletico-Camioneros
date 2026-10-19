@@ -23,8 +23,8 @@ export class SemaforoQrComponent implements OnDestroy {
     }catch{this.state='permission-error';this.error='No se pudo acceder a la cámara. Revisá el permiso del navegador y usá HTTPS o localhost.'}
   }
   // Verde: al día. Amarillo: con un mes de deuda o ingreso sin verificar la deuda. Rojo: sin acceso (inhabilitado o dado de baja).
-  get tono():'green'|'yellow'|'red'{const r=this.result;if(!r||!r.accesoPermitido)return 'red';return r.verificado===false||r.cuotasVencidas>=1?'yellow':'green'}
-  get titulo():string{const r=this.result;if(!r)return '';if(!r.accesoPermitido)return r.estado==='baja'?'Jugador dado de baja':'Jugador inhabilitado';if(r.verificado===false)return '¡Ingreso sin verificar!';return r.cuotasVencidas===0?'¡Registro exitoso!':'¡Jugador con deuda!'}
+  get tono():'green'|'yellow'|'red'{const r=this.result;if(!r||!r.accesoPermitido)return 'red';return r.verificado===false||r.estado==='solo_entrenamientos'?'yellow':'green'}
+  get titulo():string{const r=this.result;if(!r)return '';if(!r.accesoPermitido)return r.estado==='baja'?'Jugador dado de baja':'Jugador inhabilitado';if(r.verificado===false)return '¡Ingreso sin verificar!';return r.estado==='solo_entrenamientos'?'¡Jugador con deuda!':'¡Registro exitoso!'}
   get icono():string{return this.tono==='green'?'✓':this.tono==='yellow'?'!':'×'}
   submitManual():void{this.processPayload(this.dni)}
   retry():void{this.result=undefined;this.error='';this.dni='';this.locked=false;this.state='scanner';void this.startCamera()}

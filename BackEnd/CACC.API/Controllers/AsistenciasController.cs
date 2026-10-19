@@ -61,9 +61,7 @@ namespace CACC.API.Controllers
                     yaRegistrada = false,
                     verificado = true,
                     estado = estado.Estado,
-                    mensaje = MensajeDenegado(estado),
-                    deudaTotal = estado.DeudaTotal,
-                    cuotasVencidas = estado.CuotasVencidas
+                    mensaje = MensajeDenegado(estado)
                 });
             }
 
@@ -73,11 +71,11 @@ namespace CACC.API.Controllers
                 return UnprocessableEntity(new { message = resultado.Error ?? "No se pudo identificar un jugador inequívoco." });
             }
 
-            string mensaje = resultado.YaRegistrada ? "La asistencia ya estaba registrada para hoy." : estado.CuotasVencidas switch
-            {
-                0 => "Asistencia registrada. Acceso permitido.",
-                _ => "Asistencia registrada. El jugador posee un mes de deuda."
-            };
+            string mensaje = resultado.YaRegistrada
+                ? "La asistencia ya estaba registrada para hoy."
+                : estado.Estado == "solo_entrenamientos"
+                    ? "Asistencia registrada. El jugador posee un mes de deuda."
+                    : "Asistencia registrada. Acceso permitido.";
             return Ok(new
             {
                 accesoPermitido = true,
@@ -85,9 +83,7 @@ namespace CACC.API.Controllers
                 yaRegistrada = resultado.YaRegistrada,
                 verificado = true,
                 estado = estado.Estado,
-                mensaje,
-                deudaTotal = estado.DeudaTotal,
-                cuotasVencidas = estado.CuotasVencidas
+                mensaje
             });
         }
 
@@ -117,14 +113,12 @@ namespace CACC.API.Controllers
                 yaRegistrada = resultado.YaRegistrada,
                 verificado = false,
                 estado = "sin_verificar",
-                mensaje = "No se pudo verificar la deuda (el Portal Administrativo no responde). Ingreso permitido y marcado para revisar.",
-                deudaTotal = 0m,
-                cuotasVencidas = 0
+                mensaje = "No se pudo verificar la deuda (el Portal Administrativo no responde). Ingreso permitido y marcado para revisar."
             });
         }
 
         private static string MensajeDenegado(EstadoDeudaAdministrativo estado) => estado.Estado == "baja"
             ? "Acceso denegado. El jugador está dado de baja y la asistencia no fue registrada."
-            : $"Acceso denegado. El jugador posee {estado.CuotasVencidas} cuotas vencidas y la asistencia no fue registrada.";
+            : "Acceso denegado. El jugador está inhabilitado por deuda y la asistencia no fue registrada.";
     }
 }

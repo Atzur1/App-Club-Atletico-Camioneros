@@ -9,7 +9,7 @@ namespace CACC.Tests;
 
 public class EstadoDeudaClientTests
 {
-    private const string Habilitado = "{\"dni\":\"40111222\",\"idJugador\":7,\"estado\":\"habilitado\",\"accesoPermitido\":true,\"cuotasVencidas\":0,\"deudaTotal\":0,\"enTermino\":true,\"fechaBaja\":null}";
+    private const string Habilitado = "{\"dni\":\"40111222\",\"idJugador\":7,\"estado\":\"habilitado\",\"accesoPermitido\":true,\"fechaBaja\":null}";
 
     private static EstadoDeudaClient Cliente(Func<HttpRequestMessage, HttpResponseMessage> responder, out Manejador manejador, string? token = "token-del-usuario")
     {
@@ -37,7 +37,7 @@ public class EstadoDeudaClientTests
         Assert.True(consulta.Estado.AccesoPermitido);
         Assert.Equal(7, consulta.Estado.IdJugador);
         Assert.Equal("Bearer token-del-usuario", manejador.Pedidos[0].Headers.Authorization!.ToString());
-        Assert.Equal("/api/estado-deuda/dni/40111222", manejador.Pedidos[0].RequestUri!.AbsolutePath);
+        Assert.Equal("/api/integracion/v1/estado-deuda/dni/40111222", manejador.Pedidos[0].RequestUri!.AbsolutePath);
     }
 
     [Theory]
@@ -95,6 +95,7 @@ public class EstadoDeudaClientTests
         Assert.Single(lote!);
         Assert.Equal("habilitado", lote["40111222"].Estado);
         Assert.Single(manejador.Pedidos);
+        Assert.Equal("/api/integracion/v1/estado-deuda/lote", manejador.Pedidos[0].RequestUri!.AbsolutePath);
         Assert.Contains("\"dnis\":[\"40111222\",\"1\"]", manejador.Cuerpos[0]);
     }
 

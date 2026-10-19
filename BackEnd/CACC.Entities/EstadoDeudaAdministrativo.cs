@@ -1,7 +1,8 @@
 namespace CACC.Entities
 {
-    // Estado de deuda de un jugador tal como lo informa el Portal Administrativo (api/estado-deuda). Ese portal es la
-    // única fuente de verdad de la deuda: acá no se calcula nada.
+    // Estado de habilitación de un jugador tal como lo informa el Portal Administrativo (api/integracion/v1/estado-deuda).
+    // Ese portal es la única fuente de verdad de la deuda: acá no se calcula nada y NO se recibe ningún monto ni cantidad de
+    // cuotas (contrato v1: solo el estado).
     public class EstadoDeudaAdministrativo
     {
         public string Dni { get; set; } = string.Empty;
@@ -10,9 +11,6 @@ namespace CACC.Entities
         // "habilitado", "solo_entrenamientos", "inhabilitado" o "baja".
         public string Estado { get; set; } = string.Empty;
         public bool AccesoPermitido { get; set; }
-        public int CuotasVencidas { get; set; }
-        public decimal DeudaTotal { get; set; }
-        public bool EnTermino { get; set; }
         public string? FechaBaja { get; set; }
     }
 }
