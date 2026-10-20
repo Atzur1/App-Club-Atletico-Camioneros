@@ -1,4 +1,4 @@
-<div class="cacc-layout" [class.sidebar-collapsed]="sidebarCollapsed" [class.mobile-sidebar-open]="mobileSidebarOpen">
+<div class="cacc-layout" [class.sidebar-collapsed]="sidebarCollapsed" [class.mobile-sidebar-open]="mobileSidebarOpen" [class.desktop-child-shell]="desktopChildOwnsShell">
   <button *ngIf="mobileSidebarOpen" type="button" class="sidebar-overlay" aria-label="Cerrar menú de navegación" (click)="closeMobileSidebar()"></button>
 
   <aside id="portal-navigation" class="sidebar" aria-label="Navegación principal">
@@ -21,7 +21,7 @@
     </nav>
 
     <div class="sidebar-footer">
-      <a *ngIf="role === 'admin'" class="footer-action-btn portal-btn" routerLink="/admin/portales">
+      <a *ngIf="role === 'admin'" class="footer-action-btn portal-btn" routerLink="/admin/portales" title="Volver a Selección de Portales">
         <span class="footer-icon" aria-hidden="true"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><polyline points="15 18 9 12 15 6"></polyline></svg></span>
         <span>Selección de Portales</span>
       </a>
@@ -48,7 +48,7 @@
       <div class="header-right">
         <button type="button" class="admin-profile" aria-haspopup="menu" [attr.aria-expanded]="userMenuOpen" (click)="toggleUserMenu($event)">
           <span class="profile-avatar" aria-hidden="true"><svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-10S17.52 2 12 2zm0 3c1.66 0 3 1.34 3 3s-1.34 3-3 3-3-1.34-3-3 1.34-3 3-3zm0 14.2c-2.5 0-4.71-1.28-6-3.22.03-1.99 4-3.08 6-3.08 1.99 0 5.97 1.09 6 3.08-1.29 1.94-3.5 3.22-6 3.22z" /></svg></span>
-          <span class="profile-info"><span class="profile-name">{{ roleLabel }}</span><span class="profile-email">{{ user.email }}</span></span>
+          <span class="profile-info"><span class="profile-name">{{ roleLabel }}</span><span class="profile-email">{{ userIdentifier }}</span></span>
           <span class="chevron-down" [class.rotated]="userMenuOpen" aria-hidden="true"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"></polyline></svg></span>
         </button>
         <div class="user-dropdown-menu" *ngIf="userMenuOpen" role="menu" (click)="$event.stopPropagation()">

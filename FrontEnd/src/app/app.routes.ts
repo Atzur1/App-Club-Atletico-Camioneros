@@ -5,6 +5,7 @@ import { MainLayout } from './layout/main-layout/main-layout';
 export const routes: Routes = [
   { path: '', redirectTo: 'login', pathMatch: 'full' },
   { path: 'login', title: 'Iniciar sesión', loadComponent: () => import('./features/login/login.component').then((m) => m.LoginComponent) },
+  { path: 'admin/portales', title: 'Portales', data: { roles: ['admin'] }, canMatch: [roleMatchGuard], canActivate: [roleGuard], loadComponent: () => import('./features/admin-seleccion-portales/seleccion-portal.component').then((m) => m.SeleccionPortalComponent) },
   { path: 'admin', component: MainLayout, data: { roles: ['admin'] }, canMatch: [roleMatchGuard], canActivate: [roleGuard], loadChildren: () => import('./routes/admin.routes').then((m) => m.ADMIN_ROUTES) },
   { path: 'coordinador', component: MainLayout, data: { roles: ['coordinador'] }, canMatch: [roleMatchGuard], canActivate: [roleGuard], loadChildren: () => import('./routes/coordinador.routes').then((m) => m.COORDINADOR_ROUTES) },
   { path: 'medico', component: MainLayout, data: { roles: ['medico'] }, canMatch: [roleMatchGuard], canActivate: [roleGuard], loadChildren: () => import('./routes/medico.routes').then((m) => m.MEDICO_ROUTES) },

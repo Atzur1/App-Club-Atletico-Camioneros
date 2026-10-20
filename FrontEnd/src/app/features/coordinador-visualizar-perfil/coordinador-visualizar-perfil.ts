@@ -37,6 +37,7 @@ interface PlayerProfile {
   styleUrl: './coordinador-visualizar-perfil.css'
 })
 export class CoordinadorVisualizarPerfil implements OnInit {
+  playerId = 0;
   
   userName = 'Rubén del Olmo';
   userEmail = 'Ejemplo@mailejemplo.com';
@@ -137,6 +138,7 @@ export class CoordinadorVisualizarPerfil implements OnInit {
   ngOnInit(): void {
     const id = Number(this.route.snapshot.paramMap.get('id'));
     if (!id) return;
+    this.playerId = id;
     const user = this.auth.obtenerDatosUsuario();
     this.userEmail = user.email;
     this.userName = user.email.split('@')[0];
@@ -172,5 +174,9 @@ export class CoordinadorVisualizarPerfil implements OnInit {
   logout() {
     this.auth.logout();
     this.router.navigate(['/login']);
+  }
+
+  verHistorialAsistencia(): void {
+    this.router.navigate(['/coordinador/jugadores', this.playerId, 'asistencias']);
   }
 }

@@ -72,7 +72,19 @@ export class AdminHomeComponent implements OnInit {
   players: Player[] = [];
   listaCategorias: Categoria[] = [];
 
+  get esAdministrador(): boolean {
+    return this.limpiarNombreRol(this.authService.getRol() ?? '') === 'Administrador';
+  }
+
+  get tituloPanel(): string {
+    return `Panel Principal de ${this.limpiarNombreRol(this.authService.getRol() ?? '')}`;
+  }
+
   ngOnInit(): void {
+    const rol = this.limpiarNombreRol(this.authService.getRol() ?? '');
+    if (rol !== 'Administrador' && rol !== 'Coordinador') {
+      this.navItems = this.navItems.filter((item) => item.label !== 'Staff');
+    }
     this.cargarUsuario();
     this.cargarDatos();
     this.cargarCategoriasBd();

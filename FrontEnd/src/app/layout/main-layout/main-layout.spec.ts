@@ -42,10 +42,17 @@ describe('MainLayout', () => {
     const element: HTMLElement = fixture.nativeElement;
     expect(element.querySelector('.sidebar')).not.toBeNull();
     expect(element.querySelector('.top-header')).not.toBeNull();
+    expect(element.querySelector('.sidebar-header .logo-wrapper .cacc-shield-img')).not.toBeNull();
+    expect(element.querySelector('.admin-profile .profile-avatar svg')).not.toBeNull();
+    expect(element.querySelector('.admin-profile .profile-info .profile-name')?.textContent).toContain('Administrador');
+    expect(element.querySelector('.admin-profile .chevron-down svg')).not.toBeNull();
+    expect(element.querySelector('.sidebar-footer .portal-btn')?.textContent).toContain('Selección de Portales');
     expect(component.navItems.map((item) => item.path)).toEqual([
       '/admin', '/admin/jugadores', '/admin/staff', '/admin/categorias',
     ]);
-    expect(element.querySelector('.profile-email')?.textContent).toContain('usuario@camioneros.test');
+    expect(element.querySelector('.profile-email')?.textContent).toContain('usuario');
+    expect(element.querySelector('.profile-email')?.textContent).not.toContain('@camioneros.test');
+    expect(element.querySelector('.sidebar-footer .portal-btn')?.getAttribute('title')).toBe('Volver a Selección de Portales');
   });
 
   it('builds the menu from role capabilities', () => {

@@ -86,4 +86,8 @@ export class MedicoFichaJugadorComponent implements OnInit {
   editarFicha() {
     this.router.navigate(['/medico/jugadores', this.playerId, 'ficha-medica']);
   }
+
+  verHistorialAsistencia(): void {
+    this.router.navigate(['/medico/jugadores', this.playerId, 'asistencias']);
+  }
 }

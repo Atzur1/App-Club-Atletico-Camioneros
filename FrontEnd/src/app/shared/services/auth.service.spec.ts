@@ -4,7 +4,7 @@ import { TestBed } from '@angular/core/testing';
 import { AuthService } from './auth.service';
 
 describe('AuthService', () => {
-  it('posts the browser login payload to the backend host allowed by CORS', () => {
+  it('posts the browser login payload through the same-origin API proxy', () => {
     TestBed.configureTestingModule({
       providers: [provideHttpClient(), provideHttpClientTesting()],
     });
@@ -13,7 +13,7 @@ describe('AuthService', () => {
 
     service.login({ email: 'cacc.test.dt@example.test', password: 'temporary-password' }).subscribe();
 
-    const request = http.expectOne('http://127.0.0.1:5191/api/auth/login');
+    const request = http.expectOne('/api/auth/login');
     expect(request.request.method).toBe('POST');
     expect(request.request.body).toEqual({
       email: 'cacc.test.dt@example.test',

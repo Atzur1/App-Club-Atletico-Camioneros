@@ -25,5 +25,6 @@ describe('DtFichaJugadorComponent', () => {
     expect(element.querySelector('aside.sidebar')).toBeNull();
     expect(element.querySelector('header.top-header')).toBeNull();
     expect(element.querySelector('button[title*="Editar"], a[title*="Editar"]')).toBeNull();
+    expect(element.querySelector('.attendance-history-button')?.textContent).toContain('Historial de asistencia');
   });
 });

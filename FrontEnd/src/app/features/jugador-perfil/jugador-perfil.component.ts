@@ -332,6 +332,18 @@ export class JugadorPerfilComponent implements OnInit {
 
   volver(): void { this.router.navigate([this.rutaPorRol('Jugadores')]); }
 
+  verHistorialAsistencia(): void {
+    this.router.navigate(['/', this.normalizarRutaRol(), 'jugadores', this.playerId, 'asistencias']);
+  }
+
+  private normalizarRutaRol(): string {
+    const roleId = this.authService.getRoleId();
+    if (roleId === RoleId.Medico) return 'medico';
+    if (roleId === RoleId.DirectorTecnico || roleId === RoleId.PreparadorFisico) return 'dt';
+    if (roleId === RoleId.Coordinador) return 'coordinador';
+    return 'admin';
+  }
+
   editarFichaMedica(): void {
     if (this.jugador && this.puedeEditarFichaMedica) {
       this.router.navigate(['/medico/editar-ficha', this.jugador.id]);

@@ -35,4 +35,10 @@ public class SecurityTests
     [Fact]
     public void PlayerScope_RejectsUnassignedPlayer() =>
         Assert.False(PlayerCategoryScope.CanAccess([10, 20], 30, [40, 50]));
+
+    [Fact]
+    public void PhysicalTrainer_IsAPlayerReaderWithAssignedCategoryScope()
+    {
+        Assert.Contains(AppRoles.PreparadorFisico, AppRoles.LecturaDeportiva.Split(','));
+    }
 }

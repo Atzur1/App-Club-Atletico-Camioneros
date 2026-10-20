@@ -81,4 +81,8 @@ export class DtFichaJugadorComponent implements OnInit {
     this.router.navigate(['/dt/jugadores']);
   }
 
+  verHistorialAsistencia(): void {
+    this.router.navigate(['/dt/jugadores', this.playerId, 'asistencias']);
+  }
+
 }

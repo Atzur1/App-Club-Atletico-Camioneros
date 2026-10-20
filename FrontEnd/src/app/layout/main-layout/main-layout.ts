@@ -82,6 +82,7 @@ export class MainLayout implements OnInit, OnDestroy {
   sidebarCollapsed = false;
   mobileSidebarOpen = false;
   userMenuOpen = false;
+  desktopChildOwnsShell = false;
   pageTitle = this.shell.heading;
 
   get navItems(): readonly PortalShellNavItem[] {
@@ -94,6 +95,10 @@ export class MainLayout implements OnInit, OnDestroy {
       dt: 'Director Técnico', 'don-qr': 'Don QR',
     };
     return labels[this.role];
+  }
+
+  get userIdentifier(): string {
+    return this.user.email.split('@')[0] || this.user.email;
   }
 
   ngOnInit(): void {
@@ -141,11 +146,17 @@ export class MainLayout implements OnInit, OnDestroy {
   @HostListener('window:resize')
   handleResize(): void {
     if (!this.isMobileViewport()) this.mobileSidebarOpen = false;
+    this.updatePageTitle();
   }
 
   private updatePageTitle(): void {
     let route = this.router.routerState.snapshot.root;
     while (route.firstChild) route = route.firstChild;
+    this.desktopChildOwnsShell = route.data['desktopOwnShell'] === true;
+    if (!this.isMobileViewport()) {
+      this.pageTitle = this.shell.heading;
+      return;
+    }
     this.pageTitle = route.title || this.shell.heading;
   }
 
