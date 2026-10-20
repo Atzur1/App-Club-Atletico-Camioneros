@@ -42,7 +42,6 @@ public class EstadoDeudaClientTests
 
     [Theory]
     [InlineData(HttpStatusCode.BadRequest, ResultadoConsulta.DniInvalido)]
-    [InlineData(HttpStatusCode.NotFound, ResultadoConsulta.NoEsJugador)]
     [InlineData(HttpStatusCode.Conflict, ResultadoConsulta.Ambiguo)]
     [InlineData(HttpStatusCode.Unauthorized, ResultadoConsulta.SinPermiso)]
     [InlineData(HttpStatusCode.Forbidden, ResultadoConsulta.SinPermiso)]
@@ -52,6 +51,85 @@ public class EstadoDeudaClientTests
     {
         var cliente = Cliente(_ => Json(codigo, "{}"), out _);
         Assert.Equal(esperado, (await cliente.PorDniAsync("40111222")).Resultado);
+    }
+
+    [Fact]
+    public async Task UnDniQueNoEsDeUnJugador_LlegaComo404ConMensaje()
+    {
+        var cliente = Cliente(_ => Json(HttpStatusCode.NotFound, "{\"exito\":false,\"mensaje\":\"El DNI no pertenece a un jugador.\"}"), out _);
+        Assert.Equal(ResultadoConsulta.NoEsJugador, (await cliente.PorDniAsync("40111222")).Resultado);
+    }
+
+    // Una ruta que no existe (Administrativo de una versión anterior) también es 404, pero sin mensaje: no es "no es un jugador".
+    [Theory]
+    [InlineData("")]
+    [InlineData("{}")]
+    [InlineData("<html>Not Found</html>")]
+    public async Task UnDosCuatrocientosCuatroSinMensaje_EsUnProblemaDeConfiguracion(string cuerpo)
+    {
+        var cliente = Cliente(_ => Json(HttpStatusCode.NotFound, cuerpo), out _);
+        var consulta = await cliente.PorDniAsync("40111222");
+        Assert.Equal(ResultadoConsulta.NoResponde, consulta.Resultado);
+        Assert.Equal(404, consulta.CodigoHttp);
+    }
+
+    // ===== Cargos de alta (opción A): el Deportivo avisa al Administrativo después de dar de alta a un jugador =====
+
+    [Fact]
+    public async Task CargosDeAlta_PideLosCargosConElTokenDelUsuario_YLeeQueSeGeneraron()
+    {
+        var cliente = Cliente(_ => Json(HttpStatusCode.OK, "{\"idJugador\":42,\"inscripcionGenerada\":true,\"cuotaGenerada\":false}"), out var manejador);
+
+        var resultado = await cliente.GenerarCargosDeAltaAsync(42);
+
+        Assert.Equal(EstadoCargosAlta.Generados, resultado.Estado);
+        Assert.True(resultado.Inscripcion);
+        Assert.False(resultado.Cuota);
+        Assert.Equal(HttpMethod.Post, manejador.Pedidos[0].Method);
+        Assert.Equal("/api/integracion/v1/jugadores/42/cargos-alta", manejador.Pedidos[0].RequestUri!.AbsolutePath);
+        Assert.Equal("Bearer token-del-usuario", manejador.Pedidos[0].Headers.Authorization!.ToString());
+    }
+
+    [Theory]
+    [InlineData(HttpStatusCode.NotFound, "{\"exito\":false,\"mensaje\":\"No existe el jugador 42.\"}", "No existe el jugador 42.")]
+    [InlineData(HttpStatusCode.UnprocessableEntity, "{\"exito\":false,\"mensaje\":\"El jugador está dado de baja.\"}", "El jugador está dado de baja.")]
+    [InlineData(HttpStatusCode.BadRequest, "{\"exito\":false,\"mensaje\":\"Indicá un jugador válido.\"}", "Indicá un jugador válido.")]
+    public async Task CargosDeAlta_UnaRespuestaQueDiceQueNoCorresponde_EsRechazada(HttpStatusCode codigo, string cuerpo, string motivo)
+    {
+        var resultado = await Cliente(_ => Json(codigo, cuerpo), out _).GenerarCargosDeAltaAsync(42);
+
+        Assert.Equal(EstadoCargosAlta.Rechazado, resultado.Estado);
+        Assert.Equal(motivo, resultado.Motivo);
+    }
+
+    [Theory]
+    [InlineData(HttpStatusCode.Unauthorized)]
+    [InlineData(HttpStatusCode.Forbidden)]
+    public async Task CargosDeAlta_SinPermisoEnElAdministrativo_EsRechazada(HttpStatusCode codigo)
+    {
+        var resultado = await Cliente(_ => Json(codigo, ""), out _).GenerarCargosDeAltaAsync(42);
+
+        Assert.Equal(EstadoCargosAlta.Rechazado, resultado.Estado);
+    }
+
+    [Theory]
+    [InlineData(HttpStatusCode.NotFound, "")]
+    [InlineData(HttpStatusCode.NotFound, "{}")]
+    [InlineData(HttpStatusCode.InternalServerError, "{}")]
+    [InlineData(HttpStatusCode.BadGateway, "no es json")]
+    public async Task CargosDeAlta_UnErrorDelServidorOUnaRutaInexistente_CuentaComoNoResponde(HttpStatusCode codigo, string cuerpo)
+    {
+        var resultado = await Cliente(_ => Json(codigo, cuerpo), out _).GenerarCargosDeAltaAsync(42);
+
+        Assert.Equal(EstadoCargosAlta.NoResponde, resultado.Estado);
+    }
+
+    [Fact]
+    public async Task CargosDeAlta_SiLaConexionFalla_NoLanzaYCuentaComoNoResponde()
+    {
+        var cliente = Cliente(_ => throw new HttpRequestException("sin conexión"), out _);
+
+        Assert.Equal(EstadoCargosAlta.NoResponde, (await cliente.GenerarCargosDeAltaAsync(42)).Estado);
     }
 
     [Fact]

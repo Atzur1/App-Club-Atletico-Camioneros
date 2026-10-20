@@ -1,5 +1,5 @@
 import { ComponentFixture, TestBed, fakeAsync, tick } from '@angular/core/testing';
-import { of } from 'rxjs';
+import { of, Subject } from 'rxjs';
 import { SemaforoQrComponent } from './semaforo-qr';
 import { AsistenciaService } from '../../shared/services/asistencia.service';
 import { AuthService } from '../../shared/services/auth.service';
@@ -57,6 +57,31 @@ describe('SemaforoQrComponent', () => {
     const card = mostrar({ accesoPermitido: false, asistenciaRegistrada: false, yaRegistrada: false, mensaje: 'Baja', verificado: true, estado: 'baja' });
     expect(card.classList).toContain('red');
     expect(card.querySelector('h1')!.textContent).toContain('dado de baja');
+  });
+
+  it('says the attendance was already registered today instead of a new success', () => {
+    const card = mostrar({ accesoPermitido: true, asistenciaRegistrada: true, yaRegistrada: true, mensaje: 'Ya registrada', verificado: true, estado: 'habilitado' });
+    expect(card.classList).toContain('green');
+    expect(card.querySelector('h1')!.textContent).toContain('Ya registrado hoy');
+  });
+
+  it('does not block manual entry while the camera is being activated', () => {
+    void fixture.componentInstance.startCamera();
+    expect(fixture.componentInstance.state).not.toBe('loading');
+  });
+
+  it('ignores a late response once the screen was reset with Volver', () => {
+    const tardia = new Subject<object>();
+    registrar.and.returnValue(tardia);
+    fixture.componentInstance.dni = '40111222';
+    fixture.componentInstance.submitManual();
+    expect(fixture.componentInstance.state).toBe('loading');
+
+    fixture.componentInstance.retry();
+    tardia.next({ accesoPermitido: true, asistenciaRegistrada: true, yaRegistrada: false, mensaje: 'tarde', verificado: true, estado: 'habilitado' });
+
+    expect(fixture.componentInstance.result).toBeUndefined();
+    expect(fixture.componentInstance.state).not.toBe('result');
   });
 
   it('shows yellow, never green, when the debt could not be verified', () => {

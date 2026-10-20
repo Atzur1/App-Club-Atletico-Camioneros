@@ -198,5 +198,8 @@ public class AsistenciasControllerTests
 
         public Task<IReadOnlyDictionary<string, EstadoDeudaAdministrativo>?> PorLoteAsync(IEnumerable<string> dnis, CancellationToken ct = default) =>
             Task.FromResult<IReadOnlyDictionary<string, EstadoDeudaAdministrativo>?>(null);
+
+        public Task<ResultadoCargosAlta> GenerarCargosDeAltaAsync(int idJugador, CancellationToken ct = default) =>
+            Task.FromResult(new ResultadoCargosAlta(EstadoCargosAlta.NoResponde));
     }
 }

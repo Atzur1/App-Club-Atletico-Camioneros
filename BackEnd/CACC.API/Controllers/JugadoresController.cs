@@ -261,13 +261,23 @@ namespace CACC.API.Controllers
 
                 int nuevoId = await _jugadorDao.CrearAsync(jugadorAlta);
 
+                // La inscripción y la cuota del mes las genera el Portal Administrativo (contrato v1), con sus reglas. El alta ya
+                // quedó hecha: si esa llamada falla no se deshace ni se rechaza; la cuota sale con la próxima generación mensual
+                // y la inscripción al registrar el primer pago.
+                var cargos = await _estadoDeuda.GenerarCargosDeAltaAsync(nuevoId, HttpContext.RequestAborted);
+                bool cargosGenerados = cargos.Estado == EstadoCargosAlta.Generados;
+
                 return StatusCode(201, new
                 {
                     message = "Jugador creado con éxito.",
                     idJugador = nuevoId,
                     dni = dto.Dni,
                     nombre = dto.Nombre,
-                    apellido = dto.Apellido
+                    apellido = dto.Apellido,
+                    cargosGenerados,
+                    avisoCargos = cargosGenerados
+                        ? null
+                        : "El jugador se guardó, pero el Portal Administrativo todavía no generó su inscripción y su cuota. La cuota aparece en la próxima generación mensual y la inscripción al registrar el primer pago."
                 });
             }
             catch (SqlException ex) when (ex.Number == 2627 || ex.Number == 2601)

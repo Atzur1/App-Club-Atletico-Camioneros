@@ -43,6 +43,19 @@ namespace CACC.API.Services
 
     public sealed record ConsultaEstadoDeuda(ResultadoConsulta Resultado, EstadoDeudaAdministrativo? Estado = null, int CodigoHttp = 0);
 
+    public enum EstadoCargosAlta
+    {
+        // El Administrativo respondió bien (aunque no haya generado nada nuevo: es idempotente).
+        Generados,
+        // El Administrativo respondió que no corresponde (sin permiso, jugador inexistente, dado de baja, alta no reciente).
+        Rechazado,
+        // No respondió, devolvió un error o la ruta no existe en esa versión.
+        NoResponde
+    }
+
+    // Qué pasó al pedirle los cargos de alta. Inscripcion / Cuota dicen si se generaron en esa llamada; nunca hay montos.
+    public sealed record ResultadoCargosAlta(EstadoCargosAlta Estado, bool Inscripcion = false, bool Cuota = false, string? Motivo = null);
+
     public interface IEstadoDeudaClient
     {
         Task<ConsultaEstadoDeuda> PorDniAsync(string dni, CancellationToken ct = default);
@@ -50,6 +63,10 @@ namespace CACC.API.Services
         // El estado de varios jugadores por DNI (para los listados). Devuelve null si el Portal Administrativo no responde;
         // los DNI que no son de jugadores simplemente no figuran en el resultado.
         Task<IReadOnlyDictionary<string, EstadoDeudaAdministrativo>?> PorLoteAsync(IEnumerable<string> dnis, CancellationToken ct = default);
+
+        // Pide al Administrativo que genere la inscripción y la cuota del mes de un jugador recién dado de alta (contrato v1).
+        // No lanza: si no se pudo, el alta ya hecha no se toca y el resultado dice qué pasó.
+        Task<ResultadoCargosAlta> GenerarCargosDeAltaAsync(int idJugador, CancellationToken ct = default);
     }
 
     public sealed class EstadoDeudaClient : IEstadoDeudaClient
@@ -84,7 +101,15 @@ namespace CACC.API.Services
                     case HttpStatusCode.BadRequest:
                         return new ConsultaEstadoDeuda(ResultadoConsulta.DniInvalido, CodigoHttp: 400);
                     case HttpStatusCode.NotFound:
-                        return new ConsultaEstadoDeuda(ResultadoConsulta.NoEsJugador, CodigoHttp: 404);
+                        // El 404 de "no es un jugador" trae un mensaje en el cuerpo. Uno vacío es una ruta que no existe (por
+                        // ejemplo, un Portal Administrativo de una versión anterior sin la API v1): es un problema de
+                        // configuración, no un DNI desconocido, y no debe mostrarse como tal.
+                        if (await TieneMensajeAsync(respuesta, ct))
+                        {
+                            return new ConsultaEstadoDeuda(ResultadoConsulta.NoEsJugador, CodigoHttp: 404);
+                        }
+                        _logger.LogError("El Portal Administrativo respondió 404 sin mensaje: la ruta {Ruta} no existe en esa versión de la API. Revisá AdministrativoApi:BaseUrl y la versión del Administrativo.", pedido.RequestUri);
+                        return new ConsultaEstadoDeuda(ResultadoConsulta.NoResponde, CodigoHttp: 404);
                     case HttpStatusCode.Conflict:
                         return new ConsultaEstadoDeuda(ResultadoConsulta.Ambiguo, CodigoHttp: 409);
                     case HttpStatusCode.Unauthorized:
@@ -135,6 +160,65 @@ namespace CACC.API.Services
             }
         }
 
+        public async Task<ResultadoCargosAlta> GenerarCargosDeAltaAsync(int idJugador, CancellationToken ct = default)
+        {
+            using var pedido = NuevoPedido(HttpMethod.Post, $"api/integracion/v1/jugadores/{idJugador}/cargos-alta");
+            try
+            {
+                using var respuesta = await _http.SendAsync(pedido, ct);
+                if (respuesta.IsSuccessStatusCode)
+                {
+                    var cargos = await respuesta.Content.ReadFromJsonAsync<CargosAltaRespuesta>(Json, ct);
+                    return cargos is null
+                        ? new ResultadoCargosAlta(EstadoCargosAlta.NoResponde)
+                        : new ResultadoCargosAlta(EstadoCargosAlta.Generados, cargos.InscripcionGenerada, cargos.CuotaGenerada);
+                }
+
+                string? mensaje = await LeerMensajeAsync(respuesta, ct);
+                int codigo = (int)respuesta.StatusCode;
+                // 4xx con mensaje: el Administrativo entendió el pedido y dijo que no corresponde. Un 404 vacío es una ruta que no existe.
+                if (codigo is >= 400 and < 500 && mensaje is not null)
+                {
+                    _logger.LogWarning("El Portal Administrativo rechazó generar los cargos del jugador {IdJugador}: {Codigo} {Motivo}", idJugador, codigo, mensaje);
+                    return new ResultadoCargosAlta(EstadoCargosAlta.Rechazado, Motivo: mensaje);
+                }
+                if (codigo is 401 or 403)
+                {
+                    _logger.LogWarning("El Portal Administrativo no aceptó la sesión para generar los cargos del jugador {IdJugador}: {Codigo}", idJugador, codigo);
+                    return new ResultadoCargosAlta(EstadoCargosAlta.Rechazado, Motivo: "Sin permiso en el Portal Administrativo.");
+                }
+
+                _logger.LogWarning("El Portal Administrativo respondió {Codigo} al generar los cargos del jugador {IdJugador}.", codigo, idJugador);
+                return new ResultadoCargosAlta(EstadoCargosAlta.NoResponde);
+            }
+            catch (Exception ex) when (EsFalloDeConexion(ex, ct))
+            {
+                _logger.LogWarning(ex, "No se pudo pedir al Portal Administrativo los cargos del jugador {IdJugador}.", idJugador);
+                return new ResultadoCargosAlta(EstadoCargosAlta.NoResponde);
+            }
+        }
+
+        private static async Task<bool> TieneMensajeAsync(HttpResponseMessage respuesta, CancellationToken ct) =>
+            await LeerMensajeAsync(respuesta, ct) is not null;
+
+        // El cuerpo de error del Administrativo es { exito, mensaje }. Sin ese mensaje (cuerpo vacío o de otra forma) no es una
+        // respuesta de la API sino, por ejemplo, un 404 de ruta inexistente.
+        private static async Task<string?> LeerMensajeAsync(HttpResponseMessage respuesta, CancellationToken ct)
+        {
+            try
+            {
+                await using var cuerpo = await respuesta.Content.ReadAsStreamAsync(ct);
+                using var documento = await JsonDocument.ParseAsync(cuerpo, cancellationToken: ct);
+                return documento.RootElement.ValueKind == JsonValueKind.Object && documento.RootElement.TryGetProperty("mensaje", out var m)
+                    ? m.GetString()
+                    : null;
+            }
+            catch (JsonException)
+            {
+                return null;
+            }
+        }
+
         // Reenvía el token del usuario: es el mismo en los dos portales.
         private HttpRequestMessage NuevoPedido(HttpMethod metodo, string ruta)
         {
@@ -154,6 +238,12 @@ namespace CACC.API.Services
         private sealed class LoteRespuesta
         {
             public List<EstadoDeudaAdministrativo>? Items { get; set; }
+        }
+
+        private sealed class CargosAltaRespuesta
+        {
+            public bool InscripcionGenerada { get; set; }
+            public bool CuotaGenerada { get; set; }
         }
     }
 
