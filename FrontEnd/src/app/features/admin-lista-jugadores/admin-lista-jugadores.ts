@@ -84,7 +84,7 @@ export class AdminListaJugadores implements OnInit {
     { label: 'Jugadores', icon: 'group', active: true },
     { label: 'Staff', icon: 'badge', active: false },
     { label: 'Categorias', icon: 'category', active: false }
-  ];
+  ].filter((item) => item.label !== 'Staff' || ['admin', 'coordinador'].includes(this.access.role ?? ''));
 
   players: Player[] = [];
   listaCategorias: Categoria[] = [];
@@ -245,10 +245,12 @@ export class AdminListaJugadores implements OnInit {
   selectNav(label: string): void {
     this.navItems.forEach(item => item.active = (item.label === label));
     this.activeTab = label;
-    if (label === 'Inicio') this.router.navigate(['/admin']);
-    else if (label === 'Jugadores') this.router.navigate(['/admin/jugadores']);
-    else if (label === 'Categorias' || label === 'Categorías') this.router.navigate(['/admin/categorias']);
-    else if (label === 'Staff') this.router.navigate(['/admin/staff']);
+    if (label === 'Inicio') this.router.navigate([this.portalRoot]);
+    else if (label === 'Jugadores') this.router.navigate([this.portalRoot, 'jugadores']);
+    else if (label === 'Categorias' || label === 'Categorías') this.router.navigate([this.portalRoot, 'categorias']);
+    else if (label === 'Staff' && ['admin', 'coordinador'].includes(this.access.role ?? '')) {
+      this.router.navigate([this.portalRoot, 'staff']);
+    }
   }
 
   verFicha(id: number): void {

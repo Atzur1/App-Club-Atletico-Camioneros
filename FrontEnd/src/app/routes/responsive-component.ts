@@ -1,6 +1,7 @@
 import { Type } from '@angular/core';
 
 type ComponentLoader = () => Promise<Type<unknown>>;
+type ResponsiveComponentLoader = ComponentLoader & { readonly responsive: true };
 
 /**
  * Keeps the supplied mobile experiences isolated from the original portal views.
@@ -10,8 +11,15 @@ type ComponentLoader = () => Promise<Type<unknown>>;
 export function responsiveComponent(
   mobile: ComponentLoader,
   desktop: ComponentLoader,
-): ComponentLoader {
-  return () => isMobileViewport() ? mobile() : desktop();
+): ResponsiveComponentLoader {
+  const loader = (() => isMobileViewport() ? mobile() : desktop()) as ResponsiveComponentLoader;
+  Object.defineProperty(loader, 'responsive', { value: true });
+  return loader;
+}
+
+export function isResponsiveComponentLoader(value: unknown): boolean {
+  return typeof value === 'function'
+    && (value as Partial<ResponsiveComponentLoader>).responsive === true;
 }
 
 function isMobileViewport(): boolean {

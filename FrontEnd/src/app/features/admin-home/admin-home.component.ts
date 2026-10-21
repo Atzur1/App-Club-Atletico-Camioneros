@@ -4,6 +4,7 @@ import { FormsModule } from '@angular/forms';
 import { Router, RouterModule } from '@angular/router';
 import { HttpClient } from '@angular/common/http';
 import { AuthService } from '../../shared/services/auth.service';
+import { normalizeRole } from '../../core/auth/roles';
 
 interface TutorInfo {
   nombre?: string;
@@ -244,10 +245,13 @@ export class AdminHomeComponent implements OnInit {
   selectNav(label: string): void {
     this.navItems.forEach(item => item.active = (item.label === label));
     this.activeTab = label;
-    if (label === 'Jugadores') this.router.navigate(['/admin/jugadores']);
-    else if (label === 'Inicio') this.router.navigate(['/admin']);
-    else if (label === 'Categorias' || label === 'Categorías') this.router.navigate(['/admin/categorias']);
-    else if (label === 'Staff') this.router.navigate(['/admin/staff']);
+    const role = normalizeRole(this.authService.getRol());
+    const portalBase = role && role !== 'don-qr' ? `/${role}` : '/admin';
+
+    if (label === 'Jugadores') this.router.navigate([`${portalBase}/jugadores`]);
+    else if (label === 'Inicio') this.router.navigate([portalBase]);
+    else if (label === 'Categorias' || label === 'Categorías') this.router.navigate([`${portalBase}/categorias`]);
+    else if (label === 'Staff') this.router.navigate([`${portalBase}/staff`]);
   }
 
   getBadgeClass(estado: Player['estadoCuota']): string {

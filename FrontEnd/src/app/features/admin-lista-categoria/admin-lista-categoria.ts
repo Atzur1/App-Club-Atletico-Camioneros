@@ -56,6 +56,8 @@ export class AdminListaCategoria implements OnInit {
   readonly canManageCategories = this.access.capabilities.canManageCategories;
   readonly canManageRoster = this.access.capabilities.canManageCategoryRoster;
   readonly isCoordinator = this.access.role === 'coordinador';
+  readonly isAdmin = this.access.role === 'admin';
+  readonly portalRoot = `/${this.access.role}`;
 
   usuarioActual = {
     nombre: 'Cargando...',
@@ -75,7 +77,7 @@ export class AdminListaCategoria implements OnInit {
     { label: 'Jugadores', icon: 'group', active: false },
     { label: 'Staff', icon: 'badge', active: false },
     { label: 'Categorias', icon: 'category', active: true }
-  ];
+  ].filter((item) => item.label !== 'Staff' || ['admin', 'coordinador'].includes(this.access.role ?? ''));
 
   categorias: CategoriaItem[] = [];
 
@@ -546,7 +548,9 @@ export class AdminListaCategoria implements OnInit {
     if (!this.categoriaActiva) return;
     const idCat = this.categoriaActiva.id;
     this.cerrarModalPlantel();
-    this.router.navigate(['/admin/categorias', idCat, 'partidos']);
+    if (this.isAdmin) {
+      this.router.navigate(['/admin/categorias', idCat, 'partidos']);
+    }
   }
 
   cerrarModalPlantel(): void {
@@ -586,9 +590,11 @@ export class AdminListaCategoria implements OnInit {
   selectNav(label: string): void {
     this.navItems.forEach(item => item.active = (item.label === label));
     this.activeTab = label;
-    if (label === 'Inicio') this.router.navigate(['/admin']);
-    else if (label === 'Jugadores') this.router.navigate(['/admin/jugadores']);
-    else if (label === 'Categorias' || label === 'Categorías') this.router.navigate(['/admin/categorias']);
-    else if (label === 'Staff') this.router.navigate(['/admin/staff']);
+    if (label === 'Inicio') this.router.navigate([this.portalRoot]);
+    else if (label === 'Jugadores') this.router.navigate([this.portalRoot, 'jugadores']);
+    else if (label === 'Categorias' || label === 'Categorías') this.router.navigate([this.portalRoot, 'categorias']);
+    else if (label === 'Staff' && ['admin', 'coordinador'].includes(this.access.role ?? '')) {
+      this.router.navigate([this.portalRoot, 'staff']);
+    }
   }
 }

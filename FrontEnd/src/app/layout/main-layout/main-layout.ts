@@ -6,6 +6,7 @@ import { AppRole } from '../../core/auth/roles';
 import { PortalAccessService } from '../../shared/auth/portal-access.service';
 import { RoleCapabilities } from '../../shared/auth/role-capabilities';
 import { AuthService } from '../../shared/services/auth.service';
+import { isResponsiveComponentLoader } from '../../routes/responsive-component';
 
 type Capability = keyof RoleCapabilities;
 
@@ -73,6 +74,8 @@ export class MainLayout implements OnInit, OnDestroy {
   private readonly access = inject(PortalAccessService);
   private readonly router = inject(Router);
   private readonly destroyed$ = new Subject<void>();
+  private mobileViewport = this.isMobileViewport();
+  private responsiveReloadPending = false;
 
   readonly role = this.access.role;
   readonly capabilities = this.access.capabilities;
@@ -145,8 +148,24 @@ export class MainLayout implements OnInit, OnDestroy {
 
   @HostListener('window:resize')
   handleResize(): void {
-    if (!this.isMobileViewport()) this.mobileSidebarOpen = false;
+    const isMobile = this.isMobileViewport();
+    if (isMobile !== this.mobileViewport) {
+      this.mobileViewport = isMobile;
+      if (this.currentRouteUsesResponsiveComponent() && !this.responsiveReloadPending) {
+        this.responsiveReloadPending = true;
+        window.location.reload();
+        return;
+      }
+    }
+
+    if (!isMobile) this.mobileSidebarOpen = false;
     this.updatePageTitle();
+  }
+
+  private currentRouteUsesResponsiveComponent(): boolean {
+    let route = this.router.routerState.snapshot.root;
+    while (route.firstChild) route = route.firstChild;
+    return isResponsiveComponentLoader(route.routeConfig?.loadComponent);
   }
 
   private updatePageTitle(): void {

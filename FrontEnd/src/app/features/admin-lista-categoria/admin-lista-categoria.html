@@ -419,7 +419,7 @@
 
       <!-- Footer del modal con botón al Historial Completo y Botón Listo -->
       <div class="popup-footer modal-footer-dual">
-        <button *ngIf="!isCoordinator" type="button" class="btn-action-outline btn-ver-partidos" (click)="irAPartidosCategoria()">
+        <button *ngIf="isAdmin" type="button" class="btn-action-outline btn-ver-partidos" (click)="irAPartidosCategoria()">
           Ver Partidos de la Categoría
         </button>
         <button type="button" class="btn-solid-green" (click)="cerrarModalPlantel()">Listo</button>
