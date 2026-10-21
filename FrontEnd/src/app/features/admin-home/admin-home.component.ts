@@ -116,7 +116,7 @@ export class AdminHomeComponent implements OnInit {
   }
 
   private cargarDatos(): void {
-    this.http.get<any[]>('http://localhost:5191/api/jugadores').subscribe({
+    this.http.get<any[]>('/api/jugadores').subscribe({
       next: (data) => {
         this.players = data.map(j => {
           let fechaFormateada = 'Sin informar';
@@ -149,7 +149,7 @@ export class AdminHomeComponent implements OnInit {
   }
 
   private cargarCategoriasBd(): void {
-    this.http.get<Categoria[]>('http://localhost:5191/api/categorias').subscribe({
+    this.http.get<Categoria[]>('/api/categorias').subscribe({
       next: (data) => {
         this.listaCategorias = data;
         this.kpiCards[1].value = `+${data.length}`;

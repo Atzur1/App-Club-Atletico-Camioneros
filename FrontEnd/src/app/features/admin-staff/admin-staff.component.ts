@@ -106,7 +106,7 @@ export class AdminStaffComponent implements OnInit {
   }
 
   private cargarStaff(): void {
-    this.http.get<any[]>('http://localhost:5191/api/staff').subscribe({
+    this.http.get<any[]>('/api/staff').subscribe({
       next: (data) => {
         this.trabajadores = data.map(s => {
           let edadTexto = 'Sin edad';

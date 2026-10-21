@@ -6,6 +6,9 @@ export const MEDICO_ROUTES: Routes = [
     () => import('../features/medico-home/medico-home.component').then((m) => m.MedicoHomeComponent),
     () => import('../features/admin-home/admin-home.component').then((m) => m.AdminHomeComponent),
   ) },
+  { path: 'lista-jugadores', redirectTo: 'jugadores', pathMatch: 'full' },
+  { path: 'ficha-jugador/:id', redirectTo: ({ params }) => `jugadores/${params['id']}` },
+  { path: 'editar-ficha/:id', redirectTo: ({ params }) => `jugadores/${params['id']}/ficha-medica` },
   { path: 'jugadores', title: 'Jugadores', loadComponent: responsiveComponent(
     () => import('../features/medico-lista-jugadores/medico-lista-jugadores.component').then((m) => m.MedicoListaJugadoresComponent),
     () => import('../features/admin-lista-jugadores/admin-lista-jugadores').then((m) => m.AdminListaJugadores),

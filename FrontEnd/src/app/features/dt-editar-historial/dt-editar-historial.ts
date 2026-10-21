@@ -81,18 +81,18 @@ export class DtEditarHistorialComponent {
   constructor(private router: Router) {}
 
   cancelar() {
-    this.router.navigate(['/dt-ficha-jugador']);
+    this.router.navigate(['/dt/jugadores']);
   }
 
   guardar() {
-    this.router.navigate(['/dt-ficha-jugador']);
+    this.router.navigate(['/dt/jugadores']);
   }
 
   selectNav(label: string) {
     if (label === 'Inicio') {
       this.router.navigate(['/dt']);
     } else if (label === 'Jugadores') {
-      this.router.navigate(['/dt-categoria-jugadores']);
+      this.router.navigate(['/dt/jugadores']);
     } else if (label === 'Categorias') {
       this.router.navigate(['/dt/categorias']);
     }

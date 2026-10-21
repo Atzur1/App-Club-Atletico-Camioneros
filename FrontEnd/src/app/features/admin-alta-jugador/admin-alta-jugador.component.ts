@@ -114,7 +114,7 @@ export class AdminAltaJugadorComponent implements OnInit {
   }
 
   cargarCategoriasDesdeBD(): void {
-    this.http.get<any[]>('http://localhost:5191/api/categorias').subscribe({
+    this.http.get<any[]>('/api/categorias').subscribe({
       next: (data) => {
         this.categoriasList = data.map(c => ({
           id: c.idCategoria || c.PK_id_categoria || c.pk_id_categoria || c.id,
@@ -192,7 +192,7 @@ export class AdminAltaJugadorComponent implements OnInit {
     const dniLimpio = this.tutorDni.trim();
     if (!this.esMenorDeEdad || !dniLimpio) return;
 
-    this.http.get<any[]>('http://localhost:5191/api/jugadores').subscribe({
+    this.http.get<any[]>('/api/jugadores').subscribe({
       next: (data) => {
         const jugadorConTutor = data.find(j => {
           const t = j.tutor || j.Tutor;

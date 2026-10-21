@@ -29,7 +29,11 @@ builder.Services.AddScoped<IStaffDao, StaffDao>();
 builder.Services.AddScoped<IJugadorDao, JugadorDao>();
 builder.Services.AddScoped<IFichaMedicaDao, FichaMedicaDao>();
 builder.Services.AddScoped<IAsistenciaDao, AsistenciaDao>();
+builder.Services.AddScoped<ICredentialDao, CredentialDao>();
 builder.Services.AddScoped<IQrService, QrService>();
+builder.Services.AddSingleton<ICredentialTokenService, CredentialTokenService>();
+builder.Services.AddSingleton<ICredentialPdfService>(_ => new CredentialPdfService(
+    Path.Combine(builder.Environment.ContentRootPath, "Assets", "Credentials")));
 builder.Services.AddHttpContextAccessor();
 builder.Services.AddScoped<ICurrentUserAccess, CurrentUserAccess>();
 builder.Services.AddScoped<CACC.API.Authorization.IUserScopeService, CACC.API.Authorization.UserScopeService>();

@@ -105,7 +105,7 @@ export class AdminAltaTrabajadorComponent implements OnInit {
   }
 
   private cargarCategorias(): void {
-    this.http.get<any[]>('http://localhost:5191/api/categorias').subscribe({
+    this.http.get<any[]>('/api/categorias').subscribe({
       next: (data) => {
         this.listaCategorias = data.map(c => ({
           idCategoria: c.idCategoria || c.PK_id_categoria,
@@ -206,7 +206,7 @@ export class AdminAltaTrabajadorComponent implements OnInit {
     };
 
     this.isLoading = true;
-    this.http.post<any>('http://localhost:5191/api/staff', payload).subscribe({
+    this.http.post<any>('/api/staff', payload).subscribe({
       next: () => {
         this.isLoading = false;
         this.mensajeExito = true;

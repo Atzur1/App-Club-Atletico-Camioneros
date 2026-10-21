@@ -29,7 +29,7 @@ export class CoordinadorVisualizarStaff implements OnInit {
   navItems = [
     { label: 'Inicio', icon: 'home', active: false, route: '/coordinador' },
     { label: 'Jugadores', icon: 'group', active: false, route: '/coordinador/jugadores' },
-    { label: 'Staff', icon: 'badge', active: true, route: '/coordinador/visualizar-staff' },
+    { label: 'Staff', icon: 'badge', active: true, route: '/coordinador/staff' },
     { label: 'Categorias', icon: 'category', active: false, route: '/coordinador/categorias' }
   ];
 
@@ -76,7 +76,7 @@ export class CoordinadorVisualizarStaff implements OnInit {
   }
 
   verFicha(staffName: string) {
-    this.router.navigate(['/coordinador/visualizar-perfil-staff'], {
+    this.router.navigate(['/coordinador/staff/perfil'], {
       queryParams: { staff: staffName }
     });
   }

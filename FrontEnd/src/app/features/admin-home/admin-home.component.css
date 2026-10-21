@@ -797,6 +797,64 @@
 :host {
 --viewport-tier: mobile;
 }
+
+.kpi-cards-grid {
+  gap: 12px;
+}
+
+.kpi-card {
+  min-height: 104px;
+  padding: 16px 18px;
+  border: 0;
+  border-radius: 16px;
+  box-shadow: 0 4px 14px rgba(15, 23, 42, 0.08);
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+.kpi-card-header {
+  position: relative;
+  z-index: 2;
+  gap: 10px;
+  margin-bottom: 6px;
+}
+
+.kpi-icon-box {
+  position: relative;
+  z-index: 2;
+  flex: 0 0 auto;
+}
+
+.kpi-title {
+  position: relative;
+  z-index: 2;
+  color: #334155;
+  font-size: 14px;
+  font-weight: 700;
+}
+
+.kpi-value {
+  position: relative;
+  z-index: 2;
+  margin: 0;
+  color: #0f172a;
+  font-size: 30px;
+  font-weight: 800;
+  line-height: 1;
+  letter-spacing: -0.02em;
+}
+
+.kpi-decor-shape {
+  display: block;
+  right: 0;
+  bottom: 0;
+  width: 88px;
+  height: 100%;
+  border-top-left-radius: 78px;
+  background: #98e4b8;
+  opacity: 0.45;
+}
 }
 @media (min-width: 768px) and (max-width: 1439px) {
 :host {

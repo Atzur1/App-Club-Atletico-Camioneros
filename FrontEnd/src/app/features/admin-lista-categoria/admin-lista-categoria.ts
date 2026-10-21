@@ -163,7 +163,7 @@ export class AdminListaCategoria implements OnInit {
   }
 
   cargarDatos(): void {
-    this.http.get<any[]>('http://localhost:5191/api/categorias').subscribe({
+    this.http.get<any[]>('/api/categorias').subscribe({
       next: (data) => {
         this.categorias = data.map(c => {
           const cantJug = c.cantidadJugadores || 0;
@@ -245,7 +245,7 @@ export class AdminListaCategoria implements OnInit {
     };
 
     if (this.modoEdicion) {
-      this.http.put(`http://localhost:5191/api/categorias/${this.categoriaFormId}`, payload).subscribe({
+      this.http.put(`/api/categorias/${this.categoriaFormId}`, payload).subscribe({
         next: () => {
           this.cerrarModalCategoria();
           this.cargarDatos();
@@ -253,7 +253,7 @@ export class AdminListaCategoria implements OnInit {
         error: (err) => alert('Error al actualizar la categoría: ' + (err.error?.message || 'Error del servidor'))
       });
     } else {
-      this.http.post('http://localhost:5191/api/categorias', payload).subscribe({
+      this.http.post('/api/categorias', payload).subscribe({
         next: () => {
           this.cerrarModalCategoria();
           this.cargarDatos();
@@ -282,7 +282,7 @@ export class AdminListaCategoria implements OnInit {
     this.eliminando = true;
     const id = this.categoriaAEliminar.id;
 
-    this.http.delete(`http://localhost:5191/api/categorias/${id}`).subscribe({
+    this.http.delete(`/api/categorias/${id}`).subscribe({
       next: () => {
         this.eliminando = false;
         this.modalEliminarVisible = false;
@@ -317,7 +317,7 @@ export class AdminListaCategoria implements OnInit {
 
   cargarPlantel(idCategoria: number): void {
     this.cargandoPlantel = true;
-    this.http.get<JugadorCategoria[]>(`http://localhost:5191/api/categorias/${idCategoria}/jugadores`).subscribe({
+    this.http.get<JugadorCategoria[]>(`/api/categorias/${idCategoria}/jugadores`).subscribe({
       next: (data) => {
         this.cargandoPlantel = false;
         this.jugadoresPlantel = data.map(j => ({ ...j, minutosJugados: 90 }));
@@ -328,7 +328,7 @@ export class AdminListaCategoria implements OnInit {
 
   cargarJugadoresDisponibles(idCategoria: number, query: string = ''): void {
     const q = encodeURIComponent(query.trim());
-    this.http.get<JugadorCategoria[]>(`http://localhost:5191/api/categorias/${idCategoria}/jugadores-disponibles?q=${q}`).subscribe({
+    this.http.get<JugadorCategoria[]>(`/api/categorias/${idCategoria}/jugadores-disponibles?q=${q}`).subscribe({
       next: (data) => {
         this.jugadoresDisponibles = data;
         if (data.length === 1 && query.trim().length > 0) {
@@ -362,7 +362,7 @@ export class AdminListaCategoria implements OnInit {
       return;
     }
 
-    this.http.post(`http://localhost:5191/api/categorias/${this.categoriaActiva.id}/jugadores`, {
+    this.http.post(`/api/categorias/${this.categoriaActiva.id}/jugadores`, {
       idJugador: this.jugadorSeleccionadoId
     }).subscribe({
       next: () => {
@@ -380,7 +380,7 @@ export class AdminListaCategoria implements OnInit {
     if (!this.categoriaActiva) return;
     if (!confirm('¿Desea desvincular al jugador de esta categoría?')) return;
 
-    this.http.delete(`http://localhost:5191/api/categorias/${this.categoriaActiva.id}/jugadores/${idJugador}`).subscribe({
+    this.http.delete(`/api/categorias/${this.categoriaActiva.id}/jugadores/${idJugador}`).subscribe({
       next: () => {
         this.cargarPlantel(this.categoriaActiva!.id);
         this.cargarJugadoresDisponibles(this.categoriaActiva!.id, this.busquedaJugadorTexto);
@@ -392,7 +392,7 @@ export class AdminListaCategoria implements OnInit {
 
   cargarStaff(idCategoria: number): void {
     this.cargandoStaff = true;
-    this.http.get<StaffCategoria[]>(`http://localhost:5191/api/categorias/${idCategoria}/staff`).subscribe({
+    this.http.get<StaffCategoria[]>(`/api/categorias/${idCategoria}/staff`).subscribe({
       next: (data) => {
         this.cargandoStaff = false;
         this.staffPlantel = data;
@@ -403,7 +403,7 @@ export class AdminListaCategoria implements OnInit {
 
   cargarStaffDisponibles(idCategoria: number, query: string = ''): void {
     const q = encodeURIComponent(query.trim());
-    this.http.get<StaffCategoria[]>(`http://localhost:5191/api/categorias/${idCategoria}/staff-disponibles?q=${q}`).subscribe({
+    this.http.get<StaffCategoria[]>(`/api/categorias/${idCategoria}/staff-disponibles?q=${q}`).subscribe({
       next: (data) => {
         this.staffDisponibles = data;
         if (data.length === 1 && query.trim().length > 0) {
@@ -437,7 +437,7 @@ export class AdminListaCategoria implements OnInit {
       return;
     }
 
-    this.http.post(`http://localhost:5191/api/categorias/${this.categoriaActiva.id}/staff`, {
+    this.http.post(`/api/categorias/${this.categoriaActiva.id}/staff`, {
       idStaff: this.staffSeleccionadoId
     }).subscribe({
       next: () => {
@@ -455,7 +455,7 @@ export class AdminListaCategoria implements OnInit {
     if (!this.categoriaActiva) return;
     if (!confirm('¿Desea desvincular a este colaborador del cuerpo técnico de esta categoría?')) return;
 
-    this.http.delete(`http://localhost:5191/api/categorias/${this.categoriaActiva.id}/staff/${idStaff}`).subscribe({
+    this.http.delete(`/api/categorias/${this.categoriaActiva.id}/staff/${idStaff}`).subscribe({
       next: () => {
         this.cargarStaff(this.categoriaActiva!.id);
         this.cargarStaffDisponibles(this.categoriaActiva!.id, this.busquedaStaffTexto);
@@ -467,7 +467,7 @@ export class AdminListaCategoria implements OnInit {
 
   cargarPartidos(idCategoria: number): void {
     this.cargandoPartidos = true;
-    this.http.get<any[]>(`http://localhost:5191/api/categorias/${idCategoria}/partidos`).subscribe({
+    this.http.get<any[]>(`/api/categorias/${idCategoria}/partidos`).subscribe({
       next: (data) => {
         this.cargandoPartidos = false;
         this.partidosCategoria = data.map(p => {
@@ -529,7 +529,7 @@ export class AdminListaCategoria implements OnInit {
     };
 
     this.guardandoPartido = true;
-    this.http.post(`http://localhost:5191/api/categorias/${this.categoriaActiva.id}/partidos`, payload).subscribe({
+    this.http.post(`/api/categorias/${this.categoriaActiva.id}/partidos`, payload).subscribe({
       next: () => {
         this.guardandoPartido = false;
         this.mostrarFormPartido = false;

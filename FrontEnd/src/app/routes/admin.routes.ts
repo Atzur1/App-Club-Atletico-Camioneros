@@ -3,6 +3,9 @@ import { responsiveComponent } from './responsive-component';
 
 export const ADMIN_ROUTES: Routes = [
   { path: '', title: 'Administración', data: { desktopOwnShell: true }, loadComponent: () => import('../features/admin-home/admin-home.component').then((m) => m.AdminHomeComponent) },
+  { path: 'lista-jugadores', redirectTo: 'jugadores', pathMatch: 'full' },
+  { path: 'ficha-jugador/:id', redirectTo: ({ params }) => `jugadores/${params['id']}` },
+  { path: 'editar-perfil/:id', redirectTo: ({ params }) => `jugadores/${params['id']}/editar` },
   { path: 'registro-personas', title: 'Registro de personas', loadComponent: () => import('../features/admin-registro-personas/admin-registro-personas.component').then((m) => m.AdminRegistroPersonasComponent) },
   { path: 'jugadores', title: 'Jugadores', loadComponent: () => import('../features/admin-lista-jugadores/admin-lista-jugadores').then((m) => m.AdminListaJugadores) },
   { path: 'jugadores/nuevo', title: 'Registrar jugador', data: { desktopOwnShell: true }, loadComponent: () => import('../features/admin-alta-jugador/admin-alta-jugador.component').then((m) => m.AdminAltaJugadorComponent) },

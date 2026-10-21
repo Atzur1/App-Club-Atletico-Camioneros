@@ -95,7 +95,21 @@ public class AsistenciasControllerTests
     }
 
     private static AsistenciasController CreateController(FakeAsistenciaDao? dao = null, ICurrentUserAccess? access = null) =>
-        new(dao ?? new FakeAsistenciaDao(new ResultadoIngreso()), new FakeJugadorDao(), access ?? new FakeAccess(true));
+        new(dao ?? new FakeAsistenciaDao(new ResultadoIngreso()), new FakeJugadorDao(), access ?? new FakeAccess(true), new FakeCredentialTokenService(), new FakeCredentialDao());
+
+    private sealed class FakeCredentialTokenService : CACC.API.Services.ICredentialTokenService
+    {
+        public string Create(Guid id) => id.ToString();
+        public CACC.API.Services.CredentialToken? Validate(string token) =>
+            token == "invalid" ? null : new CACC.API.Services.CredentialToken(1, Guid.Parse("11111111-1111-1111-1111-111111111111"));
+    }
+
+    private sealed class FakeCredentialDao : ICredentialDao
+    {
+        public Task<Guid?> GetOrCreateActiveCredentialForPlayerAsync(int playerId, CancellationToken cancellationToken) => Task.FromResult<Guid?>(Guid.NewGuid());
+        public Task<string?> GetActiveDniAsync(Guid credentialId, CancellationToken cancellationToken) => Task.FromResult<string?>("99000002");
+        public Task<CredentialPlayerData?> GetPlayerAsync(int playerId, CancellationToken cancellationToken) => Task.FromResult<CredentialPlayerData?>(null);
+    }
 
     private static CurrentUserAccess CreatePhysicalTrainerAccess(int categoryId)
     {

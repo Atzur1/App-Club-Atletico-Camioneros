@@ -2,9 +2,6 @@ using CACC.API.Services;
 using CACC.DAO;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using QuestPDF.Fluent;
-using QuestPDF.Helpers;
-using QuestPDF.Infrastructure;
 using CACC.API.Security;
 
 namespace CACC.API.Controllers
@@ -15,65 +12,42 @@ namespace CACC.API.Controllers
     public class CredencialesController : ControllerBase
     {
         private readonly IQrService _qrService;
-        private readonly IJugadorDao _jugadorDao;
+        private readonly ICredentialDao _credentialDao;
+        private readonly ICredentialTokenService _tokenService;
+        private readonly ICredentialPdfService _pdfService;
 
-        public CredencialesController(IQrService qrService, IJugadorDao jugadorDao)
+        public CredencialesController(
+            IQrService qrService,
+            ICredentialDao credentialDao,
+            ICredentialTokenService tokenService,
+            ICredentialPdfService pdfService)
         {
             _qrService = qrService;
-            _jugadorDao = jugadorDao;
-
-            // Configuramos la licencia community de QuestPDF
-            QuestPDF.Settings.License = LicenseType.Community;
+            _credentialDao = credentialDao;
+            _tokenService = tokenService;
+            _pdfService = pdfService;
         }
 
         [HttpGet("jugador/{idJugador}/pdf")]
         public async Task<IActionResult> DescargarCredencialJugador(int idJugador)
         {
-            var jugador = await _jugadorDao.ObtenerPorIdAsync(idJugador);
+            var cancellationToken = HttpContext?.RequestAborted ?? CancellationToken.None;
+            var jugador = await _credentialDao.GetPlayerAsync(idJugador, cancellationToken);
             if (jugador == null)
             {
                 return NotFound(new { message = "Jugador no encontrado para generar credencial." });
             }
 
-            string nombre = "Nombre";
-            string apellido = "Apellido";
-            string dni = "12345678";
-
-            var qrBytes = _qrService.GenerarQrCodePng(dni);
-
-            var document = Document.Create(container =>
+            var credentialId = await _credentialDao.GetOrCreateActiveCredentialForPlayerAsync(
+                idJugador, cancellationToken);
+            if (credentialId is null)
             {
-                container.Page(page =>
-                {
-                    // Usamos 'f' para pasar float en lugar de double
-                    page.Size(85.6f, 54f, Unit.Millimetre);
-                    page.Margin(4, Unit.Millimetre);
-                    page.DefaultTextStyle(x => x.FontSize(10).FontFamily(Fonts.Arial));
+                return NotFound(new { message = "No se encontró la persona asociada al jugador." });
+            }
 
-                    page.Content().Column(col =>
-                    {
-                        // Espaciado uniforme en la columna
-                        col.Spacing(2);
-
-                        col.Item().Text("CLUB ATLÉTICO CAMIONEROS").Bold().FontSize(9).AlignCenter();
-
-                        col.Item().Row(row =>
-                        {
-                            row.RelativeItem().Column(c =>
-                            {
-                                c.Spacing(2);
-                                c.Item().Text($"{apellido}, {nombre}").Bold().FontSize(11);
-                                c.Item().Text($"DNI: {dni}").FontSize(9);
-                                c.Item().Text("CATEGORÍA: Oficial").FontSize(8);
-                            });
-
-                            row.ConstantItem(35, Unit.Millimetre).Image(qrBytes);
-                        });
-                    });
-                });
-            });
-
-            byte[] pdfBytes = document.GeneratePdf();
+            var qrBytes = _qrService.GenerarQrCodePng(_tokenService.Create(credentialId.Value));
+            byte[] pdfBytes = _pdfService.Generate(new CredentialPdfData(
+                jugador.FirstName, jugador.LastName, jugador.Dni, qrBytes));
             string fileName = $"credencial_jugador_{idJugador}.pdf";
 
             return File(pdfBytes, "application/pdf", fileName);

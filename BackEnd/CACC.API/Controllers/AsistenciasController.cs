@@ -1,4 +1,5 @@
 using CACC.API.DTOs;
+using CACC.API.Services;
 using CACC.DAO;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -14,15 +15,21 @@ namespace CACC.API.Controllers
         private readonly IAsistenciaDao _asistenciaDao;
         private readonly IJugadorDao _jugadorDao;
         private readonly ICurrentUserAccess _access;
+        private readonly ICredentialTokenService _tokenService;
+        private readonly ICredentialDao _credentialDao;
 
         public AsistenciasController(
             IAsistenciaDao asistenciaDao,
             IJugadorDao jugadorDao,
-            ICurrentUserAccess access)
+            ICurrentUserAccess access,
+            ICredentialTokenService tokenService,
+            ICredentialDao credentialDao)
         {
             _asistenciaDao = asistenciaDao;
             _jugadorDao = jugadorDao;
             _access = access;
+            _tokenService = tokenService;
+            _credentialDao = credentialDao;
         }
 
         [HttpPost("verificar-y-registrar")]
@@ -40,7 +47,26 @@ namespace CACC.API.Controllers
                 return BadRequest(new { message = "El método de registro debe ser DNI_MANUAL o QR." });
             }
 
-            var resultado = await _asistenciaDao.ProcesarIngresoAsync(request.Dni.Trim(), metodoRegistro);
+            var identificador = request.Dni.Trim();
+            if (metodoRegistro == "QR")
+            {
+                var token = _tokenService.Validate(identificador);
+                if (token is null)
+                {
+                    return BadRequest(new { message = "La credencial QR no es válida." });
+                }
+
+                var dniActivo = await _credentialDao.GetActiveDniAsync(
+                    token.CredentialId, HttpContext?.RequestAborted ?? CancellationToken.None);
+                if (dniActivo is null)
+                {
+                    return NotFound(new { message = "La credencial no existe, fue revocada o está inactiva." });
+                }
+
+                identificador = dniActivo;
+            }
+
+            var resultado = await _asistenciaDao.ProcesarIngresoAsync(identificador, metodoRegistro);
             if (!resultado.PersonaEncontrada)
             {
                 return UnprocessableEntity(new { message = resultado.Error ?? "No se pudo identificar un jugador inequívoco." });

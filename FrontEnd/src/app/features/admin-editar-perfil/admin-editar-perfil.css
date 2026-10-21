@@ -1045,3 +1045,224 @@
 --viewport-tier: desktop;
 }
 }
+
+/* Player editor mirrors the visual hierarchy of the read-only profile card. */
+.profile-editor-summary {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 2px 0 16px;
+  text-align: center;
+}
+
+.profile-editor-summary .avatar-banner-circle {
+  width: 64px;
+  height: 64px;
+  margin-bottom: 10px;
+}
+
+.editor-player-name {
+  margin: 0;
+  color: #0f172a;
+  font-size: 18px;
+  font-weight: 800;
+  line-height: 1.25;
+  text-transform: uppercase;
+}
+
+.editor-player-badges {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 6px;
+  margin-top: 8px;
+}
+
+.editor-badge {
+  padding: 4px 10px;
+  border: 1px solid #cbd5e1;
+  border-radius: 999px;
+  background: #f8fafc;
+  color: #334155;
+  font-size: 11px;
+  font-weight: 700;
+}
+
+.editor-badge-primary {
+  border-color: #86efac;
+  background: #ecfdf5;
+  color: #007a3d;
+}
+
+.editor-badge-category {
+  border-radius: 6px;
+  color: #007a3d;
+}
+
+.identity-edit-grid,
+.personal-data-grid,
+.tutor-edit-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px;
+}
+
+.identity-position,
+.tutor-name-card,
+.tutor-contact-card {
+  grid-column: 1 / -1;
+}
+
+.data-item-card,
+.domicilio-card {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-width: 0;
+  min-height: 66px;
+  padding: 10px 12px;
+  border: 1px solid #d8e0e8;
+  border-radius: 10px;
+  background: #f8fafc;
+  box-sizing: border-box;
+}
+
+.domicilio-card {
+  margin-top: 10px;
+}
+
+.data-icon {
+  display: flex;
+  flex: 0 0 22px;
+  align-items: center;
+  justify-content: center;
+  color: #008443;
+}
+
+.data-label-group {
+  min-width: 0;
+  flex: 1;
+}
+
+.data-label-group > .data-label {
+  display: block;
+  margin-bottom: 4px;
+  color: #64748b;
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: .2px;
+  text-transform: uppercase;
+}
+
+.data-item-card .edit-form-control,
+.domicilio-card .edit-form-control {
+  height: 34px;
+  background: #fff;
+  font-weight: 600;
+}
+
+.section-title-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+}
+
+.section-title-row .section-subtitle {
+  margin-bottom: 10px;
+}
+
+.optional-badge {
+  padding: 3px 8px;
+  border: 1px solid #bbf7d0;
+  border-radius: 999px;
+  background: #ecfdf5;
+  color: #007a3d;
+  font-size: 10px;
+  font-weight: 800;
+}
+
+.tutor-divider {
+  margin-top: 16px;
+}
+
+.btn-save {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  min-height: 38px;
+  padding: 8px 22px;
+  border: 0;
+  border-radius: 8px;
+  background: #007a3d;
+  color: #fff;
+  font-size: 13px;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.btn-save:hover:not(:disabled) {
+  background: #006633;
+}
+
+.btn-save:disabled {
+  background: #94a3b8;
+  cursor: not-allowed;
+}
+
+@media (max-width: 767px) {
+  .edit-form-wrapper {
+    gap: 12px;
+  }
+
+  .cards-grid-row {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 12px;
+  }
+
+  .card-box {
+    padding: 16px;
+    border: 1px solid #dfe4e2;
+    border-radius: 12px;
+    background: #fff;
+  }
+
+  .identity-edit-grid,
+  .personal-data-grid,
+  .tutor-edit-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .identity-position,
+  .tutor-name-card,
+  .tutor-contact-card {
+    grid-column: auto;
+  }
+
+  .data-item-card,
+  .domicilio-card {
+    min-height: 72px;
+  }
+
+  .form-row-2 {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 8px;
+  }
+
+  .bottom-actions-row,
+  .right-actions-group {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 8px;
+  }
+
+  .btn-cancel,
+  .btn-save {
+    width: 100%;
+    min-height: 44px;
+    justify-content: center;
+  }
+}

@@ -139,7 +139,7 @@ export class AdminListaJugadores implements OnInit {
   }
 
   cargarJugadores(): void {
-    this.http.get<any[]>('http://localhost:5191/api/jugadores').subscribe({
+    this.http.get<any[]>('/api/jugadores').subscribe({
       next: (data) => {
         this.players = data.map(j => {
           let fechaFormateada = 'Sin informar';
@@ -175,7 +175,7 @@ export class AdminListaJugadores implements OnInit {
   }
 
   private cargarCategorias(): void {
-    this.http.get<Categoria[]>('http://localhost:5191/api/categorias').subscribe({
+    this.http.get<Categoria[]>('/api/categorias').subscribe({
       next: (data) => {
         this.listaCategorias = data;
       },
@@ -277,7 +277,7 @@ export class AdminListaJugadores implements OnInit {
     this.eliminando = true;
     const id = this.jugadorAEliminar.id;
 
-    this.http.delete(`http://localhost:5191/api/jugadores/${id}`).subscribe({
+    this.http.delete(`/api/jugadores/${id}`).subscribe({
       next: () => {
         this.players = this.players.filter(p => p.id !== id);
         this.eliminando = false;
@@ -334,7 +334,7 @@ export class AdminListaJugadores implements OnInit {
     this.buscandoTutor = true;
     this.tutorEncontradoMensaje = '';
 
-    this.http.get<any>(`http://localhost:5191/api/jugadores/tutores/${dni}`).subscribe({
+    this.http.get<any>(`/api/jugadores/tutores/${dni}`).subscribe({
       next: (data) => {
         this.buscandoTutor = false;
         this.tutorForm.nombre = data.nombre || '';
@@ -365,7 +365,7 @@ export class AdminListaJugadores implements OnInit {
     this.guardandoTutor = true;
     const id = this.jugadorTutor.id;
 
-    this.http.put(`http://localhost:5191/api/jugadores/${id}/tutor`, this.tutorForm).subscribe({
+    this.http.put(`/api/jugadores/${id}/tutor`, this.tutorForm).subscribe({
       next: () => {
         if (this.jugadorTutor) {
           this.jugadorTutor.tutor = { ...this.tutorForm };

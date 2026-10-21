@@ -95,29 +95,37 @@
 
           <!-- CARD 1: PERFIL & DATOS PERSONALES -->
           <section class="card-box card-perfil">
-            <div class="photo-banner">
+            <div class="profile-editor-summary">
               <div class="avatar-banner-circle">
                 <svg width="44" height="44" viewBox="0 0 24 24" fill="#007A3D"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 3c1.66 0 3 1.34 3 3s-1.34 3-3 3-3-1.34-3-3 1.34-3 3-3zm0 14.2c-2.5 0-4.71-1.28-6-3.22.03-1.99 4-3.08 6-3.08 1.99 0 5.97 1.09 6 3.08-1.29 1.94-3.5 3.22-6 3.22z" /></svg>
               </div>
-            </div>
-
-            <div class="form-group">
-              <label class="data-label">Nombre y Apellido</label>
-              <div class="form-row-2">
-                <input type="text" class="edit-form-control text-uppercase" name="nombre" [(ngModel)]="perfil.nombre" required placeholder="Nombre">
-                <input type="text" class="edit-form-control text-uppercase" name="apellido" [(ngModel)]="perfil.apellido" required placeholder="Apellido">
+              <h2 class="editor-player-name">{{ perfil.nombre }} {{ perfil.apellido }}</h2>
+              <div class="editor-player-badges">
+                <span class="editor-badge editor-badge-primary">{{ perfil.posicion || 'Sin posición' }}</span>
+                <span class="editor-badge">DNI: {{ perfil.dni || 'Sin informar' }}</span>
+                <span class="editor-badge editor-badge-category">{{ perfil.categoria || 'Sin categoría' }}</span>
               </div>
             </div>
 
-            <div class="form-group mt-1">
-              <label class="data-label">Posición</label>
-              <select class="edit-form-control" name="posicion" [(ngModel)]="perfil.posicion">
-                <option *ngFor="let pos of posiciones" [value]="pos">{{ pos }}</option>
-              </select>
+            <div class="identity-edit-grid">
+              <div class="form-group">
+                <label class="data-label">Nombre</label>
+                <input type="text" class="edit-form-control text-uppercase" name="nombre" [(ngModel)]="perfil.nombre" required placeholder="Nombre">
+              </div>
+              <div class="form-group">
+                <label class="data-label">Apellido</label>
+                <input type="text" class="edit-form-control text-uppercase" name="apellido" [(ngModel)]="perfil.apellido" required placeholder="Apellido">
+              </div>
+              <div class="form-group identity-position">
+                <label class="data-label">Posición</label>
+                <select class="edit-form-control" name="posicion" [(ngModel)]="perfil.posicion">
+                  <option *ngFor="let pos of posiciones" [value]="pos">{{ pos }}</option>
+                </select>
+              </div>
             </div>
 
             <hr class="card-divider" />
-            <h3 class="section-subtitle">DATOS PERSONALES</h3>
+            <h3 class="section-subtitle">DATOS PERSONALES Y FÍSICOS</h3>
 
             <div class="personal-data-grid">
               <!-- Fecha de Nacimiento -->
@@ -190,30 +198,6 @@
                 </div>
               </div>
 
-              <!-- Tutor -->
-              <div class="data-item-card tutor-card">
-                <div class="data-icon">
-                  <svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><circle cx="8" cy="7" r="4"/><circle cx="17" cy="6" r="3"/><path d="M1 22v-3a6 6 0 0 1 12 0v3H1Zm13 0v-3c0-2-.7-3.7-1.8-5A5 5 0 0 1 23 17v5h-9Z"/></svg>
-                </div>
-                <div class="data-label-group">
-                  <span class="data-label">Tutor (Opcional)</span>
-                  <div class="form-row-2">
-                    <input type="text" class="edit-form-control" name="tutorNombre" [(ngModel)]="perfil.tutor.nombre" placeholder="Nombre">
-                    <input type="text" class="edit-form-control" name="tutorApellido" [(ngModel)]="perfil.tutor.apellido" placeholder="Apellido">
-                  </div>
-                </div>
-              </div>
-
-              <!-- Teléfono Tutor -->
-              <div class="data-item-card tutor-card">
-                <div class="data-icon">
-                  <svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="m6.6 2 3 6-2.2 1.8a16 16 0 0 0 6.8 6.8l1.8-2.2 6 3v3A2 2 0 0 1 20 22C10.1 22 2 13.9 2 4a2 2 0 0 1 2-2h2.6Z"/></svg>
-                </div>
-                <div class="data-label-group">
-                  <span class="data-label">Teléfono Tutor</span>
-                  <input type="text" class="edit-form-control" name="tutorTelefono" [(ngModel)]="perfil.tutor.telefono" placeholder="Ej: 3510000000">
-                </div>
-              </div>
             </div>
 
             <!-- Domicilio -->
@@ -224,6 +208,37 @@
               <div class="data-label-group">
                 <span class="data-label">Domicilio</span>
                 <input type="text" class="edit-form-control" name="domicilio" [(ngModel)]="perfil.domicilio" placeholder="Calle falsa 123">
+              </div>
+            </div>
+
+            <hr class="card-divider tutor-divider" />
+            <div class="section-title-row">
+              <h3 class="section-subtitle">TUTOR / RESPONSABLE LEGAL</h3>
+              <span class="optional-badge">OPCIONAL</span>
+            </div>
+
+            <div class="tutor-edit-grid">
+              <div class="data-item-card tutor-name-card">
+                <div class="data-icon">
+                  <svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><circle cx="12" cy="7" r="4"/><path d="M4 22v-3a8 8 0 0 1 16 0v3H4Z"/></svg>
+                </div>
+                <div class="data-label-group">
+                  <span class="data-label">Nombre y apellido</span>
+                  <div class="form-row-2">
+                    <input type="text" class="edit-form-control" name="tutorNombre" [(ngModel)]="perfil.tutor.nombre" placeholder="Nombre">
+                    <input type="text" class="edit-form-control" name="tutorApellido" [(ngModel)]="perfil.tutor.apellido" placeholder="Apellido">
+                  </div>
+                </div>
+              </div>
+
+              <div class="data-item-card tutor-contact-card">
+                <div class="data-icon">
+                  <svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="m6.6 2 3 6-2.2 1.8a16 16 0 0 0 6.8 6.8l1.8-2.2 6 3v3A2 2 0 0 1 20 22C10.1 22 2 13.9 2 4a2 2 0 0 1 2-2h2.6Z"/></svg>
+                </div>
+                <div class="data-label-group">
+                  <span class="data-label">Teléfono de contacto</span>
+                  <input type="text" class="edit-form-control" name="tutorTelefono" [(ngModel)]="perfil.tutor.telefono" placeholder="Ej: 3510000000">
+                </div>
               </div>
             </div>
           </section>
