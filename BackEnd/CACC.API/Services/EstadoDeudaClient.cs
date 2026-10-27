@@ -255,7 +255,7 @@ namespace CACC.API.Services
         public static string De(EstadoDeudaAdministrativo? estado) => estado?.Estado switch
         {
             "habilitado" => "AL DÍA",
-            "solo_entrenamientos" => "PENDIENTE",
+            "solo_entrenamientos" => "SOLO ENTRENAMIENTOS",
             "inhabilitado" => "INHABILITADO",
             "baja" => "BAJA",
             _ => SinVerificar

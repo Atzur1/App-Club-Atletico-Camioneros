@@ -205,7 +205,7 @@ public class EstadoDeudaClientTests
 
     [Theory]
     [InlineData("habilitado", "AL DÍA")]
-    [InlineData("solo_entrenamientos", "PENDIENTE")]
+    [InlineData("solo_entrenamientos", "SOLO ENTRENAMIENTOS")]
     [InlineData("inhabilitado", "INHABILITADO")]
     [InlineData("baja", "BAJA")]
     public void ElTextoDeCuotaSigueAlEstadoDelAdministrativo(string estado, string texto) =>

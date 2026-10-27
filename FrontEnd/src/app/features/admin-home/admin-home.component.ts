@@ -5,6 +5,7 @@ import { Router, RouterModule } from '@angular/router';
 import { HttpClient } from '@angular/common/http';
 import { AuthService } from '../../shared/services/auth.service';
 import { normalizeRole } from '../../core/auth/roles';
+import { badgeClassDeEstadoCuota, prioridadDeEstadoCuota } from '../../shared/estado-cuota';
 
 interface TutorInfo {
   nombre?: string;
@@ -20,7 +21,7 @@ interface Player {
   dni: string;
   categoria: string;
   fechaNacimiento: string;
-  estadoCuota: 'AL DÍA' | 'PENDIENTE' | 'ADEUDA' | 'INHABILITADO' | string;
+  estadoCuota: 'AL DÍA' | 'SOLO ENTRENAMIENTOS' | 'INHABILITADO' | 'BAJA' | 'SIN VERIFICAR' | string;
   tutor?: TutorInfo | null;
 }
 
@@ -163,11 +164,7 @@ export class AdminHomeComponent implements OnInit {
   }
 
   private getPrioridadEstadoCuota(estado: string): number {
-    const e = (estado || '').trim().toUpperCase();
-    if (e.includes('INHABILITADO') || e.includes('ADEUDA')) return 1;
-    if (e.includes('PENDIENTE')) return 2;
-    if (e.includes('AL DÍA') || e.includes('AL DIA')) return 3;
-    return 4;
+    return prioridadDeEstadoCuota(estado);
   }
 
   getCategoriasList(categoriaStr: string): string[] {
@@ -255,11 +252,7 @@ export class AdminHomeComponent implements OnInit {
   }
 
   getBadgeClass(estado: Player['estadoCuota']): string {
-    const e = (estado || '').toUpperCase();
-    if (e.includes('AL DÍA') || e.includes('AL DIA')) return 'badge-aldia';
-    if (e.includes('PENDIENTE') || e.includes('SIN VERIFICAR')) return 'badge-pendiente';
-    if (e.includes('ADEUDA') || e.includes('INHABILITADO')) return 'badge-adeuda';
-    return '';
+    return badgeClassDeEstadoCuota(estado);
   }
 
   cerrarSesion(): void {
