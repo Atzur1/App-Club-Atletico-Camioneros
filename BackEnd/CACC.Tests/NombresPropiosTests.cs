@@ -18,6 +18,8 @@ public class NombresPropiosTests
     [InlineData("PÉREZ-GÓMEZ", "Pérez-Gómez")]
     [InlineData("d'angelo", "D'Angelo")]
     [InlineData("MCDONALD", "McDonald")]
+    [InlineData("PÉREZ-MCDONALD", "Pérez-McDonald")]
+    [InlineData("mcdonald-mcgregor", "McDonald-McGregor")]
     [InlineData("ñandú NÚÑEZ", "Ñandú Núñez")]
     public void Deja_la_primera_letra_de_cada_palabra_en_mayuscula(string escrito, string esperado)
         => Assert.Equal(esperado, NombresPropios.Normalizar(escrito));
