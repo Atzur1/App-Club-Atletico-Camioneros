@@ -226,6 +226,10 @@ export class AdminFichaJugador implements OnInit {
     this.router.navigate([this.portalRoot, 'jugadores']);
   }
 
+  verHistorialAsistencia(): void {
+    this.router.navigate([this.portalRoot, 'jugadores', this.playerId, 'asistencias']);
+  }
+
   editarPerfil(): void {
     if (!this.canEditPlayers) return;
     if (this.jugador) {

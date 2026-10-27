@@ -5,6 +5,5 @@ public class ResultadoIngreso {
  public bool YaRegistrada { get; set; }
  public string? Error { get; set; }
  public bool AccesoPermitido { get; set; }
- public decimal DeudaTotal { get; set; }
- public int CuotasVencidas { get; set; }
+ public string EstadoAcceso { get; set; } = string.Empty;
 }

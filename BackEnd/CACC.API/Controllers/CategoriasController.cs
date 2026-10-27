@@ -30,7 +30,7 @@ namespace CACC.API.Controllers
         {
             var categoriasConConteo = await _categoriaDao.ObtenerTodasConConteoAsync();
 
-            if (_access.IsDirectorTecnico)
+            if (_access.IsCategoryScoped)
             {
                 categoriasConConteo = categoriasConConteo.Where(c => _access.CategoriaIds.Contains(c.IdCategoria));
             }
@@ -51,7 +51,7 @@ namespace CACC.API.Controllers
         public async Task<IActionResult> GetCategoriasSimple()
         {
             var categorias = await _categoriaDao.ObtenerTodasAsync();
-            if (_access.IsDirectorTecnico)
+            if (_access.IsCategoryScoped)
             {
                 categorias = categorias.Where(c => _access.CategoriaIds.Contains(c.IdCategoria));
             }

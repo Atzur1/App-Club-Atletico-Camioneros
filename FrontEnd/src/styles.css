@@ -1,6 +1,425 @@
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
-:root{--cacc-green:#008443;--cacc-green-dark:#006b36;--cacc-mint:#e5f4ed;--cacc-bg:#f8faf9;--cacc-card:#fff;--cacc-text:#252525;--cacc-muted:#7a7d7c;--cacc-line:#dfe4e2;--cacc-danger:#ff3131;--cacc-radius:10px;color-scheme:light;font-family:Inter,system-ui,-apple-system,'Segoe UI',sans-serif}html,body{margin:0;width:100%;min-height:100%;box-sizing:border-box;background:var(--cacc-bg);color:var(--cacc-text)}*,*::before,*::after{box-sizing:inherit}button,input,select,textarea{font:inherit}button,a,input,select,textarea{-webkit-tap-highlight-color:transparent}img,svg{max-width:100%}.sr-only{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0}
-@media (max-width:767px){:root{--page-gutter:16px;--content-max:none}}
-@media (min-width:768px) and (max-width:1439px){:root{--page-gutter:24px;--content-max:1180px}}
-@media (min-width:1440px){:root{--page-gutter:30px;--content-max:1600px}}
-@media (prefers-reduced-motion:reduce){html:focus-within{scroll-behavior:auto}*,*::before,*::after{animation-duration:.01ms;animation-iteration-count:1;transition-duration:.01ms}}
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap');
+
+:root {
+  --cacc-green: #008443;
+  --cacc-green-dark: #006b36;
+  --cacc-mint: #e5f4ed;
+  --cacc-bg: #f8faf9;
+  --cacc-card: #fff;
+  --cacc-text: #252525;
+  --cacc-muted: #7a7d7c;
+  --cacc-line: #dfe4e2;
+  --cacc-danger: #ff3131;
+  --cacc-radius: 10px;
+  --cacc-font-body: 14px;
+  --cacc-font-small: 12px;
+  --cacc-font-label: 13px;
+  --cacc-font-title: 24px;
+  --cacc-font-section: 18px;
+  --cacc-control-height: 42px;
+  color-scheme: light;
+  font-family: Inter, system-ui, -apple-system, 'Segoe UI', sans-serif;
+}
+
+html, body { margin: 0; width: 100%; min-height: 100%; box-sizing: border-box; }
+*, *::before, *::after { box-sizing: inherit; }
+.sidebar,
+.sidebar * {
+  font-family: 'Segoe UI', system-ui, -apple-system, BlinkMacSystemFont, Roboto, sans-serif !important;
+  font-style: normal !important;
+}
+
+@media (max-width: 767px) {
+  :root { --page-gutter: 16px; --content-max: none; }
+  html, body { background: var(--cacc-bg); color: var(--cacc-text); }
+  button, input, select, textarea { font: inherit; }
+  button, a, input, select, textarea { -webkit-tap-highlight-color: transparent; }
+  img, svg { max-width: 100%; }
+  .sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0, 0, 0, 0); white-space: nowrap; border: 0; }
+
+  /* Canonical mobile search and filter panel. */
+  .table-controls,
+  .filter-bar-card,
+  .filters-card {
+    position: relative;
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: stretch !important;
+    gap: 10px !important;
+    width: 100% !important;
+    margin: 0 0 14px !important;
+    padding: 14px !important;
+    overflow: hidden;
+    border: 1px solid rgba(0, 132, 67, .22) !important;
+    border-top: 4px solid var(--cacc-green) !important;
+    border-radius: 14px !important;
+    background:
+      linear-gradient(145deg, rgba(229, 244, 237, .92), #fff 48%) !important;
+    box-shadow: 0 4px 14px rgba(0, 107, 54, .08) !important;
+  }
+
+  .table-controls::before,
+  .filter-bar-card::before,
+  .filters-card::before {
+    position: absolute;
+    top: -42px;
+    right: -42px;
+    width: 100px;
+    height: 100px;
+    border-radius: 50%;
+    background: rgba(0, 132, 67, .08);
+    content: '';
+    pointer-events: none;
+  }
+
+  .search-box,
+  .search-field,
+  .select-box,
+  .filters-card .field {
+    position: relative;
+    z-index: 1;
+    width: 100% !important;
+    min-width: 0 !important;
+    max-width: none !important;
+  }
+
+  .search-box .search-icon,
+  .search-field .search-icon {
+    position: absolute !important;
+    top: 50% !important;
+    left: 13px !important;
+    z-index: 2;
+    width: 18px !important;
+    height: 18px !important;
+    color: var(--cacc-green) !important;
+    stroke: var(--cacc-green) !important;
+    transform: translateY(-50%) !important;
+    pointer-events: none;
+  }
+
+  .table-controls input,
+  .table-controls select,
+  .filter-bar-card input,
+  .filter-bar-card select,
+  .filters-card input,
+  .filters-card select {
+    width: 100% !important;
+    min-height: 46px !important;
+    margin: 0 !important;
+    padding: 10px 38px 10px 13px !important;
+    border: 1px solid #c8d8d0 !important;
+    border-radius: 10px !important;
+    outline: none !important;
+    background: rgba(255, 255, 255, .96) !important;
+    color: #1e293b !important;
+    font-size: 13px !important;
+    box-shadow: 0 1px 2px rgba(15, 23, 42, .04) !important;
+    transition: border-color .2s ease, box-shadow .2s ease, background .2s ease;
+  }
+
+  .table-controls .search-input,
+  .filter-bar-card .search-input {
+    padding-left: 42px !important;
+  }
+
+  .table-controls input:focus,
+  .table-controls select:focus,
+  .filter-bar-card input:focus,
+  .filter-bar-card select:focus,
+  .filters-card input:focus,
+  .filters-card select:focus {
+    border-color: var(--cacc-green) !important;
+    background: #fff !important;
+    box-shadow: 0 0 0 3px rgba(0, 132, 67, .13) !important;
+  }
+
+  .select-box select {
+    appearance: none !important;
+  }
+
+  .select-box .select-arrow {
+    position: absolute !important;
+    top: 50% !important;
+    right: 13px !important;
+    z-index: 2;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    margin: 0 !important;
+    color: var(--cacc-green-dark) !important;
+    transform: translateY(-50%) !important;
+    pointer-events: none;
+  }
+
+  .select-box .select-arrow svg {
+    width: 14px !important;
+    height: 14px !important;
+    stroke: currentColor !important;
+  }
+
+  .filter-label,
+  .filters-card label {
+    display: block;
+    margin: 0 0 5px !important;
+    color: var(--cacc-green-dark) !important;
+    font-size: 11px !important;
+    font-weight: 800 !important;
+    letter-spacing: .25px;
+    text-transform: uppercase;
+  }
+
+  .filter-pills-row,
+  .position-filters,
+  .role-filters {
+    display: flex !important;
+    gap: 7px !important;
+    padding: 2px 0 !important;
+    overflow-x: auto !important;
+    scrollbar-width: none;
+  }
+
+  .filter-pills-row::-webkit-scrollbar,
+  .position-filters::-webkit-scrollbar,
+  .role-filters::-webkit-scrollbar {
+    display: none;
+  }
+
+  .filter-pill-btn {
+    min-height: 38px !important;
+    flex: 0 0 auto;
+    padding: 8px 13px !important;
+    border: 1px solid rgba(0, 132, 67, .35) !important;
+    border-radius: 999px !important;
+    background: #fff !important;
+    color: var(--cacc-green-dark) !important;
+    font-size: 12px !important;
+    font-weight: 700 !important;
+  }
+
+  .filter-pill-btn.active {
+    border-color: var(--cacc-green) !important;
+    background: var(--cacc-green) !important;
+    color: #fff !important;
+    box-shadow: 0 3px 8px rgba(0, 132, 67, .2) !important;
+  }
+
+  .btn-add-player,
+  .btn-add-staff,
+  .btn-add-category,
+  .btn-new,
+  .table-controls > button {
+    position: relative;
+    z-index: 1;
+    display: inline-flex !important;
+    width: 100% !important;
+    min-height: 46px !important;
+    align-items: center !important;
+    justify-content: center !important;
+    gap: 7px !important;
+    padding: 10px 14px !important;
+    border: 1px solid var(--cacc-green) !important;
+    border-radius: 10px !important;
+    background: var(--cacc-green) !important;
+    color: #fff !important;
+    font-size: 13px !important;
+    font-weight: 800 !important;
+    box-shadow: 0 4px 10px rgba(0, 132, 67, .18) !important;
+  }
+
+  .filters-card .filter-actions {
+    display: grid !important;
+    grid-template-columns: 1fr 1fr;
+    gap: 8px !important;
+  }
+
+  .filters-card .button.primary {
+    border-color: var(--cacc-green) !important;
+    background: var(--cacc-green) !important;
+    color: #fff !important;
+  }
+
+  .filters-card .button.secondary {
+    border-color: var(--cacc-green) !important;
+    background: #fff !important;
+    color: var(--cacc-green-dark) !important;
+  }
+
+  .table-card,
+  .history-card,
+  .players-list-card,
+  .categories-list-card {
+    border-color: rgba(0, 132, 67, .18) !important;
+  }
+}
+
+/* Original application canvas and typography for tablet and desktop. */
+@media (min-width: 768px) {
+  html, body {
+    padding: 0;
+    height: 100%;
+    overflow-x: hidden;
+    font-family: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    background-color: #d8dce2;
+  }
+  .main-wrapper, .main-wrapper *, .content-body, .content-body * {
+    font-family: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  }
+
+  /* Shared desktop/tablet type scale. Component styles may control weight and
+     color, but sizes remain consistent throughout every role portal. */
+  .portal-content {
+    font-size: var(--cacc-font-body);
+    line-height: 1.45;
+  }
+  .portal-content h1 { font-size: var(--cacc-font-title) !important; line-height: 1.2; }
+  .portal-content h2 { font-size: var(--cacc-font-section) !important; line-height: 1.25; }
+  .portal-content h3,
+  .portal-content h4,
+  .portal-content label { font-size: var(--cacc-font-label) !important; line-height: 1.35; }
+  .portal-content p,
+  .portal-content li,
+  .portal-content td,
+  .portal-content dd { font-size: var(--cacc-font-body) !important; }
+  .portal-content th,
+  .portal-content dt,
+  .portal-content small { font-size: var(--cacc-font-small) !important; }
+  .portal-content button,
+  .portal-content input,
+  .portal-content select,
+  .portal-content textarea,
+  .portal-content .btn,
+  .portal-content [class*='btn-'] {
+    font-size: var(--cacc-font-body) !important;
+  }
+
+  /* Canonical portal sidebar dimensions. Several legacy role screens render
+     their own shell, so these rules intentionally override encapsulated visual
+     variants and keep every desktop/tablet sidebar identical. */
+  .sidebar,
+  .sidebar * {
+    font-family: 'Segoe UI', system-ui, -apple-system, BlinkMacSystemFont, Roboto, sans-serif !important;
+    font-style: normal !important;
+  }
+  .sidebar {
+    width: 280px !important;
+    min-width: 280px !important;
+    flex: 0 0 280px !important;
+    flex-direction: column !important;
+  }
+  .sidebar .sidebar-header {
+    width: 100% !important;
+    padding: 24px 20px 16px !important;
+    text-align: center !important;
+  }
+  .sidebar .logo-wrapper {
+    display: flex !important;
+    width: 100% !important;
+    height: auto !important;
+    align-items: center !important;
+    justify-content: center !important;
+    margin-bottom: 10px !important;
+  }
+  .sidebar .cacc-shield-img,
+  .sidebar .sidebar-header img {
+    width: 68px !important;
+    height: auto !important;
+    margin: 0 auto !important;
+    object-fit: contain !important;
+  }
+  .sidebar .club-title,
+  .sidebar .sidebar-header h2 {
+    margin: 0 !important;
+    font-size: 14px !important;
+    font-weight: 800 !important;
+    line-height: 1.3 !important;
+    letter-spacing: .5px !important;
+    text-transform: uppercase !important;
+  }
+  .sidebar .club-subtitle,
+  .sidebar .sidebar-header p {
+    margin: 4px 0 0 !important;
+    font-size: 12px !important;
+    font-weight: 400 !important;
+    line-height: 1.3 !important;
+  }
+  .sidebar .nav-item,
+  .sidebar .sidebar-nav > a,
+  .sidebar .sidebar-nav > button,
+  .sidebar .footer-action-btn,
+  .sidebar .logout-btn,
+  .sidebar .portal-btn,
+  .sidebar .sidebar-footer > a,
+  .sidebar .sidebar-footer > button,
+  .sidebar > .logout {
+    min-height: 44px !important;
+    padding: 10px 16px !important;
+    font-size: 14px !important;
+    font-weight: 600 !important;
+    line-height: 1.2 !important;
+    letter-spacing: 0 !important;
+  }
+  .sidebar .sidebar-nav {
+    display: grid !important;
+    width: 100% !important;
+    flex: 0 0 auto !important;
+    grid-auto-rows: minmax(44px, auto) !important;
+    align-content: start !important;
+    gap: 6px !important;
+    padding: 10px 14px !important;
+  }
+  .sidebar .nav-item,
+  .sidebar .sidebar-nav > a,
+  .sidebar .sidebar-nav > button {
+    display: flex !important;
+    width: 100% !important;
+    align-items: center !important;
+    justify-content: flex-start !important;
+    gap: 14px !important;
+    margin: 0 !important;
+    border-radius: 10px !important;
+    text-align: left !important;
+  }
+  .sidebar .sidebar-footer {
+    display: grid !important;
+    width: 100% !important;
+    gap: 8px !important;
+    margin-top: auto !important;
+    padding: 14px 14px 18px !important;
+  }
+  .sidebar .footer-action-btn,
+  .sidebar .logout-btn,
+  .sidebar .portal-btn,
+  .sidebar .sidebar-footer > a,
+  .sidebar .sidebar-footer > button {
+    display: flex !important;
+    width: 100% !important;
+    align-items: center !important;
+    justify-content: flex-start !important;
+    gap: 12px !important;
+    margin: 0 !important;
+    text-align: left !important;
+  }
+  .sidebar > .logout {
+    width: calc(100% - 28px) !important;
+    margin: auto 14px 18px !important;
+    text-align: left !important;
+  }
+  .sidebar .nav-icon,
+  .sidebar .footer-icon {
+    width: 20px !important;
+    height: 20px !important;
+    flex: 0 0 20px !important;
+  }
+  .sidebar .nav-icon svg,
+  .sidebar .footer-icon svg {
+    width: 20px !important;
+    height: 20px !important;
+  }
+}
+
+@media (min-width: 768px) and (max-width: 1439px) { :root { --page-gutter: 24px; --content-max: 1180px; } }
+@media (min-width: 1440px) { :root { --page-gutter: 30px; --content-max: 1600px; } }
+@media (prefers-reduced-motion: reduce) {
+  html:focus-within { scroll-behavior: auto; }
+  *, *::before, *::after { animation-duration: .01ms; animation-iteration-count: 1; transition-duration: .01ms; }
+}

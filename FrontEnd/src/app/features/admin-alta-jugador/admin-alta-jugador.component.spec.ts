@@ -4,7 +4,7 @@ import { HttpTestingController, provideHttpClientTesting } from '@angular/common
 import { provideRouter } from '@angular/router';
 import { AdminAltaJugadorComponent } from './admin-alta-jugador.component';
 
-const API_JUGADORES = 'http://localhost:5191/api/jugadores';
+const API_JUGADORES = '/api/jugadores';
 
 describe('AdminAltaJugadorComponent: validación del alta', () => {
   beforeEach(() => {
@@ -16,7 +16,7 @@ describe('AdminAltaJugadorComponent: validación del alta', () => {
     const fixture = TestBed.createComponent(AdminAltaJugadorComponent);
     fixture.detectChanges();
     const http = TestBed.inject(HttpTestingController);
-    http.match('http://localhost:5191/api/categorias');
+    http.match('/api/categorias');
     return { fixture, componente: fixture.componentInstance, http };
   }
 

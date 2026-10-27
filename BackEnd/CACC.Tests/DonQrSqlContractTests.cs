@@ -31,6 +31,19 @@ public class DonQrSqlContractTests
     }
 
     [Fact]
+    public void LaConsultaDelHistorialUsaParametrosYLimitesDeFechaInclusivos()
+    {
+        var dao = ReadDao(FindBackEnd());
+        Assert.Contains("FK_id_jugador = @IdJugador", dao);
+        Assert.Contains("fecha_hora >= @Desde", dao);
+        Assert.Contains("fecha_hora < @HastaExclusiva", dao);
+        Assert.Contains("hasta.Value.Date.AddDays(1)", dao);
+        Assert.Contains("estado_acceso = @Estado", dao);
+        Assert.Contains("ORDER BY fecha_hora DESC, PK_id_asistencia DESC", dao);
+        Assert.Contains("command.Parameters.Add(\"@Estado\"", dao);
+    }
+
+    [Fact]
     public void TodasLasConexionesDeLosDaoSeAbrenConAuditoria()
     {
         var carpeta = Path.Combine(FindBackEnd(), "CACC.DAO");

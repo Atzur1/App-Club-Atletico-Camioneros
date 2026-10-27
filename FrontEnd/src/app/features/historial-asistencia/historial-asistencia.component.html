@@ -1,0 +1,71 @@
+<section class="attendance-page">
+  <header class="page-heading">
+    <div>
+      <p class="eyebrow">Seguimiento del jugador</p>
+      <h1>Historial de asistencia</h1>
+      <p *ngIf="jugador as player" class="player-summary">
+        <strong>{{ player.nombre }} {{ player.apellido }}</strong>
+        <span>DNI: {{ player.dni }}</span>
+        <span>{{ player.categoria }}</span>
+      </p>
+    </div>
+    <button type="button" class="button secondary" (click)="volverAlPerfil()">← Volver al perfil</button>
+  </header>
+
+  <form class="filters-card" (ngSubmit)="buscar()">
+    <div class="field">
+      <label for="attendance-from">Desde</label>
+      <input id="attendance-from" type="date" name="desde" [(ngModel)]="desde" />
+    </div>
+    <div class="field">
+      <label for="attendance-to">Hasta</label>
+      <input id="attendance-to" type="date" name="hasta" [(ngModel)]="hasta" />
+    </div>
+    <div class="field">
+      <label for="attendance-state">Estado</label>
+      <select id="attendance-state" name="estado" [(ngModel)]="estado">
+        <option value="">Todos</option>
+        <option value="PERMITIDO">Permitido</option>
+        <option value="DENEGADO">Denegado</option>
+      </select>
+    </div>
+    <div class="filter-actions">
+      <button type="submit" class="button primary">Buscar</button>
+      <button type="button" class="button secondary" (click)="limpiarFiltros()">Limpiar</button>
+    </div>
+    <p *ngIf="errorFiltros" class="filter-error" role="alert">{{ errorFiltros }}</p>
+  </form>
+
+  <section class="history-card" aria-live="polite">
+    <p *ngIf="cargando" class="state-message">Cargando asistencias…</p>
+    <div *ngIf="error && !cargando" class="state-message error" role="alert">
+      <p>{{ error }}</p>
+      <button type="button" class="button secondary" (click)="buscar()">Reintentar</button>
+    </div>
+    <p *ngIf="!cargando && !error && asistencias.length === 0" class="state-message">
+      No hay asistencias registradas para los filtros seleccionados.
+    </p>
+
+    <div *ngIf="!cargando && !error && asistencias.length > 0" class="table-wrapper">
+      <table>
+        <thead>
+          <tr><th>Fecha</th><th>Hora</th><th>Estado</th><th>Observaciones</th></tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let asistencia of asistencias">
+            <td data-label="Fecha">{{ asistencia.fechaHora | date:'dd/MM/yyyy' }}</td>
+            <td data-label="Hora">{{ asistencia.fechaHora | date:'HH:mm' }}</td>
+            <td data-label="Estado"><span class="status-badge" [class.denied]="asistencia.estadoAcceso === 'DENEGADO'">{{ asistencia.estadoAcceso || 'Sin informar' }}</span></td>
+            <td data-label="Observaciones">
+              <ng-container *ngIf="presentarObservacion(asistencia.observaciones) as observacion">
+                <span *ngIf="observacion.metodo" class="registration-method">{{ observacion.metodo }}</span>
+                <span *ngIf="observacion.detalle">{{ observacion.detalle }}</span>
+                <span *ngIf="!observacion.metodo && !observacion.detalle" class="empty-observation">Sin observaciones</span>
+              </ng-container>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+</section>

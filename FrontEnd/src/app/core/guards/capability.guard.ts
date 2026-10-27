@@ -7,5 +7,5 @@ export const capabilityGuard: CanActivateFn = route => {
   const auth = inject(AuthService);
   const required = (route.data?.['capabilities'] ?? []) as Capability[];
   return required.some(capability => auth.puede(capability))
-    ? true : inject(Router).createUrlTree(['/sin-autorizacion']);
+    ? true : inject(Router).createUrlTree(['/acceso-denegado']);
 };

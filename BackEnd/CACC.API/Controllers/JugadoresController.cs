@@ -30,7 +30,7 @@ namespace CACC.API.Controllers
         {
             IEnumerable<JugadorDetalle> jugadoresDb;
 
-            if (_access.IsDirectorTecnico)
+            if (_access.IsCategoryScoped)
             {
                 if (categoriaId.HasValue && categoriaId.Value > 0)
                 {

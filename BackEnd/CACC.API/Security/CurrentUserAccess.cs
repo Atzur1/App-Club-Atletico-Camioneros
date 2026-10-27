@@ -6,6 +6,7 @@ public interface ICurrentUserAccess
 {
     bool IsAdmin { get; }
     bool IsDirectorTecnico { get; }
+    bool IsCategoryScoped { get; }
     IReadOnlySet<int> CategoriaIds { get; }
     bool PuedeAccederCategoria(int categoriaId);
     bool PuedeAccederAlgunaCategoria(IEnumerable<int> categoriaIds);
@@ -19,14 +20,16 @@ public sealed class CurrentUserAccess(IHttpContextAccessor httpContextAccessor) 
 
     public bool IsDirectorTecnico => User.IsInRole(AppRoles.DirectorTecnico);
 
+    public bool IsCategoryScoped => IsDirectorTecnico || User.IsInRole(AppRoles.PreparadorFisico);
+
     public IReadOnlySet<int> CategoriaIds => User.FindAll("id_categoria")
         .Select(claim => int.TryParse(claim.Value, out var id) ? id : 0)
         .Where(id => id > 0)
         .ToHashSet();
 
     public bool PuedeAccederCategoria(int categoriaId) =>
-        !IsDirectorTecnico || CategoriaIds.Contains(categoriaId);
+        !IsCategoryScoped || CategoriaIds.Contains(categoriaId);
 
     public bool PuedeAccederAlgunaCategoria(IEnumerable<int> categoriaIds) =>
-        !IsDirectorTecnico || PlayerCategoryScope.CanAccess(CategoriaIds, null, categoriaIds);
+        !IsCategoryScoped || PlayerCategoryScope.CanAccess(CategoriaIds, null, categoriaIds);
 }

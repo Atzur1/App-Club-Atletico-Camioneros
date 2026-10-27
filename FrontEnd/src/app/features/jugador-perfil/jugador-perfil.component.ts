@@ -332,24 +332,36 @@ export class JugadorPerfilComponent implements OnInit {
 
   volver(): void { this.router.navigate([this.rutaPorRol('Jugadores')]); }
 
+  verHistorialAsistencia(): void {
+    this.router.navigate(['/', this.normalizarRutaRol(), 'jugadores', this.playerId, 'asistencias']);
+  }
+
+  private normalizarRutaRol(): string {
+    const roleId = this.authService.getRoleId();
+    if (roleId === RoleId.Medico) return 'medico';
+    if (roleId === RoleId.DirectorTecnico || roleId === RoleId.PreparadorFisico) return 'dt';
+    if (roleId === RoleId.Coordinador) return 'coordinador';
+    return 'admin';
+  }
+
   editarFichaMedica(): void {
     if (this.jugador && this.puedeEditarFichaMedica) {
-      this.router.navigate(['/medico/editar-ficha', this.jugador.id]);
+      this.router.navigate(['/medico/jugadores', this.jugador.id, 'ficha-medica']);
     }
   }
 
   private rutaPorRol(seccion: string): string {
     const roleId = this.authService.getRoleId();
     const categorias = seccion === 'Categorias' || seccion === 'Categorías';
-    if (roleId === RoleId.Medico) return seccion === 'Inicio' ? '/medico' : categorias ? '/medico/categorias' : '/medico/lista-jugadores';
-    if (roleId === RoleId.DirectorTecnico || roleId === RoleId.PreparadorFisico) return seccion === 'Inicio' ? '/dt' : categorias ? '/dt/categorias' : '/dt-categoria-jugadores';
-    if (roleId === RoleId.Coordinador) return seccion === 'Inicio' ? '/coordinador' : categorias ? '/coordinador-seleccion-categorias' : '/coordinador-lista-jugadores';
-    return seccion === 'Inicio' ? '/admin' : categorias ? '/admin/categorias' : seccion === 'Staff' ? '/admin/staff' : '/admin/lista-jugadores';
+    if (roleId === RoleId.Medico) return seccion === 'Inicio' ? '/medico' : categorias ? '/medico/categorias' : '/medico/jugadores';
+    if (roleId === RoleId.DirectorTecnico || roleId === RoleId.PreparadorFisico) return seccion === 'Inicio' ? '/dt' : categorias ? '/dt/categorias' : '/dt/jugadores';
+    if (roleId === RoleId.Coordinador) return seccion === 'Inicio' ? '/coordinador' : categorias ? '/coordinador/categorias' : '/coordinador/jugadores';
+    return seccion === 'Inicio' ? '/admin' : categorias ? '/admin/categorias' : seccion === 'Staff' ? '/admin/staff' : '/admin/jugadores';
   }
 
   editarPerfil(): void {
     if (this.jugador) {
-      this.router.navigate(['/admin/editar-perfil', this.jugador.id]);
+      this.router.navigate(['/admin/jugadores', this.jugador.id, 'editar']);
     }
   }
 
@@ -359,7 +371,7 @@ export class JugadorPerfilComponent implements OnInit {
 
   descargarCredencial(): void {
     if (!this.jugador || !this.puedeGenerarCredencial) return;
-    this.http.get(`http://localhost:5191/api/credenciales/jugador/${this.jugador.id}/pdf`, { responseType: 'blob' }).subscribe({
+    this.http.get(`/api/credenciales/jugador/${this.jugador.id}/pdf`, { responseType: 'blob' }).subscribe({
       next: blob => {
         const url = URL.createObjectURL(blob);
         const link = document.createElement('a');

@@ -88,7 +88,7 @@ export class CoordinadorVisualizarPerfilStaff implements OnInit {
   navItems = [
     { label: 'Inicio', icon: 'home', active: false, route: '/coordinador' },
     { label: 'Jugadores', icon: 'group', active: false, route: '/coordinador/jugadores' },
-    { label: 'Staff', icon: 'badge', active: true, route: '/coordinador/visualizar-staff' },
+    { label: 'Staff', icon: 'badge', active: true, route: '/coordinador/staff' },
     { label: 'Categorias', icon: 'category', active: false, route: '/coordinador/categorias' }
   ];
 
@@ -129,7 +129,7 @@ export class CoordinadorVisualizarPerfilStaff implements OnInit {
   }
 
   editarPerfil() {
-    this.router.navigate(['/coordinador/editar-staff'], {
+    this.router.navigate(['/coordinador/staff/editar'], {
       queryParams: { staff: this.staffMember.name }
     });
   }

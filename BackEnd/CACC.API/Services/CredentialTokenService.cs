@@ -13,7 +13,14 @@ public sealed class CredentialTokenService : ICredentialTokenService
     public CredentialTokenService(IConfiguration configuration)
     {
         var value = configuration["CredentialQr:HmacKey"];
-        if (string.IsNullOrWhiteSpace(value)) throw new InvalidOperationException("Configure CredentialQr:HmacKey mediante user-secrets o variable de entorno.");
+        if (string.IsNullOrWhiteSpace(value))
+        {
+            var jwtKey = configuration["JwtSettings:Key"]
+                ?? throw new InvalidOperationException("Falta una clave para firmar las credenciales QR.");
+            key = Encoding.UTF8.GetBytes(jwtKey);
+            if (key.Length < 32) throw new InvalidOperationException("JwtSettings:Key debe contener al menos 256 bits.");
+            return;
+        }
         try { key = Convert.FromBase64String(value); } catch (FormatException ex) { throw new InvalidOperationException("CredentialQr:HmacKey debe estar en Base64.", ex); }
         if (key.Length < 32) throw new InvalidOperationException("CredentialQr:HmacKey debe contener al menos 256 bits.");
     }

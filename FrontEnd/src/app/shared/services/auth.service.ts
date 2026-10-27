@@ -9,9 +9,7 @@ import { PORTALES } from '../../core/auth/portales.config';
 })
 export class AuthService {
   private readonly http = inject(HttpClient);
-  // Keep the API host aligned with the development frontend host. Browsers treat
-  // localhost and 127.0.0.1 as different origins even when they reach this machine.
-  private readonly apiUrl = 'http://127.0.0.1:5191/api/auth';
+  private readonly apiUrl = '/api/auth';
 
   login(credenciales: { email: string; password: string }): Observable<any> {
     return this.http.post<any>(`${this.apiUrl}/login`, credenciales).pipe(

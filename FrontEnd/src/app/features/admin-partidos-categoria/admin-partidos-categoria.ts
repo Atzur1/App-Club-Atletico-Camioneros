@@ -127,7 +127,7 @@ export class AdminPartidosCategoria implements OnInit {
   }
 
   cargarDatosCategoria(): void {
-    this.http.get<any>(`http://localhost:5191/api/categorias/${this.categoriaId}`).subscribe({
+    this.http.get<any>(`/api/categorias/${this.categoriaId}`).subscribe({
       next: (data) => {
         this.categoriaNombre = data.nombreCategoria || 'División';
       },
@@ -137,7 +137,7 @@ export class AdminPartidosCategoria implements OnInit {
 
   cargarPartidos(): void {
     this.cargando = true;
-    this.http.get<any[]>(`http://localhost:5191/api/categorias/${this.categoriaId}/partidos`).subscribe({
+    this.http.get<any[]>(`/api/categorias/${this.categoriaId}/partidos`).subscribe({
       next: (data) => {
         this.cargando = false;
         this.partidos = data.map(p => {
@@ -199,7 +199,7 @@ export class AdminPartidosCategoria implements OnInit {
     this.marcador = '';
     this.observaciones = '';
 
-    this.http.get<any[]>(`http://localhost:5191/api/categorias/${this.categoriaId}/jugadores`).subscribe({
+    this.http.get<any[]>(`/api/categorias/${this.categoriaId}/jugadores`).subscribe({
       next: (data) => {
         this.jugadoresMinutos = data.map(j => ({
           idJugador: j.idJugador,
@@ -229,9 +229,9 @@ export class AdminPartidosCategoria implements OnInit {
       this.marcador = p.resultado;
     }
 
-    this.http.get<any>(`http://localhost:5191/api/categorias/${this.categoriaId}/partidos/${p.idPartido}`).subscribe({
+    this.http.get<any>(`/api/categorias/${this.categoriaId}/partidos/${p.idPartido}`).subscribe({
       next: (detalle) => {
-        this.http.get<any[]>(`http://localhost:5191/api/categorias/${this.categoriaId}/jugadores`).subscribe({
+        this.http.get<any[]>(`/api/categorias/${this.categoriaId}/jugadores`).subscribe({
           next: (plantel) => {
             this.jugadoresMinutos = plantel.map(j => {
               const jugado = (detalle.jugadoresMinutos || []).find((jm: any) => jm.idJugador === j.idJugador);
@@ -270,7 +270,7 @@ export class AdminPartidosCategoria implements OnInit {
 
     this.guardando = true;
     if (this.modoEdicion) {
-      this.http.put(`http://localhost:5191/api/categorias/${this.categoriaId}/partidos/${this.partidoIdSeleccionado}`, payload).subscribe({
+      this.http.put(`/api/categorias/${this.categoriaId}/partidos/${this.partidoIdSeleccionado}`, payload).subscribe({
         next: () => {
           this.guardando = false;
           this.modalFormVisible = false;
@@ -282,7 +282,7 @@ export class AdminPartidosCategoria implements OnInit {
         }
       });
     } else {
-      this.http.post(`http://localhost:5191/api/categorias/${this.categoriaId}/partidos`, payload).subscribe({
+      this.http.post(`/api/categorias/${this.categoriaId}/partidos`, payload).subscribe({
         next: () => {
           this.guardando = false;
           this.modalFormVisible = false;
@@ -297,7 +297,7 @@ export class AdminPartidosCategoria implements OnInit {
   }
 
   verDetalle(p: PartidoItem): void {
-    this.http.get<any>(`http://localhost:5191/api/categorias/${this.categoriaId}/partidos/${p.idPartido}`).subscribe({
+    this.http.get<any>(`/api/categorias/${this.categoriaId}/partidos/${p.idPartido}`).subscribe({
       next: (data) => {
         this.partidoDetalle = data;
         this.modalDetalleVisible = true;
@@ -314,7 +314,7 @@ export class AdminPartidosCategoria implements OnInit {
     if (!this.partidoAEliminar) return;
 
     this.eliminando = true;
-    this.http.delete(`http://localhost:5191/api/categorias/${this.categoriaId}/partidos/${this.partidoAEliminar.idPartido}`).subscribe({
+    this.http.delete(`/api/categorias/${this.categoriaId}/partidos/${this.partidoAEliminar.idPartido}`).subscribe({
       next: () => {
         this.eliminando = false;
         this.modalEliminarVisible = false;

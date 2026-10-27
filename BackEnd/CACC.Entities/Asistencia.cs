@@ -4,8 +4,9 @@ namespace CACC.Entities
     {
         public int IdAsistencia { get; set; }
         public int IdJugador { get; set; }
-        public int IdStaff { get; set; }
+        public int? IdStaff { get; set; }
         public DateTime FechaHora { get; set; }
         public string EstadoAcceso { get; set; } = string.Empty;
+        public string? Observaciones { get; set; }
     }
 }

@@ -116,7 +116,7 @@ export class AdminStaffEditarFicha implements OnInit {
   }
 
   private cargarCategorias(): void {
-    this.http.get<any[]>('http://localhost:5191/api/categorias').subscribe({
+    this.http.get<any[]>('/api/categorias').subscribe({
       next: (data) => {
         this.listaCategorias = data.map(c => ({
           idCategoria: c.idCategoria || c.PK_id_categoria,
@@ -129,7 +129,7 @@ export class AdminStaffEditarFicha implements OnInit {
 
   private cargarDatosStaff(id: number): void {
     this.isLoading = true;
-    this.http.get<any>(`http://localhost:5191/api/staff/${id}`).subscribe({
+    this.http.get<any>(`/api/staff/${id}`).subscribe({
       next: (s) => {
         this.isLoading = false;
         this.nombre = s.nombre || '';
@@ -274,7 +274,7 @@ export class AdminStaffEditarFicha implements OnInit {
     };
 
     this.isSaving = true;
-    this.http.put(`http://localhost:5191/api/staff/${this.staffId}`, payload).subscribe({
+    this.http.put(`/api/staff/${this.staffId}`, payload).subscribe({
       next: () => {
         this.isSaving = false;
         this.mensajeExito = true;

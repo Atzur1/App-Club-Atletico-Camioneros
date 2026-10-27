@@ -111,7 +111,7 @@ export class AdminStaffVerFicha implements OnInit {
 
   private cargarFichaStaff(id: number): void {
     this.isLoading = true;
-    this.http.get<StaffFichaDetalle>(`http://localhost:5191/api/staff/${id}`).subscribe({
+    this.http.get<StaffFichaDetalle>(`/api/staff/${id}`).subscribe({
       next: (s) => {
         this.isLoading = false;
         this.nombreCompleto = (s.nombreCompleto || `${s.nombre || ''} ${s.apellido || ''}`).trim().toUpperCase();

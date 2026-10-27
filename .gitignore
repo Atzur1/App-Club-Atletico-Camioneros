@@ -6,6 +6,8 @@
 **/out-tsc/
 **/bazel-out/
 **/coverage/
+**/.cache/
+**/artifacts/
 
 # .NET build and user output
 **/bin/
@@ -14,6 +16,10 @@
 **/TestResults/
 *.user
 *.suo
+*.userosscache
+*.sln.docstates
+*.nupkg
+*.snupkg
 
 # Local runtime state
 .runtime/
@@ -38,6 +44,21 @@ Thumbs.db
 .env.*
 !.env.example
 .agents/test-users.local.md
+**/appsettings.json
+secrets.json
+appsettings.Local.json
+appsettings.*.local.json
+
+# Local databases, backups and certificates
+*.db
+*.db-shm
+*.db-wal
+*.sqlite
+*.sqlite3
+*.bak
+*.pfx
+*.p12
+*.key
 
 # Archives and temporary files
 *.zip

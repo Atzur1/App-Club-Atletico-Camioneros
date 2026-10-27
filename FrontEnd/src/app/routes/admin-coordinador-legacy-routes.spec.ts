@@ -1,7 +1,16 @@
 import { ADMIN_ROUTES } from './admin.routes';
 import { COORDINADOR_ROUTES } from './coordinador.routes';
 
+const setMobileViewport = (matches: boolean) => {
+  Object.defineProperty(window, 'matchMedia', {
+    configurable: true,
+    value: () => ({ matches }) as MediaQueryList,
+  });
+};
+
 describe('Admin and Coordinator legacy visual routes', () => {
+  beforeEach(() => setMobileViewport(true));
+
   const assertComponents = async (routes: typeof ADMIN_ROUTES, expected: Record<string, string>) => {
     for (const [path, name] of Object.entries(expected)) {
       const route = routes.find(candidate => candidate.path === path);
@@ -28,6 +37,17 @@ describe('Admin and Coordinator legacy visual routes', () => {
       categorias: 'CoordinadorSeleccionCategorias',
       'categorias/:id': 'CoordinadorVisualizarPlantel',
       'jugadores/:id/ficha-medica': 'CoordinadorMedicalPage',
+    });
+  });
+
+  it('uses the pre-mobile shared presentations on tablet and desktop', async () => {
+    setMobileViewport(false);
+    await assertComponents(COORDINADOR_ROUTES, {
+      jugadores: 'AdminListaJugadores',
+      'jugadores/:id': 'JugadorPerfilComponent',
+      categorias: 'AdminListaCategoria',
+      'categorias/:id': 'AdminCategoriaJugadores',
+      'jugadores/:id/ficha-medica': 'JugadorPerfilComponent',
     });
   });
 });

@@ -21,9 +21,10 @@ describe('SemaforoQrComponent', () => {
   });
 
   it('announces and focuses an idempotently registered result', fakeAsync(() => {
-    registrar.and.returnValue(of({ accesoPermitido: true, asistenciaRegistrada: true, yaRegistrada: true, mensaje: 'Ya registrada' }));
+    registrar.and.returnValue(of({ accesoPermitido: true, estadoAcceso: 'PERMITIDO', asistenciaRegistrada: true, yaRegistrada: true, mensaje: 'Ya registrada' }));
     fixture.componentInstance.dni = '40111222';
     fixture.componentInstance.submitManual();
+    expect(registrar).toHaveBeenCalledWith('40111222', 'DNI_MANUAL');
     fixture.detectChanges();
     tick();
     const result = fixture.nativeElement.querySelector('[role="status"].result-card') as HTMLElement;
@@ -92,11 +93,28 @@ describe('SemaforoQrComponent', () => {
   });
 
   it('does not show green or yellow without backend attendance confirmation', () => {
-    registrar.and.returnValue(of({ accesoPermitido: true, asistenciaRegistrada: false, yaRegistrada: false, mensaje: 'No confirmada' }));
+    registrar.and.returnValue(of({ accesoPermitido: true, estadoAcceso: 'PERMITIDO', asistenciaRegistrada: false, yaRegistrada: false, mensaje: 'No confirmada' }));
     fixture.componentInstance.dni = '40111222';
     fixture.componentInstance.submitManual();
     fixture.detectChanges();
     expect(fixture.nativeElement.querySelector('.result-card')).toBeNull();
     expect(fixture.nativeElement.querySelector('[role="alert"]').textContent).toContain('no confirmó');
+  });
+
+  it('shows a recorded denied attempt as the red semaphore result', () => {
+    registrar.and.returnValue(of({ accesoPermitido: false, estadoAcceso: 'DENEGADO', asistenciaRegistrada: true, yaRegistrada: false, mensaje: 'Acceso denegado. El intento de ingreso fue registrado.' }));
+    fixture.componentInstance.dni = '99000002';
+    fixture.componentInstance.submitManual();
+    fixture.detectChanges();
+    const result = fixture.nativeElement.querySelector('.result-card') as HTMLElement;
+    expect(result.classList).toContain('red');
+    expect(result.textContent).toContain('Jugador inhabilitado');
+    expect(result.textContent).toContain('intento de ingreso fue registrado');
+  });
+
+  it('marks camera payloads as QR credential reads', () => {
+    registrar.and.returnValue(of({ accesoPermitido: true, estadoAcceso: 'PERMITIDO', asistenciaRegistrada: true, yaRegistrada: false, mensaje: 'Registrada' }));
+    (fixture.componentInstance as any).processPayload('99000001', 'QR');
+    expect(registrar).toHaveBeenCalledWith('99000001', 'QR');
   });
 });

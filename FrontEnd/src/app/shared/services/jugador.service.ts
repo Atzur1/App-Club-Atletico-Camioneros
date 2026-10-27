@@ -7,7 +7,7 @@ import { CrearJugadorModel, JugadorModel } from '../models/jugador.model';
 export class JugadorService {
   private http = inject(HttpClient);
   // Apunta directamente a tu API en C#
-  private apiUrl = 'http://localhost:5191/api/jugadores';
+  private apiUrl = '/api/jugadores';
 
   // Obtener la lista completa
   obtenerJugadores(): Observable<JugadorModel[]> {

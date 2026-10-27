@@ -33,6 +33,7 @@ builder.Services.AddScoped<IStaffDao, StaffDao>();
 builder.Services.AddScoped<IJugadorDao, JugadorDao>();
 builder.Services.AddScoped<IFichaMedicaDao, FichaMedicaDao>();
 builder.Services.AddScoped<IAsistenciaDao, AsistenciaDao>();
+builder.Services.AddScoped<ICredentialDao, CredentialDao>();
 builder.Services.AddScoped<IQrService, QrService>();
 
 // La deuda de cada jugador la informa el Portal Administrativo: es la única fuente de verdad.
@@ -47,6 +48,9 @@ builder.Services.AddHttpClient<IEstadoDeudaClient, EstadoDeudaClient>(client =>
     client.BaseAddress = new Uri(administrativoUrl.AbsoluteUri.TrimEnd('/') + "/");
     client.Timeout = TimeSpan.FromSeconds(Math.Clamp(administrativo.TimeoutSegundos, 1, 30));
 });
+builder.Services.AddSingleton<ICredentialTokenService, CredentialTokenService>();
+builder.Services.AddSingleton<ICredentialPdfService>(_ => new CredentialPdfService(
+    Path.Combine(builder.Environment.ContentRootPath, "Assets", "Credentials")));
 builder.Services.AddHttpContextAccessor();
 builder.Services.AddScoped<ICurrentUserAccess, CurrentUserAccess>();
 builder.Services.AddScoped<CACC.API.Authorization.IUserScopeService, CACC.API.Authorization.UserScopeService>();

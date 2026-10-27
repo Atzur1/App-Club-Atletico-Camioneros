@@ -82,9 +82,7 @@ export class CoordinadorSeleccionCategorias implements OnInit {
   }
 
   onViewCategory(categoryName: string): void {
-    this.router.navigate(['/coordinador/visualizar-plantel'], {
-      queryParams: { cat: categoryName }
-    });
+    this.router.navigate(['/coordinador/categorias']);
   }
 
   verCategoria(id: number): void {

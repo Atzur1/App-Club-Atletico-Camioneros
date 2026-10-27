@@ -46,7 +46,7 @@ export class CoordinadorEditarHistorial implements OnInit {
   navItems = [
     { label: 'Inicio', icon: 'home', active: false, route: '/coordinador' },
     { label: 'Jugadores', icon: 'group', active: true, route: '/coordinador/jugadores' },
-    { label: 'Staff', icon: 'badge', active: false, route: '/coordinador/visualizar-staff' },
+    { label: 'Staff', icon: 'badge', active: false, route: '/coordinador/staff' },
     { label: 'Categorias', icon: 'category', active: false, route: '/coordinador/categorias' }
   ];
 
@@ -182,13 +182,13 @@ export class CoordinadorEditarHistorial implements OnInit {
   }
 
   cancelar() {
-    this.router.navigate(['/coordinador/visualizar-perfil'], {
+    this.router.navigate(['/coordinador/jugadores'], {
       queryParams: { player: this.player.nombreCompleto }
     });
   }
 
   guardar() {
-    this.router.navigate(['/coordinador/visualizar-perfil'], {
+    this.router.navigate(['/coordinador/jugadores'], {
       queryParams: { player: this.player.nombreCompleto }
     });
   }

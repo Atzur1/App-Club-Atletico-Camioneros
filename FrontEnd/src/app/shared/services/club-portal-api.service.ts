@@ -3,7 +3,7 @@ import { Injectable, inject } from '@angular/core';
 import { Observable } from 'rxjs';
 import { CategorySummary, MedicalRecord, PlayerProfile, PlayerSummary, RosterPlayer } from '../models/portal.models';
 
-const API_ROOT = 'http://127.0.0.1:5191/api';
+const API_ROOT = '/api';
 
 @Injectable({ providedIn: 'root' })
 export class ClubPortalApiService {

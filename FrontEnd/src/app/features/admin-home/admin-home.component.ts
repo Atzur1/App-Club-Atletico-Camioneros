@@ -4,6 +4,7 @@ import { FormsModule } from '@angular/forms';
 import { Router, RouterModule } from '@angular/router';
 import { HttpClient } from '@angular/common/http';
 import { AuthService } from '../../shared/services/auth.service';
+import { normalizeRole } from '../../core/auth/roles';
 
 interface TutorInfo {
   nombre?: string;
@@ -72,7 +73,19 @@ export class AdminHomeComponent implements OnInit {
   players: Player[] = [];
   listaCategorias: Categoria[] = [];
 
+  get esAdministrador(): boolean {
+    return this.limpiarNombreRol(this.authService.getRol() ?? '') === 'Administrador';
+  }
+
+  get tituloPanel(): string {
+    return `Panel Principal de ${this.limpiarNombreRol(this.authService.getRol() ?? '')}`;
+  }
+
   ngOnInit(): void {
+    const rol = this.limpiarNombreRol(this.authService.getRol() ?? '');
+    if (rol !== 'Administrador' && rol !== 'Coordinador') {
+      this.navItems = this.navItems.filter((item) => item.label !== 'Staff');
+    }
     this.cargarUsuario();
     this.cargarDatos();
     this.cargarCategoriasBd();
@@ -104,7 +117,7 @@ export class AdminHomeComponent implements OnInit {
   }
 
   private cargarDatos(): void {
-    this.http.get<any[]>('http://localhost:5191/api/jugadores').subscribe({
+    this.http.get<any[]>('/api/jugadores').subscribe({
       next: (data) => {
         this.players = data.map(j => {
           let fechaFormateada = 'Sin informar';
@@ -137,7 +150,7 @@ export class AdminHomeComponent implements OnInit {
   }
 
   private cargarCategoriasBd(): void {
-    this.http.get<Categoria[]>('http://localhost:5191/api/categorias').subscribe({
+    this.http.get<Categoria[]>('/api/categorias').subscribe({
       next: (data) => {
         this.listaCategorias = data;
         this.kpiCards[1].value = `+${data.length}`;
@@ -232,10 +245,13 @@ export class AdminHomeComponent implements OnInit {
   selectNav(label: string): void {
     this.navItems.forEach(item => item.active = (item.label === label));
     this.activeTab = label;
-    if (label === 'Jugadores') this.router.navigate(['/admin/jugadores']);
-    else if (label === 'Inicio') this.router.navigate(['/admin']);
-    else if (label === 'Categorias' || label === 'Categorías') this.router.navigate(['/admin/categorias']);
-    else if (label === 'Staff') this.router.navigate(['/admin/staff']);
+    const role = normalizeRole(this.authService.getRol());
+    const portalBase = role && role !== 'don-qr' ? `/${role}` : '/admin';
+
+    if (label === 'Jugadores') this.router.navigate([`${portalBase}/jugadores`]);
+    else if (label === 'Inicio') this.router.navigate([portalBase]);
+    else if (label === 'Categorias' || label === 'Categorías') this.router.navigate([`${portalBase}/categorias`]);
+    else if (label === 'Staff') this.router.navigate([`${portalBase}/staff`]);
   }
 
   getBadgeClass(estado: Player['estadoCuota']): string {

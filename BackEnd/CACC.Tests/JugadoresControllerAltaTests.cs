@@ -119,6 +119,7 @@ public class JugadoresControllerAltaTests
     {
         public bool IsAdmin => true;
         public bool IsDirectorTecnico => false;
+        public bool IsCategoryScoped => false;
         public IReadOnlySet<int> CategoriaIds => new HashSet<int>();
         public bool PuedeAccederCategoria(int categoriaId) => true;
         public bool PuedeAccederAlgunaCategoria(IEnumerable<int> categoriaIds) => true;

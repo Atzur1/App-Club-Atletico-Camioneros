@@ -79,5 +79,49 @@ namespace CACC.DAO
                 throw;
             }
         }
+
+        public async Task<IReadOnlyList<Asistencia>> ObtenerHistorialJugadorAsync(
+            int idJugador,
+            DateTime? desde,
+            DateTime? hasta,
+            string? estado)
+        {
+            const string query = @"SELECT PK_id_asistencia, FK_id_jugador, FK_id_staff,
+                    fecha_hora, estado_acceso, observaciones
+                FROM ASISTENCIAS
+                WHERE FK_id_jugador = @IdJugador
+                  AND (@Desde IS NULL OR fecha_hora >= @Desde)
+                  AND (@HastaExclusiva IS NULL OR fecha_hora < @HastaExclusiva)
+                  AND (@Estado IS NULL OR estado_acceso = @Estado)
+                ORDER BY fecha_hora DESC, PK_id_asistencia DESC";
+
+            await using var connection = new SqlConnection(_connectionString);
+            await connection.OpenAuditadaAsync();
+            await using var command = new SqlCommand(query, connection);
+            command.Parameters.Add("@IdJugador", SqlDbType.Int).Value = idJugador;
+            command.Parameters.Add("@Desde", SqlDbType.DateTime).Value =
+                desde.HasValue ? desde.Value.Date : DBNull.Value;
+            command.Parameters.Add("@HastaExclusiva", SqlDbType.DateTime).Value =
+                hasta.HasValue ? hasta.Value.Date.AddDays(1) : DBNull.Value;
+            command.Parameters.Add("@Estado", SqlDbType.VarChar, 50).Value =
+                string.IsNullOrWhiteSpace(estado) ? DBNull.Value : estado.Trim();
+
+            var asistencias = new List<Asistencia>();
+            await using var reader = await command.ExecuteReaderAsync();
+            while (await reader.ReadAsync())
+            {
+                asistencias.Add(new Asistencia
+                {
+                    IdAsistencia = reader.GetInt32(0),
+                    IdJugador = reader.GetInt32(1),
+                    IdStaff = reader.IsDBNull(2) ? null : reader.GetInt32(2),
+                    FechaHora = reader.GetDateTime(3),
+                    EstadoAcceso = reader.IsDBNull(4) ? string.Empty : reader.GetString(4),
+                    Observaciones = reader.IsDBNull(5) ? null : reader.GetString(5)
+                });
+            }
+
+            return asistencias;
+        }
     }
 }
