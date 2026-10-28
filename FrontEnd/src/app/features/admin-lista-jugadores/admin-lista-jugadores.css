@@ -936,3 +936,72 @@
 --viewport-tier: desktop;
 }
 }
+
+@media (max-width: 767px) {
+  .cacc-table tr {
+    grid-template-columns: 44px minmax(0, 1fr) auto;
+    padding: 14px 16px;
+  }
+
+  .cacc-table td:first-child {
+    display: block;
+    grid-column: 1;
+    grid-row: 1 / span 4;
+    align-self: start;
+  }
+
+  .cacc-table .col-nombre { grid-column: 2; grid-row: 1; font-size: 15px; }
+  .cacc-table .col-estado { grid-column: 3; grid-row: 1; align-self: start; }
+  .cacc-table .col-dni { grid-column: 2; grid-row: 2; }
+  .cacc-table .col-posicion { grid-column: 3; grid-row: 2; justify-self: end; }
+  .cacc-table .col-categoria { grid-column: 2; grid-row: 3; }
+  .cacc-table .col-nacimiento { grid-column: 3; grid-row: 3; justify-self: end; }
+  .cacc-table .col-acciones {
+    grid-column: 2 / 4;
+    grid-row: 4;
+    align-self: end;
+    margin-top: 8px;
+  }
+
+  .cacc-table .badge-status,
+  .cacc-table .badge-posicion {
+    width: auto;
+    min-width: 0;
+    padding: 4px 9px;
+    border-radius: 999px;
+    font-size: 10px;
+    font-weight: 800;
+    line-height: 1.1;
+    white-space: nowrap;
+  }
+
+  .cacc-table .badge-posicion {
+    border: 1px solid #a7f3d0;
+    background: #ecfdf5;
+    color: #007a3d;
+  }
+
+  .cacc-table .actions-wrapper {
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+    gap: 8px;
+  }
+
+  .cacc-table .action-btn {
+    width: 36px;
+    height: 36px;
+    padding: 0;
+    border: 1px solid #d8e1dc;
+    border-radius: 9px;
+    background: #fff;
+    box-shadow: 0 1px 3px rgba(15, 23, 42, 0.06);
+  }
+
+  .cacc-table .view-btn { background: #ecfdf5; border-color: #a7f3d0; }
+  .cacc-table .edit-btn { background: #eff6ff; border-color: #bfdbfe; }
+  .cacc-table .tutor-btn { background: #fff7ed; border-color: #fed7aa; }
+  .cacc-table .delete-btn { background: #fef2f2; border-color: #fecaca; }
+  .cacc-table .tutor-btn .cacc-icon { --cacc-icon-color: #d97706; width: 18px; height: 18px; }
+  .cacc-table .action-btn svg { width: 18px; height: 18px; }
+}

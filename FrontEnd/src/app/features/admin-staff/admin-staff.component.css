@@ -636,3 +636,134 @@
 --viewport-tier: desktop;
 }
 }
+
+/* Staff cards: keep every field inside the mobile viewport. */
+@media (max-width: 767px) {
+  .table-responsive {
+    width: 100%;
+    min-width: 0;
+    overflow: hidden;
+  }
+
+  .cacc-table tbody {
+    width: 100%;
+  }
+
+  .cacc-table tbody tr:not(:has(.no-records)) {
+    width: 100%;
+    min-width: 0;
+    box-sizing: border-box;
+    overflow: hidden;
+    grid-template-columns: 44px minmax(0, 1fr) minmax(92px, 110px);
+    grid-template-rows: auto auto auto auto auto;
+    column-gap: 10px;
+    row-gap: 6px;
+  }
+
+  .cacc-table .col-foto {
+    grid-column: 1;
+    grid-row: 1 / span 4;
+    width: 44px;
+    align-self: start;
+    text-align: left;
+  }
+
+  .cacc-table .user-avatar-circle {
+    width: 40px;
+    height: 40px;
+  }
+
+  .cacc-table .user-avatar-circle svg {
+    width: 22px;
+    height: 22px;
+  }
+
+  .cacc-table .col-nombre {
+    grid-column: 2;
+    grid-row: 1;
+    width: auto;
+    min-width: 0;
+    overflow-wrap: anywhere;
+  }
+
+  .cacc-table .col-dni {
+    grid-column: 3;
+    grid-row: 1;
+    width: auto;
+    min-width: 0;
+    max-width: 110px;
+    justify-self: end;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .cacc-table .col-rol {
+    grid-column: 2;
+    grid-row: 2;
+    width: auto;
+    min-width: 0;
+  }
+
+  .cacc-table .col-categoria {
+    grid-column: 3;
+    grid-row: 2 / span 2;
+    width: auto;
+    min-width: 0;
+    max-width: 110px;
+    justify-self: end;
+    align-self: start;
+    text-align: right;
+  }
+
+  .cacc-table .col-categoria .category-pill {
+    max-width: 100%;
+    box-sizing: border-box;
+    white-space: normal;
+    overflow-wrap: anywhere;
+    text-align: center;
+    line-height: 1.25;
+  }
+
+  .cacc-table .col-edad {
+    grid-column: 2;
+    grid-row: 3;
+    width: auto;
+    min-width: 0;
+  }
+
+  .cacc-table .col-estado {
+    grid-column: 2;
+    grid-row: 4;
+    width: auto;
+    min-width: 0;
+    text-align: left;
+  }
+
+  .cacc-table .col-acciones {
+    grid-column: 2 / 4;
+    grid-row: 5;
+    width: auto;
+    min-width: 0;
+    margin-top: 2px;
+    text-align: left;
+  }
+
+  .cacc-table .action-buttons-group {
+    display: flex;
+    justify-content: flex-start;
+    gap: 8px;
+    flex-wrap: wrap;
+  }
+
+  .cacc-table .btn-action-icon {
+    width: 36px;
+    height: 36px;
+    border-radius: 8px;
+  }
+
+  .cacc-table .no-records {
+    width: 100%;
+    box-sizing: border-box;
+  }
+}

@@ -1,9 +1,10 @@
 <header class="qr-header"><img src="cacc-logo.png" alt="Escudo CACC"><strong>CLUB ATLÉTICO SOCIAL Y<br>DEPORTIVO CAMIONEROS</strong><button type="button" (click)="logout()">Salir</button></header>
 <main class="qr-page">
 <section *ngIf="state!=='result'" class="scanner-card">
-  <div class="viewer"><video #video muted playsinline aria-label="Vista de la cámara para escanear credenciales"></video><span *ngIf="!cameraStarted">▣</span></div>
+  <div class="viewer"><video #video muted playsinline aria-label="Vista de la cámara para escanear credenciales"></video><span *ngIf="!cameraStarted">▣</span><div *ngIf="cameraStarted" class="scan-guide" aria-hidden="true"></div></div>
   <h1>Apunte al código QR del jugador</h1><p>Sostenga el teléfono estable sobre la credencial</p>
   <button *ngIf="!cameraStarted && state!=='loading'" type="button" class="primary" (click)="startCamera()">Activar cámara</button>
+  <button *ngIf="cameraStarted && torchAvailable" type="button" class="torch" [class.active]="torchEnabled" (click)="toggleTorch()">{{torchEnabled ? 'Apagar linterna' : 'Encender linterna'}}</button>
   <p *ngIf="state==='loading'" role="status">Procesando…</p>
 </section>
 <section *ngIf="state!=='result'" class="manual-card"><h2>¿Problemas para leer el código QR?</h2><label for="dni">Ingresá el documento:</label><input id="dni" [(ngModel)]="dni" inputmode="numeric" pattern="[0-9]*" autocomplete="off"><button type="button" class="primary" [disabled]="state==='loading'" (click)="submitManual()">Registrar ingreso</button><p *ngIf="error" class="error" role="alert">{{error}}</p><button *ngIf="state==='permission-error'||state==='error'" type="button" class="link" (click)="retry()">Reintentar cámara</button></section>

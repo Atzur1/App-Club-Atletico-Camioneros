@@ -19,6 +19,7 @@ interface Player {
   nombreCompleto: string;
   dni: string;
   categoria: string;
+  posicion: string;
   fechaNacimiento: string;
   estadoCuota: 'AL DÍA' | 'PENDIENTE' | 'ADEUDA' | 'INHABILITADO' | string;
   tutor?: TutorInfo | null;
@@ -65,9 +66,9 @@ export class AdminHomeComponent implements OnInit {
   ];
 
   kpiCards = [
-    { title: 'Jugadores Registrados', value: '...', type: 'jugadores' },
-    { title: 'Categorías Activas', value: '...', type: 'categorias' },
-    { title: 'Cuotas al Día', value: '...', type: 'cuotas' }
+    { title: 'Jugadores Registrados', shortTitle: 'Jugadores', value: '...', type: 'jugadores' },
+    { title: 'Categorías Activas', shortTitle: 'Categorías', value: '...', type: 'categorias' },
+    { title: 'Cuotas al Día', shortTitle: 'Cuotas', value: '...', type: 'cuotas' }
   ];
 
   players: Player[] = [];
@@ -131,6 +132,7 @@ export class AdminHomeComponent implements OnInit {
             nombreCompleto: `${j.nombre} ${j.apellido}`.trim(),
             dni: j.dni,
             categoria: j.nombreCategoria || 'Sin categoría',
+            posicion: j.posicionCancha || j.posicion || 'Sin posición',
             fechaNacimiento: fechaFormateada,
             estadoCuota: j.estadoCuota || 'AL DÍA',
             tutor: j.tutor || j.Tutor || null

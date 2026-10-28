@@ -423,3 +423,237 @@ html, body { margin: 0; width: 100%; min-height: 100%; box-sizing: border-box; }
   html:focus-within { scroll-behavior: auto; }
   *, *::before, *::after { animation-duration: .01ms; animation-iteration-count: 1; transition-duration: .01ms; }
 }
+/* Institutional icon system: shared across desktop and mobile views. */
+.cacc-icon {
+  --cacc-icon-color: currentColor;
+  display: inline-block;
+  width: 20px;
+  height: 20px;
+  flex: 0 0 auto;
+  background-color: var(--cacc-icon-color);
+  -webkit-mask: var(--cacc-icon-mask) center / contain no-repeat;
+  mask: var(--cacc-icon-mask) center / contain no-repeat;
+}
+
+.cacc-icon-category { --cacc-icon-mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cg fill='none' stroke='black' stroke-width='2.2' stroke-linecap='round' stroke-linejoin='round'%3E%3Ccircle cx='12' cy='7' r='3'/%3E%3Ccircle cx='5' cy='9' r='2'/%3E%3Ccircle cx='19' cy='9' r='2'/%3E%3Cpath d='M6 20v-1a6 6 0 0 1 12 0v1M1 20v-1a4 4 0 0 1 4-4m18 5v-1a4 4 0 0 0-4-4'/%3E%3C/g%3E%3C/svg%3E"); }
+.cacc-icon-profile { --cacc-icon-mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M12 2a10 10 0 1 0 0 20 10 10 0 0 0 0-20Zm0 3a3 3 0 1 1 0 6 3 3 0 0 1 0-6Zm0 14.2a7.2 7.2 0 0 1-6-3.22c.03-1.99 4-3.08 6-3.08s5.97 1.09 6 3.08a7.2 7.2 0 0 1-6 3.22Z'/%3E%3C/svg%3E"); }
+.cacc-icon-calendar { --cacc-icon-mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M5 2h2v3h10V2h2v3h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V7a2 2 0 0 1 2-2h2V2Zm16 9H3v10h18V11Z'/%3E%3C/svg%3E"); }
+.cacc-icon-age { --cacc-icon-mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M11 1h2v5h-2V1ZM9 7h6a3 3 0 0 1 3 3v2h1a3 3 0 0 1 3 3v7H2v-7a3 3 0 0 1 3-3h1v-2a3 3 0 0 1 3-3Zm-1 5h8v-2a1 1 0 0 0-1-1H9a1 1 0 0 0-1 1v2Zm-3 2a1 1 0 0 0-1 1v1c1 .65 2 .65 3 0 1.33-.87 2.67-.87 4 0 1 .65 2 .65 3 0 1.33-.87 2.67-.87 4 0 .67.44 1.33.58 2 .4V15a1 1 0 0 0-1-1H5Zm-1 6h16v-1.55c-1 .12-2-.1-3-.75-.67-.44-1.33-.44-2 0-2 1.3-4 1.3-6 0-.67-.44-1.33-.44-2 0-1 .65-2 .87-3 .75V20Z'/%3E%3C/svg%3E"); }
+.cacc-icon-weight { --cacc-icon-mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M7 2h10l1 5h3l-1.5 15h-15L3 7h3l1-5Zm2 2-.6 3h7.2L15 4H9Zm-3.8 5 1.1 11h11.4l1.1-11H5.2Z'/%3E%3C/svg%3E"); }
+.cacc-icon-height { --cacc-icon-mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='m17 2 4 4h-3v12h3l-4 4-4-4h3V6h-3l4-4ZM7 3a3 3 0 1 1 0 6 3 3 0 0 1 0-6Zm-3 7h6a2 2 0 0 1 2 2v5H9v5H5v-5H2v-5a2 2 0 0 1 2-2Z'/%3E%3C/svg%3E"); }
+.cacc-icon-foot { --cacc-icon-mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M5 2h7v7c0 2 1 3 3 4l5 2c2 .8 3 2 3 4v3H8c-4 0-7-2-7-5 0-2 1-4 4-5V2Zm2 2v10l-2 .7c-1.4.5-2 1.3-2 2.3 0 1.6 2.2 3 5 3h13v-1c0-.8-.5-1.4-1.7-1.9l-5-2C11.4 14 10 12 10 9V4H7Z'/%3E%3C/svg%3E"); }
+.cacc-icon-blood { --cacc-icon-mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M12 1 5.7 8.2A9 9 0 1 0 18.3 8.2L12 1Zm0 19a7 7 0 0 1-4.8-12.1L12 2.5l4.8 5.4A7 7 0 0 1 12 20Z'/%3E%3C/svg%3E"); }
+.cacc-icon-tutor { --cacc-icon-mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M9 3a4 4 0 1 1 0 8 4 4 0 0 1 0-8Zm8-1a3 3 0 1 1 0 6 3 3 0 0 1 0-6ZM2 21v-3a6 6 0 0 1 12 0v3H2Zm13-1v-2a8 8 0 0 0-2-5.3A5 5 0 0 1 22 16v4h-7Z'/%3E%3C/svg%3E"); }
+.cacc-icon-phone { --cacc-icon-mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='m6.6 10.8 2.2-2.2-3.4-6.5L1.5 4c-.8 8.7 7 16.5 15.7 18l1.9-3.9-6.5-3.4-2.2 2.2c-2.8-1.3-5.1-3.5-6.4-6.4l2.6.3Z'/%3E%3C/svg%3E"); }
+.cacc-icon-location { --cacc-icon-mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M12 1a9 9 0 0 0-9 9c0 7 9 13 9 13s9-6 9-13a9 9 0 0 0-9-9Zm0 12a3 3 0 1 1 0-6 3 3 0 0 1 0 6Z'/%3E%3C/svg%3E"); }
+
+.data-icon .cacc-icon { width: 18px; height: 18px; --cacc-icon-color: #007a3d; }
+.avatar-banner-circle .cacc-icon-profile,
+.profile-avatar-banner .cacc-icon-profile { width: 44px; height: 44px; --cacc-icon-color: #007a3d; }
+.profile-avatar .cacc-icon-profile { width: 22px; height: 22px; }
+.category-avatar-circle .cacc-icon-category,
+.user-avatar-circle .cacc-icon-category,
+.category-icon .cacc-icon-category { --cacc-icon-color: #007a3d; }
+
+/* Shared mobile list treatment. Keeps every role close to the desktop visual language. */
+@media (max-width: 767px) {
+  .table-responsive {
+    overflow: visible !important;
+  }
+
+  .cacc-table tbody,
+  .plantel-table tbody {
+    gap: 10px !important;
+  }
+
+  .cacc-table tbody > tr,
+  .plantel-table tbody > tr {
+    min-height: 104px;
+    padding: 14px !important;
+    column-gap: 12px !important;
+    row-gap: 6px !important;
+    border: 1px solid #dbe4df !important;
+    border-left: 4px solid #008443 !important;
+    border-radius: 12px !important;
+    background: #fff !important;
+    box-shadow: 0 2px 7px rgba(15, 23, 42, 0.05) !important;
+  }
+
+  .cacc-table .col-foto,
+  .plantel-table .col-foto {
+    align-self: start !important;
+    padding-top: 1px !important;
+  }
+
+  .user-avatar-circle,
+  .category-avatar-circle,
+  .staff-avatar-circle {
+    width: 40px !important;
+    height: 40px !important;
+    min-width: 40px !important;
+    border-radius: 50% !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    background: #d8f7e7 !important;
+    color: #008443 !important;
+  }
+
+  .user-avatar-circle svg,
+  .category-avatar-circle svg,
+  .staff-avatar-circle svg,
+  .user-avatar-circle .cacc-icon,
+  .category-avatar-circle .cacc-icon,
+  .staff-avatar-circle .cacc-icon {
+    width: 22px !important;
+    height: 22px !important;
+  }
+
+  .cacc-table .col-nombre,
+  .plantel-table .col-nombre,
+  .player-card .player-name,
+  .staff-card .staff-name,
+  .category-card h2 {
+    color: #0f172a !important;
+    font-size: 14px !important;
+    font-weight: 800 !important;
+    line-height: 1.25 !important;
+  }
+
+  .cacc-table .col-acciones,
+  .plantel-table .col-acciones,
+  .cacc-table .actions-wrapper,
+  .plantel-table .actions-wrapper {
+    margin-top: 4px !important;
+  }
+
+  .player-card,
+  .staff-card,
+  .category-card,
+  .category-item-row {
+    padding: 14px !important;
+    border: 1px solid #dbe4df !important;
+    border-left: 4px solid #008443 !important;
+    border-radius: 12px !important;
+    background: #fff !important;
+    box-shadow: 0 2px 7px rgba(15, 23, 42, 0.05) !important;
+  }
+
+  .category-avatar-ring {
+    width: 42px !important;
+    height: 42px !important;
+    min-width: 42px !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    margin: 0 10px 0 0 !important;
+    border: 0 !important;
+  }
+
+  .badge-status,
+  .badge-posicion,
+  .badge-staff-rol,
+  .category-pill,
+  .badge-count {
+    width: auto !important;
+    min-width: 0 !important;
+    padding: 4px 9px !important;
+    border-radius: 999px !important;
+    font-size: 10px !important;
+    font-weight: 800 !important;
+    line-height: 1.1 !important;
+    white-space: nowrap !important;
+  }
+
+  .badge-posicion,
+  .category-pill,
+  .badge-count {
+    border: 1px solid #a7f3d0 !important;
+    background: #ecfdf5 !important;
+    color: #007a3d !important;
+  }
+
+  .actions-wrapper {
+    display: flex !important;
+    align-items: center !important;
+    justify-content: flex-start !important;
+    flex-wrap: wrap !important;
+    gap: 8px !important;
+  }
+
+  .actions-wrapper .action-btn {
+    width: 36px !important;
+    height: 36px !important;
+    min-width: 36px !important;
+    padding: 0 !important;
+    border-radius: 9px !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    box-shadow: 0 1px 3px rgba(15, 23, 42, 0.06) !important;
+  }
+
+  .actions-wrapper .view-btn { background: #ecfdf5 !important; border: 1px solid #a7f3d0 !important; }
+  .actions-wrapper .edit-btn { background: #eff6ff !important; border: 1px solid #bfdbfe !important; }
+  .actions-wrapper .tutor-btn { background: #fff7ed !important; border: 1px solid #fed7aa !important; }
+  .actions-wrapper .delete-btn { background: #fef2f2 !important; border: 1px solid #fecaca !important; }
+
+  .btn-action-tutor {
+    min-height: 36px !important;
+    padding: 0 12px !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    gap: 7px !important;
+    border: 1px solid #a7f3d0 !important;
+    border-radius: 9px !important;
+    background: #ecfdf5 !important;
+    color: #007a3d !important;
+    font: inherit !important;
+    font-size: 12px !important;
+    font-weight: 700 !important;
+    line-height: 1 !important;
+    box-shadow: 0 1px 3px rgba(15, 23, 42, 0.06) !important;
+  }
+
+  .btn-action-tutor .cacc-icon {
+    width: 18px !important;
+    height: 18px !important;
+    --cacc-icon-color: #007a3d;
+  }
+
+  .btn-action-tutor:disabled,
+  .btn-action-tutor.btn-tutor-disabled {
+    border-color: #dbe2df !important;
+    background: #f4f6f5 !important;
+    color: #8a9490 !important;
+    box-shadow: none !important;
+    opacity: 1 !important;
+  }
+
+  .btn-action-tutor:disabled .cacc-icon,
+  .btn-action-tutor.btn-tutor-disabled .cacc-icon {
+    --cacc-icon-color: #8a9490;
+  }
+
+  .no-tutor-container {
+    display: flex !important;
+    align-items: center !important;
+    flex-wrap: wrap !important;
+    gap: 8px !important;
+  }
+
+  .no-tutor-badge {
+    display: inline-flex !important;
+    align-items: center !important;
+    min-height: 28px !important;
+    padding: 4px 9px !important;
+    border: 1px solid #e2e8e5 !important;
+    border-radius: 999px !important;
+    background: #f8faf9 !important;
+    color: #66736d !important;
+    font-size: 11px !important;
+    font-weight: 600 !important;
+    line-height: 1.15 !important;
+  }
+}
