@@ -547,11 +547,13 @@ namespace CACC.DAO
         }
 
         // Borrar un jugador:
-        //  - Sin historial (ningun pago cobrado ni anulado, descuento, asistencia, partido, ni datos cargados en la ficha
-        //    medica) no hay nada que conservar: se elimina por completo, junto con sus cuotas pendientes sin cobrar, y su
-        //    DNI queda libre para volver a darlo de alta (el caso tipico: un alta cargada por error).
-        //  - Con historial es una baja logica: deja de figurar en los listados y de poder ingresar, pero se conserva todo
-        //    (pagos, descuentos, asistencias, ficha medica) y su persona. Si vuelve, se lo reactiva desde el Administrativo.
+        //  - Sin historial (ninguna cuota o inscripcion, ni cobrada ni pendiente; ningun pago anulado, descuento,
+        //    asistencia, partido, ni datos cargados en la ficha medica) no hay nada que conservar ni que cobrar: se elimina
+        //    por completo y su DNI queda libre para volver a darlo de alta (el caso tipico: un alta cargada por error
+        //    antes de que existiera ningun arancel).
+        //  - Con historial, y en particular si debe algo, es una baja logica: deja de figurar en los listados y de poder
+        //    ingresar, pero se conserva todo (cuotas, pagos, descuentos, asistencias, ficha medica) y su persona. Si vuelve,
+        //    se lo reactiva desde el Administrativo. Nunca se borra una deuda.
         // La persona solo se borra si no es tambien tutor, usuario o personal con asistencias.
         public async Task<ResultadoBajaJugador> EliminarAsync(int idJugador)
         {
@@ -563,7 +565,7 @@ namespace CACC.DAO
                 const string queryEstado = @"
                     SELECT j.FK_id_persona,
                            CASE WHEN
-                               EXISTS (SELECT 1 FROM PAGOS WHERE FK_id_jugador = @idJugador AND estado = 1)
+                               EXISTS (SELECT 1 FROM PAGOS WHERE FK_id_jugador = @idJugador)
                             OR EXISTS (SELECT 1 FROM PAGOS_ANULADOS WHERE FK_id_jugador = @idJugador)
                             OR EXISTS (SELECT 1 FROM JUGADORES_DESCUENTOS WHERE FK_id_jugador = @idJugador)
                             OR EXISTS (SELECT 1 FROM ASISTENCIAS WHERE FK_id_jugador = @idJugador)
@@ -612,7 +614,6 @@ namespace CACC.DAO
                 }
 
                 const string queryEliminar = @"
-                    DELETE FROM PAGOS WHERE FK_id_jugador = @idJugador AND estado = 0;
                     DELETE FROM JUGADORES_RESPONSABLES WHERE FK_id_jugador = @idJugador;
                     DELETE FROM JUGADORES_CATEGORIAS WHERE FK_id_jugador = @idJugador;
                     DELETE FROM JUGADORES_PERIODOS WHERE FK_id_jugador = @idJugador;
