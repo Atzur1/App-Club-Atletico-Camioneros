@@ -110,7 +110,7 @@ public class JugadoresControllerAltaTests
         public Task<JugadorDetalle?> ObtenerPorIdAsync(int id) => throw new NotSupportedException();
         public Task<IEnumerable<JugadorDetalle>> ObtenerPorCategoriaAsync(int idCategoria) => throw new NotSupportedException();
         public Task<bool> ActualizarPerfilAsync(int id, JugadorDetalle jugador) => throw new NotSupportedException();
-        public Task<bool> EliminarAsync(int idJugador) => throw new NotSupportedException();
+        public Task<ResultadoBajaJugador> EliminarAsync(int idJugador) => throw new NotSupportedException();
         public Task<TutorDetalle?> BuscarTutorPorDniAsync(string dni) => throw new NotSupportedException();
         public Task<bool> GuardarTutorAsync(int idJugador, string dni, string nombre, string apellido, string parentesco, string telefono, string? email) => throw new NotSupportedException();
     }

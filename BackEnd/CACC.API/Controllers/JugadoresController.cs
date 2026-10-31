@@ -296,13 +296,13 @@ namespace CACC.API.Controllers
         {
             try
             {
-                var eliminado = await _jugadorDao.EliminarAsync(id);
-                if (!eliminado)
+                var resultado = await _jugadorDao.EliminarAsync(id);
+                return resultado switch
                 {
-                    return NotFound(new { message = $"Jugador con ID {id} no encontrado." });
-                }
-
-                return Ok(new { message = "Jugador dado de baja correctamente. Su historial se conserva." });
+                    ResultadoBajaJugador.NoEncontrado => NotFound(new { message = $"Jugador con ID {id} no encontrado." }),
+                    ResultadoBajaJugador.Eliminado => Ok(new { message = "Jugador eliminado. No tenía pagos ni otro historial, así que se borró por completo y su DNI quedó libre.", eliminado = true }),
+                    _ => Ok(new { message = "Jugador dado de baja correctamente. Su historial se conserva.", eliminado = false })
+                };
             }
             catch (Exception ex)
             {

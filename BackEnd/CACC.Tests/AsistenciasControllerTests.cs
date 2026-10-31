@@ -373,7 +373,7 @@ public class AsistenciasControllerTests
         public Task<IEnumerable<JugadorDetalle>> ObtenerPorCategoriaAsync(int idCategoria) => Task.FromResult<IEnumerable<JugadorDetalle>>([]);
         public Task<bool> ActualizarPerfilAsync(int id, JugadorDetalle jugador) => Task.FromResult(false);
         public Task<int> CrearAsync(JugadorAlta dto) => Task.FromResult(0);
-        public Task<bool> EliminarAsync(int idJugador) => Task.FromResult(false);
+        public Task<ResultadoBajaJugador> EliminarAsync(int idJugador) => Task.FromResult(ResultadoBajaJugador.NoEncontrado);
         public Task<TutorDetalle?> BuscarTutorPorDniAsync(string dni) => Task.FromResult<TutorDetalle?>(null);
         public Task<bool> GuardarTutorAsync(int idJugador, string dni, string nombre, string apellido, string parentesco, string telefono, string? email) => Task.FromResult(false);
     }

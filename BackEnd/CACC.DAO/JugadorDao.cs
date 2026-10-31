@@ -546,25 +546,99 @@ namespace CACC.DAO
             }
         }
 
-        // Baja logica: el jugador deja de figurar en los listados y de poder ingresar, pero se conserva todo su historial
-        // (pagos, descuentos, asistencias, ficha medica) y su persona. Si vuelve, se lo da de alta de nuevo.
-        public async Task<bool> EliminarAsync(int idJugador)
+        // Borrar un jugador:
+        //  - Sin historial (ningun pago cobrado ni anulado, descuento, asistencia, partido, ni datos cargados en la ficha
+        //    medica) no hay nada que conservar: se elimina por completo, junto con sus cuotas pendientes sin cobrar, y su
+        //    DNI queda libre para volver a darlo de alta (el caso tipico: un alta cargada por error).
+        //  - Con historial es una baja logica: deja de figurar en los listados y de poder ingresar, pero se conserva todo
+        //    (pagos, descuentos, asistencias, ficha medica) y su persona. Si vuelve, se lo reactiva desde el Administrativo.
+        // La persona solo se borra si no es tambien tutor, usuario o personal con asistencias.
+        public async Task<ResultadoBajaJugador> EliminarAsync(int idJugador)
         {
             using var connection = new SqlConnection(_connectionString);
             await connection.OpenAuditadaAsync();
+            using var transaction = connection.BeginTransaction();
+            try
+            {
+                const string queryEstado = @"
+                    SELECT j.FK_id_persona,
+                           CASE WHEN
+                               EXISTS (SELECT 1 FROM PAGOS WHERE FK_id_jugador = @idJugador AND estado = 1)
+                            OR EXISTS (SELECT 1 FROM PAGOS_ANULADOS WHERE FK_id_jugador = @idJugador)
+                            OR EXISTS (SELECT 1 FROM JUGADORES_DESCUENTOS WHERE FK_id_jugador = @idJugador)
+                            OR EXISTS (SELECT 1 FROM ASISTENCIAS WHERE FK_id_jugador = @idJugador)
+                            OR EXISTS (SELECT 1 FROM JUGADORES_PARTIDOS WHERE FK_id_jugador = @idJugador)
+                            OR EXISTS (SELECT 1 FROM FICHAS_MEDICAS WHERE FK_id_jugador = @idJugador AND (
+                                    NULLIF(LTRIM(RTRIM(obra_social)), '') IS NOT NULL
+                                 OR numero_afiliado_os IS NOT NULL
+                                 OR NULLIF(LTRIM(RTRIM(grupo_sanguineo)), '') IS NOT NULL
+                                 OR NULLIF(LTRIM(RTRIM(factor)), '') IS NOT NULL
+                                 OR NULLIF(LTRIM(RTRIM(antecedentes_salud)), '') IS NOT NULL
+                                 OR NULLIF(LTRIM(RTRIM(medicamentos_cronicos)), '') IS NOT NULL
+                                 OR NULLIF(LTRIM(RTRIM(condiciones_cronicas)), '') IS NOT NULL
+                                 OR apto_fisico_vencimiento IS NOT NULL
+                                 OR NULLIF(LTRIM(RTRIM(observaciones)), '') IS NOT NULL))
+                           THEN 1 ELSE 0 END AS tiene_historial
+                    FROM JUGADORES j WITH (UPDLOCK, HOLDLOCK)
+                    WHERE j.PK_id_jugador = @idJugador;";
 
-            const string query = @"
-                UPDATE JUGADORES
-                SET fecha_baja = CASE
-                        WHEN fecha_alta > CAST(SYSDATETIMEOFFSET() AT TIME ZONE 'Argentina Standard Time' AS DATE) THEN fecha_alta
-                        ELSE CAST(SYSDATETIMEOFFSET() AT TIME ZONE 'Argentina Standard Time' AS DATE) END
-                WHERE PK_id_jugador = @idJugador AND fecha_baja IS NULL;
+                int idPersona;
+                bool tieneHistorial;
+                using (var cmdEstado = new SqlCommand(queryEstado, connection, transaction))
+                {
+                    cmdEstado.Parameters.AddWithValue("@idJugador", idJugador);
+                    using var reader = await cmdEstado.ExecuteReaderAsync();
+                    if (!await reader.ReadAsync())
+                    {
+                        return ResultadoBajaJugador.NoEncontrado;
+                    }
+                    idPersona = reader.GetInt32(0);
+                    tieneHistorial = reader.GetInt32(1) == 1;
+                }
 
-                SELECT CASE WHEN EXISTS (SELECT 1 FROM JUGADORES WHERE PK_id_jugador = @idJugador) THEN 1 ELSE 0 END;";
+                if (tieneHistorial)
+                {
+                    const string queryBaja = @"
+                        UPDATE JUGADORES
+                        SET fecha_baja = CASE
+                                WHEN fecha_alta > CAST(SYSDATETIMEOFFSET() AT TIME ZONE 'Argentina Standard Time' AS DATE) THEN fecha_alta
+                                ELSE CAST(SYSDATETIMEOFFSET() AT TIME ZONE 'Argentina Standard Time' AS DATE) END
+                        WHERE PK_id_jugador = @idJugador AND fecha_baja IS NULL;";
+                    using var cmdBaja = new SqlCommand(queryBaja, connection, transaction);
+                    cmdBaja.Parameters.AddWithValue("@idJugador", idJugador);
+                    await cmdBaja.ExecuteNonQueryAsync();
+                    await transaction.CommitAsync();
+                    return ResultadoBajaJugador.DadoDeBaja;
+                }
 
-            using var command = new SqlCommand(query, connection);
-            command.Parameters.AddWithValue("@idJugador", idJugador);
-            return Convert.ToInt32(await command.ExecuteScalarAsync()) == 1;
+                const string queryEliminar = @"
+                    DELETE FROM PAGOS WHERE FK_id_jugador = @idJugador AND estado = 0;
+                    DELETE FROM JUGADORES_RESPONSABLES WHERE FK_id_jugador = @idJugador;
+                    DELETE FROM JUGADORES_CATEGORIAS WHERE FK_id_jugador = @idJugador;
+                    DELETE FROM JUGADORES_PERIODOS WHERE FK_id_jugador = @idJugador;
+                    DELETE FROM FICHAS_MEDICAS WHERE FK_id_jugador = @idJugador;
+                    DELETE FROM JUGADORES WHERE PK_id_jugador = @idJugador;
+
+                    IF NOT EXISTS (SELECT 1 FROM JUGADORES WHERE FK_id_persona = @idPersona)
+                       AND NOT EXISTS (SELECT 1 FROM RESPONSABLES WHERE FK_id_persona = @idPersona)
+                       AND NOT EXISTS (SELECT 1 FROM USUARIOS WHERE FK_id_persona = @idPersona)
+                       AND NOT EXISTS (SELECT 1 FROM ASISTENCIAS WHERE FK_id_persona = @idPersona)
+                    BEGIN
+                        DELETE FROM CREDENCIALES_QR WHERE FK_id_persona = @idPersona;
+                        DELETE FROM PERSONAS WHERE PK_id_persona = @idPersona;
+                    END;";
+                using var cmdEliminar = new SqlCommand(queryEliminar, connection, transaction);
+                cmdEliminar.Parameters.AddWithValue("@idJugador", idJugador);
+                cmdEliminar.Parameters.AddWithValue("@idPersona", idPersona);
+                await cmdEliminar.ExecuteNonQueryAsync();
+                await transaction.CommitAsync();
+                return ResultadoBajaJugador.Eliminado;
+            }
+            catch
+            {
+                await transaction.RollbackAsync();
+                throw;
+            }
         }
 
         public async Task<TutorDetalle?> BuscarTutorPorDniAsync(string dni)
