@@ -3,3 +3,4 @@
 @media(min-width:768px) and (max-width:1439px){.qr-page{grid-template-columns:1fr 1fr;max-width:900px}.result-card{grid-column:1/-1;max-width:380px;margin:auto;width:100%}}
 @media(min-width:1440px){.qr-page{grid-template-columns:1fr 1fr;max-width:1000px}.result-card{grid-column:1/-1;max-width:400px;margin:auto;width:100%}}
 @media(prefers-reduced-motion:reduce){*{transition:none;animation:none}}
+.scan-guide{position:absolute;width:64%;aspect-ratio:1;border:3px solid #fff;border-radius:16px;box-shadow:0 0 0 999px #0005}.scan-guide::before,.scan-guide::after{content:'';position:absolute;inset:-3px;border:3px solid transparent;border-top-color:#18d979;border-bottom-color:#18d979;border-radius:16px}.torch{min-height:42px;margin-top:12px;padding:8px 14px;color:#087f40;background:#fff;border:1px solid #087f40;border-radius:7px;font-weight:700}.torch.active{color:#fff;background:#087f40}

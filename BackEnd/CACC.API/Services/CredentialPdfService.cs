@@ -25,7 +25,6 @@ public sealed class CredentialPdfService : ICredentialPdfService
     private const float CardWidthMm = 85.60f;
     private const float CardHeightMm = 53.98f;
     private readonly byte[] _officialLogo;
-    private readonly byte[] _photoPlaceholder;
 
     public CredentialPdfService(string assetsDirectory)
     {
@@ -33,7 +32,6 @@ public sealed class CredentialPdfService : ICredentialPdfService
         // Exact, unmodified institutional asset supplied by the project owner.
         // QuestPDF only controls its physical placement; the PNG bytes remain untouched.
         _officialLogo = File.ReadAllBytes(Path.Combine(assetsDirectory, "cacc-logo-official.png"));
-        _photoPlaceholder = File.ReadAllBytes(Path.Combine(assetsDirectory, "player-photo-placeholder.png"));
         QuestPDF.Settings.License = LicenseType.Community;
     }
 
@@ -44,7 +42,6 @@ public sealed class CredentialPdfService : ICredentialPdfService
 
         var displayName = $"{data.FirstName} {data.LastName}".Trim().ToUpperInvariant();
         var displayDni = FormatDni(data.Dni);
-        var photo = data.PlayerPhoto is { Length: > 0 } ? data.PlayerPhoto : _photoPlaceholder;
 
         var document = Document.Create(container =>
         {
@@ -53,35 +50,32 @@ public sealed class CredentialPdfService : ICredentialPdfService
                 ConfigureCard(page);
                 page.Content().Column(card =>
                 {
-                    card.Item().Height(16.1f, Unit.Millimetre)
-                        .Background("#EAF4F0")
-                        .PaddingLeft(4.4f, Unit.Millimetre)
-                        .PaddingRight(4.2f, Unit.Millimetre)
-                        .Row(header =>
+                    card.Item().Height(15.7f, Unit.Millimetre)
+                        .Background("#E6F1ED")
+                        .PaddingHorizontal(4.5f, Unit.Millimetre)
+                        .AlignMiddle()
+                        .Column(header =>
                         {
-                            header.RelativeItem().AlignMiddle().Column(text =>
-                            {
-                                text.Item().Text(displayName)
-                                    .FontFamily(Fonts.Arial).Bold().FontSize(12.5f).FontColor(Colors.Black);
-                                text.Item().Text($"DNI: {displayDni}")
-                                    .FontFamily(Fonts.Arial).FontSize(13).FontColor("#5D5D5D");
-                            });
-                            header.ConstantItem(14.5f, Unit.Millimetre)
-                                .PaddingVertical(1.7f, Unit.Millimetre)
-                                .Image(_officialLogo).FitArea();
+                            header.Spacing(0);
+                            header.Item().Text(displayName)
+                                .FontFamily(Fonts.Arial).Bold().FontSize(12.5f).FontColor(Colors.Black);
+                            header.Item().Text($"DNI: {displayDni}")
+                                .FontFamily(Fonts.Arial).FontSize(13).FontColor("#5D5D5D");
                         });
 
-                    card.Item().Height(CardHeightMm - 16.1f, Unit.Millimetre)
-                        .PaddingHorizontal(4.8f, Unit.Millimetre)
-                        .PaddingVertical(2.9f, Unit.Millimetre)
+                    card.Item().Height(CardHeightMm - 15.7f, Unit.Millimetre)
+                        .PaddingLeft(6.2f, Unit.Millimetre)
+                        .PaddingRight(4.1f, Unit.Millimetre)
+                        .PaddingVertical(2.8f, Unit.Millimetre)
                         .Row(body =>
                         {
-                            body.ConstantItem(30.4f, Unit.Millimetre)
-                                .AlignMiddle().Image(photo).FitArea();
-                            body.RelativeItem().PaddingLeft(9.8f, Unit.Millimetre)
+                            body.ConstantItem(31.5f, Unit.Millimetre)
                                 .AlignCenter().AlignMiddle()
-                                .Width(31.5f, Unit.Millimetre)
-                                .Height(31.5f, Unit.Millimetre)
+                                .Image(_officialLogo).FitArea();
+                            body.RelativeItem()
+                                .AlignRight().AlignMiddle()
+                                .Width(32.5f, Unit.Millimetre)
+                                .Height(32.5f, Unit.Millimetre)
                                 .Image(data.QrPng).FitArea();
                         });
                 });

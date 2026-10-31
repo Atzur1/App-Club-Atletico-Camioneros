@@ -19,7 +19,7 @@
           <svg *ngSwitchCase="'home'" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path><polyline points="9 22 9 12 15 12 15 22"></polyline></svg>
           <svg *ngSwitchCase="'group'" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M23 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg>
           <svg *ngSwitchCase="'badge'" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><rect x="2" y="7" width="20" height="14" rx="2" ry="2"></rect><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"></path></svg>
-          <svg *ngSwitchCase="'category'" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><circle cx="12" cy="5" r="3"></circle><circle cx="5" cy="19" r="3"></circle><circle cx="19" cy="19" r="3"></circle><line x1="8.5" y1="16.5" x2="10.5" y2="7.5"></line><line x1="15.5" y1="16.5" x2="13.5" y2="7.5"></line></svg>
+          <span *ngSwitchCase="'category'" class="cacc-icon cacc-icon-category" aria-hidden="true"></span>
         </span>
         <span class="nav-label">{{ item.label }}</span>
       </a>
@@ -58,7 +58,7 @@
         <!-- Perfil con Menú Desplegable Flotante -->
         <div class="admin-profile" (click)="toggleMenuUsuario($event)">
           <div class="profile-avatar">
-            <svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 3c1.66 0 3 1.34 3 3s-1.34 3-3 3-3-1.34-3-3 1.34-3 3-3zm0 14.2c-2.5 0-4.71-1.28-6-3.22.03-1.99 4-3.08 6-3.08 1.99 0 5.97 1.09 6 3.08-1.29 1.94-3.5 3.22-6 3.22z" /></svg>
+            <span width="22" height="22" viewBox="0 0 24 24" fill="currentColor" class="cacc-icon cacc-icon-profile"></span>
           </div>
           <div class="profile-info">
             <span class="profile-name">{{ usuarioActual.nombre }}</span>
@@ -93,7 +93,8 @@
               <svg *ngIf="card.type === 'categorias'" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#007A3D" stroke-width="2.5"><path d="M4 15s1-1 4-1 5 2 8 2 4-1 4-1V3s-1 1-4 1-5-2-8-2-4 1-4 1z"></path><line x1="4" y1="22" x2="4" y2="15"></line></svg>
               <svg *ngIf="card.type === 'cuotas'" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#007A3D" stroke-width="2.5"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline></svg>
             </div>
-            <span class="kpi-title">{{ card.title }}</span>
+            <span class="kpi-title kpi-title-desktop">{{ card.title }}</span>
+            <span class="kpi-title kpi-title-mobile">{{ card.shortTitle }}</span>
           </div>
           <div class="kpi-value">{{ card.value }}</div>
           <div class="kpi-decor-shape"></div>
@@ -145,6 +146,7 @@
                 <th class="th-nombre">Nombre Completo</th>
                 <th class="th-dni">DNI</th>
                 <th class="th-categoria">Categoría</th>
+                <th class="th-posicion">Posición</th>
                 <th class="th-nacimiento">F. Nacimiento</th>
                 <th class="th-estado">Estado Cuota</th>
                 <th class="th-acciones">Acciones</th>
@@ -166,6 +168,7 @@
                     </span>
                   </div>
                 </td>
+                <td class="col-posicion"><span class="badge-posicion">{{ p.posicion }}</span></td>
                 <td class="col-nacimiento">{{ p.fechaNacimiento }}</td>
                 <td class="col-estado">
                   <span class="badge-status" [ngClass]="getBadgeClass(p.estadoCuota)">
@@ -179,12 +182,7 @@
                           class="btn-action-tutor"
                           (click)="verTutor(p)"
                           title="Ver datos del tutor responsable">
-                    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
-                      <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
-                      <circle cx="9" cy="7" r="4"></circle>
-                      <path d="M23 21v-2a4 4 0 0 0-3-3.87"></path>
-                      <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
-                    </svg>
+                    <span width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" class="cacc-icon cacc-icon-tutor"></span>
                     <span>Ver tutor</span>
                   </button>
 
@@ -194,11 +192,7 @@
                             class="btn-action-tutor btn-tutor-disabled"
                             disabled
                             title="Este jugador no tiene tutor registrado">
-                      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
-                        <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
-                        <circle cx="9" cy="7" r="4"></circle>
-                        <line x1="2" y1="2" x2="22" y2="22"></line>
-                      </svg>
+                      <span width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" class="cacc-icon cacc-icon-tutor"></span>
                       <span>Ver tutor</span>
                     </button>
                     <span class="no-tutor-badge">Sin tutor asignado</span>
@@ -207,7 +201,7 @@
               </tr>
 
               <tr *ngIf="filteredPlayers.length === 0">
-                <td colspan="7" class="no-records">
+                <td colspan="8" class="no-records">
                   No se encontraron jugadores que coincidan con los criterios de búsqueda.
                 </td>
               </tr>
@@ -223,12 +217,7 @@
     <div class="popup-card" (click)="$event.stopPropagation()">
       <div class="popup-card-header">
         <div class="popup-header-title-box">
-          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#007A3D" stroke-width="2.2">
-            <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
-            <circle cx="9" cy="7" r="4"></circle>
-            <path d="M23 21v-2a4 4 0 0 0-3-3.87"></path>
-            <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
-          </svg>
+          <span width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#007A3D" stroke-width="2.2" class="cacc-icon cacc-icon-tutor"></span>
           <h2 class="popup-card-title">Tutor Responsable</h2>
         </div>
         <button type="button" class="btn-close-popup" (click)="cerrarModalTutor()">✕</button>
@@ -269,4 +258,9 @@
     </div>
   </div>
 </div>
+
+
+
+
+
 

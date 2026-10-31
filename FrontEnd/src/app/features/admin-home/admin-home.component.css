@@ -346,6 +346,10 @@
   color: #475569;
 }
 
+.kpi-title-mobile {
+  display: none;
+}
+
 .kpi-value {
   font-size: 32px;
   font-weight: 800;
@@ -812,25 +816,35 @@
 }
 
 .kpi-cards-grid {
-  gap: 12px;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 8px;
 }
 
 .kpi-card {
-  min-height: 104px;
-  padding: 16px 18px;
+  min-width: 0;
+  min-height: 92px;
+  padding: 12px;
   border: 0;
   border-radius: 16px;
-  box-shadow: 0 4px 14px rgba(15, 23, 42, 0.08);
+  background: #fff;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+  position: relative;
+  overflow: hidden;
   display: flex;
   flex-direction: column;
   justify-content: center;
+  isolation: isolate;
+}
+
+.kpi-card:nth-child(n+3) {
+  display: flex;
 }
 
 .kpi-card-header {
   position: relative;
   z-index: 2;
-  gap: 10px;
-  margin-bottom: 6px;
+  gap: 6px;
+  margin-bottom: 8px;
 }
 
 .kpi-icon-box {
@@ -843,8 +857,18 @@
   position: relative;
   z-index: 2;
   color: #334155;
-  font-size: 14px;
+  min-width: 0;
+  font-size: 11px;
   font-weight: 700;
+  line-height: 1.1;
+}
+
+.kpi-title-desktop {
+  display: none;
+}
+
+.kpi-title-mobile {
+  display: inline;
 }
 
 .kpi-value {
@@ -852,7 +876,7 @@
   z-index: 2;
   margin: 0;
   color: #0f172a;
-  font-size: 30px;
+  font-size: 25px;
   font-weight: 800;
   line-height: 1;
   letter-spacing: -0.02em;
@@ -860,13 +884,15 @@
 
 .kpi-decor-shape {
   display: block;
+  position: absolute;
   right: 0;
   bottom: 0;
-  width: 88px;
+  width: 54px;
   height: 100%;
-  border-top-left-radius: 78px;
+  border-top-left-radius: 54px;
   background: #98e4b8;
   opacity: 0.45;
+  z-index: 0;
 }
 }
 @media (min-width: 768px) and (max-width: 1439px) {
@@ -878,4 +904,26 @@
 :host {
 --viewport-tier: desktop;
 }
+}
+
+@media (max-width: 767px) {
+  .cacc-table tr {
+    grid-template-columns: 44px minmax(0, 1fr) auto;
+    padding: 14px 16px;
+  }
+
+  .cacc-table td:first-child {
+    display: block;
+    grid-column: 1;
+    grid-row: 1 / span 4;
+    align-self: start;
+  }
+
+  .cacc-table .col-nombre { grid-column: 2; grid-row: 1; font-size: 15px; }
+  .cacc-table .col-estado { grid-column: 3; grid-row: 1; align-self: start; }
+  .cacc-table .col-dni { grid-column: 2; grid-row: 2; }
+  .cacc-table .col-posicion { grid-column: 3; grid-row: 2; justify-self: end; }
+  .cacc-table .col-categoria { grid-column: 2; grid-row: 3; }
+  .cacc-table .col-nacimiento { grid-column: 3; grid-row: 3; justify-self: end; }
+  .cacc-table .col-acciones { grid-column: 2 / 4; grid-row: 4; margin-top: 8px; }
 }

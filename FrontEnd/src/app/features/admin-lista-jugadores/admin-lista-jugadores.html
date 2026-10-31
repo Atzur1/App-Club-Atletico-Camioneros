@@ -109,7 +109,7 @@
                     </button>
                     <!-- Agregar / Editar Tutor -->
                     <button *ngIf="canEditPlayers" type="button" class="action-btn tutor-btn" (click)="abrirModalTutor(p)" [title]="p.tutor ? 'Editar Tutor Responsable' : 'Asignar Tutor Responsable'">
-                      <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="#D97706" stroke-width="2.2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M23 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg>
+                      <span width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="#D97706" stroke-width="2.2" class="cacc-icon cacc-icon-tutor"></span>
                     </button>
                     <!-- Eliminar Jugador -->
                     <button *ngIf="canEditPlayers" type="button" class="action-btn delete-btn" (click)="abrirModalEliminar(p)" title="Eliminar Jugador">
@@ -163,12 +163,7 @@
     <div class="popup-card" (click)="$event.stopPropagation()">
       <div class="popup-card-header">
         <div class="popup-header-title-box">
-          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#007A3D" stroke-width="2.2">
-            <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
-            <circle cx="9" cy="7" r="4"></circle>
-            <path d="M23 21v-2a4 4 0 0 0-3-3.87"></path>
-            <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
-          </svg>
+          <span width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#007A3D" stroke-width="2.2" class="cacc-icon cacc-icon-tutor"></span>
           <h2 class="popup-card-title">{{ jugadorTutor?.tutor ? 'Editar Tutor Responsable' : 'Asignar Nuevo Tutor' }}</h2>
         </div>
         <button type="button" class="btn-close-popup" (click)="cancelarTutor()">✕</button>
@@ -250,4 +245,7 @@
       </div>
     </div>
   </div>
+
+
+
 
