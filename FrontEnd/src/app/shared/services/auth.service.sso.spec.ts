@@ -55,9 +55,9 @@ describe('AuthService con la sesión del Portal Administrativo', () => {
     expect(service.iniciarSesionConToken('esto no es un token')).toBeFalse();
   });
 
-  it('si el rol guardado falta, lo toma del token aunque traiga varios', () => {
+  it('si el rol guardado falta, lo toma del token aunque traiga varios, y prefiere el nombre al id', () => {
     service.iniciarSesionConToken(token({ [ROL]: ['1', 'Administrador (Tesorero)'], exp: enUnaHora }));
     localStorage.removeItem('user_rol');
-    expect(service.getRol()).toBe('1');
+    expect(service.getRol()).toBe('Administrador (Tesorero)');
   });
 });

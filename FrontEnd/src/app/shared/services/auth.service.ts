@@ -63,6 +63,16 @@ export class AuthService {
   getRol(): string | null {
     const rolLocal = this.storage?.getItem('user_rol');
     if (rolLocal && rolLocal !== 'undefined' && rolLocal !== 'null') {
+      // Una sesion guardada con el id del rol ("1") se corrige con el nombre que trae el mismo token.
+      if (/^\d+$/.test(rolLocal.trim())) {
+        const token = this.getToken();
+        if (token) {
+          try {
+            const rolDelToken = this.elegirRol(this.decodeTokenPayload(token));
+            if (rolDelToken) return rolDelToken;
+          } catch { /* se usa el valor guardado */ }
+        }
+      }
       return rolLocal;
     }
 
@@ -153,7 +163,10 @@ export class AuthService {
   private elegirRol(payload: Record<string, any>): string | null {
     const crudo = payload['http://schemas.microsoft.com/ws/2008/06/identity/claims/role'] ?? payload['role'] ?? payload['rol'];
     const candidatos: unknown[] = Array.isArray(crudo) ? crudo : [crudo];
-    return candidatos.find((r): r is string => typeof r === 'string' && normalizeRole(r) !== null) ?? null;
+    const validos = candidatos.filter((r): r is string => typeof r === 'string' && normalizeRole(r) !== null);
+    // El token del login unico trae el id del rol ("1") y su nombre ("Administrador (Tesorero)"): se prefiere el nombre,
+    // que es lo que comparan y muestran las pantallas (boton de Seleccion de Portales, menu Staff, nombre en la barra).
+    return validos.find((r) => !/^\d+$/.test(r.trim())) ?? validos[0] ?? null;
   }
 
   private decodeTokenPayload(token: string): Record<string, any> {
